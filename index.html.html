@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FVL FORB LABORATORY</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
+    </script>
+    <style>
+        :root {
+            --bg: #0a0f14;
+            --surface: #0f161c;
+            --surface2: #131c24;
+            --border: #1e2d3a;
+            --text: #e8edf2;
+            --text2: #8a9ba8;
+            --accent: #3b7c9c;
+            --accent2: #4d9fc0;
+            --danger: #b53b3b;
+            --success: #2d7a4f;
+            --info: #2b6f9c;
+            --warning: #b8860b;
+            --radius: 10px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --transition: 0.25s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            background-image: radial-gradient(ellipse at 20% 20%, #1a2c38 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, #0a0f14 0%, transparent 60%);
+        }
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 2px 25px rgba(0, 0, 0, 0.4);
+        }
+        .logo {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #5ba4c4, #2d6d8a, #1e4f66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+        }
+        .logo span {
+            background: var(--accent);
+            -webkit-text-fill-color: #ffffff;
+            background-clip: text;
+            font-weight: 900;
+            font-size: 2.2rem;
+        }
+        nav { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+        nav button, nav a {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1.1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            white-space: nowrap;
+            letter-spacing: 0.4px;
+        }
+        nav button:hover, nav a:hover {
+            background: var(--border);
+            border-color: var(--accent);
+            color: #c0e0f0;
+        }
+        .cart-badge {
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 4px;
+            vertical-align: top;
+        }
+        main { max-width: 1300px; margin: 2rem auto; padding: 0 1.5rem; }
+        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent2);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        h3 { color: var(--accent2); margin-bottom: 1rem; font-size: 1.2rem; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.5rem; }
+        .product-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 16px 40px rgba(59, 124, 156, 0.2);
+        }
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: var(--surface2);
+            padding: 0.5rem;
+        }
+        .product-card .name { font-weight: 700; font-size: 0.95rem; min-height: 2.4rem; color: #fff; }
+        .product-card .price { font-size: 1.4rem; font-weight: 800; color: var(--accent2); letter-spacing: -0.5px; }
+        .product-card .brand-tag {
+            font-size: 0.65rem;
+            background: var(--surface2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            display: inline-block;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .qty-input {
+            width: 55px;
+            padding: 0.4rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+        }
+        .btn:hover { background: #4d9fc0; transform: scale(1.03); }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: var(--accent); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #d44; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #3d8b5f; }
+        .btn-info { background: var(--info); color: white; }
+        .btn-info:hover { background: #3a8ab5; }
+        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--text2);
+            font-size: 0.8rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 124, 156, 0.25);
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        .whatsapp-link {
+            color: #25d366;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .whatsapp-link:hover { text-decoration: underline; }
+        .search-box {
+            width: 100%;
+            padding: 0.7rem 1.2rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 124, 156, 0.25);
+        }
+        .status-badge {
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .status-pendente { background: #b8860b20; color: #d4a017; border: 1px solid #b8860b40; }
+        .status-finalizado { background: #2d7a4f20; color: #2ecc71; border: 1px solid #2d7a4f40; }
+        .toggle-brand {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--accent2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .toggle-brand.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .brand-filters { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1.5rem; }
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface2);
+            margin-bottom: 0.5rem;
+        }
+        .client-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+        .client-card:hover { border-color: var(--accent); }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(4px);
+        }
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            header { padding: 1rem; flex-direction: column; text-align: center; }
+            nav { justify-content: center; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .modal { padding: 1.5rem; }
+        }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text2); }
+        .hidden { display: none !important; }
+        .flex-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { justify-content: space-between; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="showSection('catalogo')">
+            <span>FVL</span> FORB <span style="font-size:1rem; -webkit-text-fill-color: var(--text2);">LABORATORY</span>
+        </div>
+        <nav>
+            <button onclick="showSection('catalogo')" id="nav-catalogo">🏪 Produtos</button>
+            <button onclick="showSection('carrinho')" id="nav-carrinho">🛒 Carrinho <span class="cart-badge" id="cart-count">0</span></button>
+            <button onclick="showSection('login')" id="nav-login">👤 Entrar / Cadastro</button>
+            <button onclick="showSection('admin')" id="nav-admin" style="display:none;">📊 Dashboard</button>
+            <button onclick="showSection('gerenciarClientes')" id="nav-clientes" style="display:none;">👥 Clientes</button>
+            <button onclick="showSection('gerenciarProdutos')" id="nav-gerenciar" style="display:none;">🖼️ Produtos</button>
+            <button onclick="logout()" id="nav-logout" style="display:none;">🚪 Sair</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- CATÁLOGO -->
+        <section id="catalogo" class="section active">
+            <h2>🏪 Catálogo de Produtos</h2>
+            <input type="text" class="search-box" placeholder="🔍 Buscar por nome..." id="searchInput" oninput="renderCatalogo()">
+            <div class="brand-filters" id="brandFilters"></div>
+            <div id="catalogoContainer" class="product-grid"></div>
+        </section>
+
+        <!-- CARRINHO -->
+        <section id="carrinho" class="section">
+            <h2>🛒 Seu Carrinho</h2>
+            <div id="carrinhoContainer"></div>
+            <div id="carrinhoResumo" class="hidden">
+                <div class="card">
+                    <h3>Resumo do Pedido</h3>
+                    <p><strong>Total de itens:</strong> <span id="resumoItens">0</span></p>
+                    <p><strong>Valor Total:</strong> <span id="resumoTotal" style="font-size:1.5rem;color:var(--accent2);">R$ 0,00</span></p>
+                    <button class="btn" onclick="finalizarPedido()" id="btnFinalizar" disabled>✅ Finalizar Compra</button>
+                    <p id="msgLoginNeeded" style="color:#e74c3c;margin-top:0.5rem;">⚠️ Faça login para finalizar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOGIN CLIENTE -->
+        <section id="login" class="section">
+            <h2>👤 Acesso do Cliente</h2>
+            <div class="card" style="max-width:500px;margin:0 auto;">
+                <div id="loginForm">
+                    <h3>Entrar</h3>
+                    <div class="form-group"><label>CPF (apenas números)</label><input type="text" id="loginCpf" placeholder="000.000.000-00"></div>
+                    <button class="btn" onclick="loginCliente()">Entrar</button>
+                    <p style="margin-top:1rem;">Não tem conta? <a href="#" onclick="toggleCadastro()" style="color:var(--accent2);">Cadastre-se</a></p>
+                </div>
+                <div id="cadastroForm" class="hidden">
+                    <h3>Cadastro</h3>
+                    <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
+                    <div class="form-group"><label>CPF (apenas números)</label><input type="text" id="cadCpf"></div>
+                    <div class="form-group"><label>Endereço Completo</label><input type="text" id="cadEndereco"></div>
+                    <div class="form-group"><label>WhatsApp (com DDD)</label><input type="text" id="cadContato" placeholder="93 99138-1813"></div>
+                    <button class="btn" onclick="cadastrarCliente()">Cadastrar</button>
+                    <p style="margin-top:1rem;">Já tem conta? <a href="#" onclick="toggleCadastro()" style="color:var(--accent2);">Entrar</a></p>
+                </div>
+            </div>
+            <div class="card" style="max-width:500px;margin:1rem auto;background:var(--surface2);border-left:4px solid var(--accent);">
+                <p style="font-size:0.85rem;color:var(--text2);">🔐 <strong>Admin?</strong> Use suas credenciais no botão abaixo.</p>
+                <button class="btn btn-outline" onclick="showAdminLogin()">Acessar Painel Admin</button>
+            </div>
+        </section>
+
+        <!-- ADMIN DASHBOARD -->
+        <section id="admin" class="section">
+            <h2>📊 Painel Administrativo</h2>
+            <div id="adminLoginForm" class="card" style="max-width:400px;margin:2rem auto;">
+                <h3>Login Admin</h3>
+                <div class="form-group"><label>Login</label><input type="text" id="adminUser"></div>
+                <div class="form-group"><label>Senha</label><input type="password" id="adminPass"></div>
+                <button class="btn" onclick="loginAdmin()">Entrar</button>
+            </div>
+            <div id="adminContent" class="hidden">
+                <div class="flex-row flex-between mb-2">
+                    <h2>📋 Pedidos</h2>
+                    <div>
+                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('todos')">Todos</button>
+                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('pendente')" style="color:#d4a017;">Pendentes</button>
+                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('finalizado')" style="color:#2ecc71;">Finalizados</button>
+                    </div>
+                </div>
+                <div id="adminPedidosContainer"></div>
+            </div>
+        </section>
+
+        <!-- GERENCIAR CLIENTES (ADMIN) -->
+        <section id="gerenciarClientes" class="section">
+            <h2>👥 Gerenciar Clientes</h2>
+            <div id="clientesContainer"></div>
+        </section>
+
+        <!-- GERENCIAR PRODUTOS (ADMIN) -->
+        <section id="gerenciarProdutos" class="section">
+            <h2>🖼️ Gerenciar Imagens dos Produtos</h2>
+            <div id="gerenciarContainer" class="admin-product-list"></div>
+        </section>
+
+        <!-- MODAL EDITAR CLIENTE -->
+        <div id="modalEditarCliente" class="modal-overlay hidden">
+            <div class="modal">
+                <h3>✏️ Editar Cliente</h3>
+                <div class="form-group"><label>Nome Completo</label><input type="text" id="editNome"></div>
+                <div class="form-group"><label>CPF</label><input type="text" id="editCpf" readonly style="opacity:0.7;"></div>
+                <div class="form-group"><label>Endereço Completo</label><input type="text" id="editEndereco"></div>
+                <div class="form-group"><label>WhatsApp</label><input type="text" id="editContato"></div>
+                <input type="hidden" id="editClienteId">
+                <div class="flex-row flex-between mt-2">
+                    <button class="btn btn-danger btn-sm" onclick="fecharModal()">Cancelar</button>
+                    <button class="btn btn-success btn-sm" onclick="salvarEdicaoCliente()">💾 Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ============ FIREBASE CONFIG ============
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMXzy9rvOg_OiosG-j83nxGdEEcBwMfeo",
+            authDomain: "fort-laboratory.firebaseapp.com",
+            projectId: "fort-laboratory",
+            storageBucket: "fort-laboratory.firebasestorage.app",
+            messagingSenderId: "368236792295",
+            appId: "1:368236792295:web:a131e20afe77187cf09542"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ============ DADOS INICIAIS ============
+        const produtos = [
+            { id: 1, nome: 'Testenat 250 mg 4 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Testenat' },
+            { id: 2, nome: 'Deca 5 ml 200 mg', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Deca' },
+            { id: 3, nome: 'Depo Lander 3 x 2 ml 6 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Depo' },
+            { id: 4, nome: 'Dura Lander 1 ml 250 Mg', preco: 50, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Dura' },
+            { id: 5, nome: 'Stanozolol 30 ml aquoso 50 Mg', preco: 175, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Stano' },
+            { id: 6, nome: 'Stanozolol 15 ml aquoso 50 Mg', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Stano15' },
+            { id: 7, nome: 'Primobolan 100 mg 10 ml', preco: 410, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Primo' },
+            { id: 8, nome: 'Propionato 100 mg 10 ml', preco: 175, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Prop' },
+            { id: 9, nome: 'Oxandrolona 10 mg 50 compr', preco: 310, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan10' },
+            { id: 10, nome: 'Oxandrolona 5 mg 100 compr', preco: 300, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan5' },
+            { id: 11, nome: 'Stanozolol 10 Mg 100 compr', preco: 135, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=StanoC' },
+            { id: 12, nome: 'Diana compr 10 Mg 100 compr', preco: 135, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Diana' },
+            { id: 13, nome: 'Hemog lander 50 mg 20 comp', preco: 135, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Hemog' },
+            { id: 14, nome: 'Clembuterol oral', preco: 150, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Clemb' },
+            { id: 15, nome: 'Masteron oral', preco: 250, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=MastOral' },
+            { id: 16, nome: 'Proviron 20comp/25mg', preco: 160, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Prov' },
+            { id: 17, nome: 'Deca nandrolona 200 mg 10ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=DecaGold' },
+            { id: 18, nome: 'Boldenona 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=BoldGold' },
+            { id: 19, nome: 'Masteron 100 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=MastGold' },
+            { id: 20, nome: 'Npp 100 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=NppGold' },
+            { id: 21, nome: 'Enantato 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=EnantGold' },
+            { id: 22, nome: 'Durateston 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=DuraGold' },
+            { id: 23, nome: 'Trembo acetato 100 Mg 10 ml', preco: 240, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremA' },
+            { id: 24, nome: 'Trembo enantato 200 mg 10 ml', preco: 220, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremE' },
+            { id: 25, nome: 'Trembo hexahydro 51 mg 10 ml', preco: 300, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremH' },
+            { id: 26, nome: 'Sales de Trembo 200 mg 10 ml', preco: 330, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=SalesTrem' },
+            { id: 27, nome: 'Deca nandrolona 200 mg 10ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DecaMP' },
+            { id: 28, nome: 'Boldenona 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=BoldMP' },
+            { id: 29, nome: 'Masteron 100 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=MastMP' },
+            { id: 30, nome: 'Npp 100 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=NppMP' },
+            { id: 31, nome: 'Enantato 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantMP' },
+            { id: 32, nome: 'Durateston 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DuraMP' },
+            { id: 33, nome: 'Trembo acetato 100 Mg 10 ml', preco: 180, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremAMP' },
+            { id: 34, nome: 'Trembo enantato 200 mg 10 ml', preco: 200, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremEMP' },
+            { id: 35, nome: 'Trembo hexahydro 51 mg 10 ml', preco: 300, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremHMP' },
+            { id: 36, nome: 'Sales de Trembo 200 mg 10 ml', preco: 300, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=SalesTremMP' },
+            { id: 37, nome: 'Oxan 5,10mg', preco: 250, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=OxanMP' },
+            { id: 38, nome: 'Stano oral', preco: 140, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=StanoMP' },
+            { id: 39, nome: 'Hemogenin', preco: 140, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=HemoMP' },
+            { id: 40, nome: 'Diana', preco: 140, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DianaMP' },
+            { id: 41, nome: 'Turinabol', preco: 190, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TuriMP' },
+            { id: 42, nome: 'Proviron 40caps/25mg', preco: 150, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=ProvMP' },
+            { id: 43, nome: 'Cutstack', preco: 200, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=CutMP' },
+            { id: 44, nome: 'Primobolan', preco: 380, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoMP' },
+            { id: 45, nome: 'Primo muscle black 5ML', preco: 250, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoBlack' },
+            { id: 46, nome: 'Enantato muscle black 5ML', preco: 200, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantBlack' },
+            { id: 47, nome: 'Boldenona 300 mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=BoldKing' },
+            { id: 48, nome: 'Propionato 200mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=PropKing' },
+            { id: 49, nome: 'Deca 300mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=DecaKing' },
+            { id: 50, nome: 'Primobolan 100mg 10ml', preco: 350, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=PrimoKing' },
+            { id: 51, nome: 'Testex 200mg 10ml(cipionato)', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Testex' },
+            { id: 52, nome: 'Nebido', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Nebido' },
+            { id: 53, nome: 'Stanozolol 30 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Stano30' },
+            { id: 54, nome: 'Stanozolol 15ml', preco: 100, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Stano15K' },
+            { id: 55, nome: 'Testoviron 250mg 10ml (enantato)', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Testov' },
+            { id: 56, nome: 'Sustan 250mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Sustan' },
+            { id: 57, nome: 'Masteron 100 mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=MastKing' },
+            { id: 58, nome: 'Npp 100 mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=NppKing' },
+            { id: 59, nome: 'Cutstack 150mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=CutKing' },
+            { id: 60, nome: 'Parabolan 100mg 10ml (Trembo acetato)', preco: 170, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaA' },
+            { id: 61, nome: 'Parabolin blend 200mg 10ml (Trembo blend)', preco: 250, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaBlend' },
+            { id: 62, nome: 'Finaplix 100mg 10 ml (Trembo enantato)', preco: 180, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Fina' },
+            { id: 63, nome: 'Parabolan hexa (Trembo Hexahydro)', preco: 200, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaHexa' },
+            { id: 64, nome: 'Masterom show', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=MastShow' },
+            { id: 65, nome: 'Turinabol', preco: 170, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=TuriKing' },
+            { id: 66, nome: 'Proviron-RX 20caps/25mg', preco: 135, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=ProvRX' },
+            { id: 67, nome: 'Diana compr', preco: 125, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=DianaKC' },
+            { id: 68, nome: 'Stano compr', preco: 125, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=StanoKC' },
+            { id: 69, nome: 'Halotestin', preco: 300, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Halo' },
+            { id: 70, nome: 'Turinabol R$200', preco: 200, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Turi200' },
+            { id: 71, nome: 'Anavar Oxan 50cp 10mg', preco: 200, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Anavar' },
+            { id: 72, nome: 'Anadrol 50comp 50 mg (hemogenin)', preco: 175, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Anadrol' },
+            { id: 73, nome: 'Propionato oral', preco: 175, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=PropOral' },
+            { id: 74, nome: 'Dura Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DuraB' },
+            { id: 75, nome: 'Enantato Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=EnantB' },
+            { id: 76, nome: 'Deca Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DecaB' },
+            { id: 77, nome: 'Masterom Bujão', preco: 160, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=MastB' },
+            { id: 78, nome: 'Trembo ac Bujão', preco: 180, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TremB' },
+            { id: 79, nome: 'Stano injetável', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=StanoB' },
+            { id: 80, nome: 'Primobolan Bujão', preco: 300, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PrimoB' },
+            { id: 81, nome: 'Boldenona Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=BoldB' },
+            { id: 82, nome: 'Cipionato Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=CipB' },
+            { id: 83, nome: 'Propionato bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PropB' },
+            { id: 84, nome: 'B-blend Bujão', preco: 180, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=BBlend' },
+            { id: 85, nome: 'Npp Bujão', preco: 160, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=NppB' },
+            { id: 86, nome: 'Primo ampola', preco: 350, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PrimoAmp' },
+            { id: 87, nome: 'Trembo ac ampola', preco: 240, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TremAmp' },
+            { id: 88, nome: 'Testo enantato ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TestoEnant' },
+            { id: 89, nome: 'Testo Sales ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TestoSales' },
+            { id: 90, nome: 'Deca ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DecaAmp' },
+            { id: 91, nome: 'Masterom ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=MastAmp' },
+            { id: 92, nome: 'Proviron 25caps/25mg', preco: 135, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=ProvB' },
+            { id: 93, nome: 'Stano oral', preco: 110, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=StanoBO' },
+            { id: 94, nome: 'Diana', preco: 110, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DianaB' },
+            { id: 95, nome: 'Oxandrolona', preco: 220, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=OxanB' },
+            { id: 96, nome: 'LIPOSTABIL 5 ampolas de 5 ml', preco: 125, marca: 'QUEIMA DE GORDURA', img: 'https://placehold.co/150x150/2a1e1e/d4af37?text=Lipo' },
+            { id: 97, nome: 'Anastrozol 1mg 30compr', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Anastr' },
+            { id: 98, nome: 'Deposteron de farmácia', preco: 120, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Depost' },
+            { id: 99, nome: 'Durateston aspen 1 ml', preco: 120, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=DuraAsp' },
+            { id: 100, nome: 'Venvanse 30 Mg', preco: 650, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven30' },
+            { id: 101, nome: 'Venvanse 50 Mg', preco: 700, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven50' },
+            { id: 102, nome: 'Venvanse 70 Mg', preco: 750, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven70' },
+            { id: 103, nome: 'Tamoxifeno 20 mg 30 compr', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Tamox' },
+            { id: 104, nome: 'Sibutramina legrand 15mg', preco: 75, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Sibut' },
+            { id: 105, nome: 'Rivotril compr Original', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivOri' },
+            { id: 106, nome: 'Rivotril gotas Original', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGotas' },
+            { id: 107, nome: 'Rivotril compr genérico', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGen' },
+            { id: 108, nome: 'Rivotril gotas genérico', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGenG' },
+            { id: 109, nome: 'Roacutan genérico', preco: 175, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RoacGen' },
+            { id: 110, nome: 'Roacutan original', preco: 380, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RoacOri' },
+            { id: 111, nome: 'Ritalina eas 30 compr', preco: 100, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalEAS' },
+            { id: 112, nome: 'Ritalina genérica 60 compr', preco: 150, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalGen' },
+            { id: 113, nome: 'Ritalina Novartis 30 compr 10 mg', preco: 150, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalNov30' },
+            { id: 114, nome: 'Ritalina Novartis 60 compr 10 mg', preco: 200, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalNov60' },
+            { id: 115, nome: 'Pramil 20 compr 50 Mg', preco: 50, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Pramil' },
+            { id: 116, nome: 'Erectalis tadalafil 20 Mg 20 compr', preco: 50, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Erect' },
+            { id: 117, nome: 'Dualid (anfepramona) original farmácia', preco: 110, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Dualid' },
+            { id: 118, nome: 'Deca aspen original', preco: 70, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=DecaAsp' },
+            { id: 119, nome: 'Tb500 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=TB500', obs: 'Peça a tabela' },
+            { id: 120, nome: 'Frag 176 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Frag176', obs: 'Peça a tabela' },
+            { id: 121, nome: 'Ipamorelim (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Ipa', obs: 'Peça a tabela' },
+            { id: 122, nome: 'Adipodite (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Adipo', obs: 'Peça a tabela' },
+            { id: 123, nome: 'BPC 157 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=BPC157', obs: 'Peça a tabela' },
+            { id: 124, nome: 'Igf1 Lr3 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=IGF1', obs: 'Peça a tabela' },
+            { id: 125, nome: 'SARMs DRAGON elite', preco: 180, marca: 'SARMS', img: 'https://placehold.co/150x150/1e1e2e/d4af37?text=SARMs' },
+        ];
+
+        let carrinho = [];
+        let usuarios = [];
+        let pedidos = [];
+        let clienteLogado = null;
+        let adminLogado = false;
+        let filtroMarca = 'TODAS';
+        let filtroAdminStatus = 'todos';
+        let clienteEditandoId = null;
+
+        // ============ FIREBASE FUNCTIONS ============
+        async function carregarDados() {
+            try {
+                const usuariosSnap = await db.collection('usuarios').get();
+                usuarios = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                const pedidosSnap = await db.collection('pedidos').orderBy('data', 'desc').get();
+                pedidos = pedidosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                const produtosSnap = await db.collection('produtos').get();
+                if (!produtosSnap.empty) {
+                    const firebaseProdutos = produtosSnap.docs.map(doc => doc.data());
+                    firebaseProdutos.forEach(fp => {
+                        const existing = produtos.find(p => p.id === fp.id);
+                        if (existing) existing.img = fp.img;
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+
+        async function salvarUsuario(usuario) {
+            try {
+                await db.collection('usuarios').doc(usuario.id.toString()).set(usuario);
+            } catch (error) {
+                console.error('Erro ao salvar usuário:', error);
+            }
+        }
+
+        async function atualizarUsuario(usuario) {
+            try {
+                await db.collection('usuarios').doc(usuario.id.toString()).update(usuario);
+            } catch (error) {
+                console.error('Erro ao atualizar usuário:', error);
+            }
+        }
+
+        async function salvarPedido(pedido) {
+            try {
+                await db.collection('pedidos').doc(pedido.id.toString()).set(pedido);
+            } catch (error) {
+                console.error('Erro ao salvar pedido:', error);
+            }
+        }
+
+        async function atualizarPedido(pedidoId, dados) {
+            try {
+                await db.collection('pedidos').doc(pedidoId.toString()).update(dados);
+            } catch (error) {
+                console.error('Erro ao atualizar pedido:', error);
+            }
+        }
+
+        async function deletarPedido(pedidoId) {
+            try {
+                await db.collection('pedidos').doc(pedidoId.toString()).delete();
+            } catch (error) {
+                console.error('Erro ao deletar pedido:', error);
+            }
+        }
+
+        async function salvarProdutoImagem(produtoId, imgUrl) {
+            try {
+                await db.collection('produtos').doc(produtoId.toString()).set({ id: produtoId, img: imgUrl });
+            } catch (error) {
+                console.error('Erro ao salvar imagem do produto:', error);
+            }
+        }
+
+        // ============ FUNÇÕES AUXILIARES ============
+        function salvarDadosLocais() {
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            sessionStorage.setItem('clienteLogado', JSON.stringify(clienteLogado));
+            sessionStorage.setItem('adminLogado', JSON.stringify(adminLogado));
+        }
+
+        function atualizarUI() {
+            document.getElementById('cart-count').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
+            const btnFinalizar = document.getElementById('btnFinalizar');
+            const msgLogin = document.getElementById('msgLoginNeeded');
+            if (clienteLogado) { btnFinalizar.disabled = false; msgLogin.style.display = 'none'; }
+            else { btnFinalizar.disabled = true; msgLogin.style.display = 'block'; }
+            document.getElementById('nav-admin').style.display = adminLogado ? 'inline-block' : 'none';
+            document.getElementById('nav-clientes').style.display = adminLogado ? 'inline-block' : 'none';
+            document.getElementById('nav-gerenciar').style.display = adminLogado ? 'inline-block' : 'none';
+            document.getElementById('nav-logout').style.display = (clienteLogado || adminLogado) ? 'inline-block' : 'none';
+            document.getElementById('nav-login').style.display = (clienteLogado || adminLogado) ? 'none' : 'inline-block';
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if (id === 'catalogo') renderCatalogo();
+            if (id === 'carrinho') renderCarrinho();
+            if (id === 'admin') renderAdmin();
+            if (id === 'gerenciarClientes') {
+                if (!adminLogado) { alert('Acesso restrito.'); showSection('login'); return; }
+                renderGerenciarClientes();
+            }
+            if (id === 'gerenciarProdutos') {
+                if (!adminLogado) { alert('Acesso restrito.'); showSection('login'); return; }
+                renderGerenciarProdutos();
+            }
+            atualizarUI();
+        }
+
+        function logout() {
+            clienteLogado = null;
+            adminLogado = false;
+            salvarDadosLocais();
+            showSection('catalogo');
+            atualizarUI();
+        }
+
+        function renderCatalogo() {
+            const container = document.getElementById('catalogoContainer');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = produtos.filter(p => {
+                const matchMarca = filtroMarca === 'TODAS' || p.marca === filtroMarca;
+                const matchSearch = p.nome.toLowerCase().includes(search);
+                return matchMarca && matchSearch;
+            });
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Nenhum produto encontrado.</p></div>';
+                return;
+            }
+            container.innerHTML = filtered.map(p => {
+                const precoExibicao = p.preco > 0 ? `R$ ${p.preco.toFixed(2)}` : (p.obs || 'Consulte');
+                return `
+                <div class="product-card">
+                    <img src="${p.img}" alt="${p.nome}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22><rect fill=%22%23131c24%22 width=%22150%22 height=%22150%22/><text fill=%22%234d9fc0%22 x=%2275%22 y=%2275%22 text-anchor=%22middle%22 dy=%22.3em%22>Sem</text></svg>'">
+                    <span class="brand-tag">${p.marca}</span>
+                    <span class="name">${p.nome}</span>
+                    <span class="price">${precoExibicao}</span>
+                    <div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;margin-top:auto;">
+                        <input type="number" min="1" value="1" class="qty-input" id="qty-${p.id}">
+                        <button class="btn" onclick="adicionarAoCarrinho(${p.id})">🛒</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderBrandFilters() {
+            const marcas = [...new Set(produtos.map(p => p.marca))];
+            document.getElementById('brandFilters').innerHTML = `<button class="toggle-brand ${filtroMarca==='TODAS'?'active':''}" onclick="setFiltroMarca('TODAS')">TODAS</button>` + marcas.map(m => `<button class="toggle-brand ${filtroMarca===m?'active':''}" onclick="setFiltroMarca('${m}')">${m}</button>`).join('');
+        }
+
+        function setFiltroMarca(m) { filtroMarca = m; renderBrandFilters(); renderCatalogo(); }
+
+        function adicionarAoCarrinho(prodId) {
+            const qtd = parseInt(document.getElementById(`qty-${prodId}`)?.value) || 1;
+            const prod = produtos.find(p => p.id === prodId);
+            if (!prod) return;
+            const existente = carrinho.find(i => i.prodId === prodId);
+            if (existente) existente.qtd += qtd;
+            else carrinho.push({ prodId, qtd, preco: prod.preco, nome: prod.nome, marca: prod.marca });
+            salvarDadosLocais(); atualizarUI(); alert(`${prod.nome} adicionado!`);
+        }
+
+        function renderCarrinho() {
+            const container = document.getElementById('carrinhoContainer');
+            const resumo = document.getElementById('carrinhoResumo');
+            if (carrinho.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>🛒 Carrinho vazio.</p></div>';
+                resumo.classList.add('hidden'); return;
+            }
+            resumo.classList.remove('hidden');
+            let total = 0;
+            container.innerHTML = carrinho.map((item, i) => {
+                const sub = item.preco * item.qtd;
+                total += sub;
+                return `<div class="card flex-row flex-between"><div><strong>${item.nome}</strong><br>R$ ${item.preco.toFixed(2)} x ${item.qtd} = R$ ${sub.toFixed(2)}</div><div><input type="number" min="1" value="${item.qtd}" class="qty-input" onchange="alterarQtdCarrinho(${i}, this.value)"><button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(${i})">🗑️</button></div></div>`;
+            }).join('');
+            document.getElementById('resumoItens').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
+            document.getElementById('resumoTotal').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        function alterarQtdCarrinho(i, v) { carrinho[i].qtd = Math.max(1, parseInt(v)||1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
+        function removerDoCarrinho(i) { carrinho.splice(i,1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
+
+        function finalizarPedido() {
+            if (!clienteLogado) return alert('Faça login.');
+            if (carrinho.length===0) return alert('Carrinho vazio.');
+            const total = carrinho.reduce((s,i)=>s+i.preco*i.qtd,0);
+            const numero = Date.now().toString().slice(-8);
+            if (confirm(`PIX: Fortpharma137@gmail.com\nValor: R$ ${total.toFixed(2)}`)) {
+                const novoPedido = {
+                    id: Date.now(),
+                    numero,
+                    clienteId: clienteLogado.id,
+                    clienteNome: clienteLogado.nome,
+                    clienteContato: clienteLogado.contato,
+                    clienteEndereco: clienteLogado.endereco,
+                    clienteCpf: clienteLogado.cpf,
+                    itens: [...carrinho],
+                    total,
+                    status: 'pendente',
+                    data: new Date().toISOString()
+                };
+                pedidos.unshift(novoPedido);
+                salvarPedido(novoPedido);
+                carrinho=[];
+                salvarDadosLocais();
+                atualizarUI();
+                renderCarrinho();
+                window.open(`https://wa.me/5593991381813?text=Pedido #${numero} - ${clienteLogado.nome} - R$ ${total.toFixed(2)}`, '_blank');
+            }
+        }
+
+        function toggleCadastro() {
+            document.getElementById('loginForm').classList.toggle('hidden');
+            document.getElementById('cadastroForm').classList.toggle('hidden');
+        }
+
+        function loginCliente() {
+            const cpf = document.getElementById('loginCpf').value.replace(/\D/g,'');
+            const u = usuarios.find(u=>u.cpf===cpf);
+            if (!u) return alert('CPF não cadastrado.');
+            clienteLogado=u; adminLogado=false; salvarDadosLocais(); atualizarUI(); showSection('catalogo');
+        }
+
+        function cadastrarCliente() {
+            const n=document.getElementById('cadNome').value.trim();
+            const c=document.getElementById('cadCpf').value.replace(/\D/g,'');
+            const e=document.getElementById('cadEndereco').value.trim();
+            const t=document.getElementById('cadContato').value.trim();
+            if(!n||!c||!e||!t) return alert('Preencha todos os campos.');
+            if(usuarios.find(u=>u.cpf===c)) return alert('CPF já cadastrado.');
+            const novo={id:Date.now(), nome:n, cpf:c, endereco:e, contato:t};
+            usuarios.push(novo);
+            salvarUsuario(novo);
+            clienteLogado=novo; adminLogado=false; salvarDadosLocais(); atualizarUI(); showSection('catalogo');
+        }
+
+        function showAdminLogin() { showSection('admin'); }
+
+        function loginAdmin() {
+            if(document.getElementById('adminUser').value.trim()==='Fortbomba' && document.getElementById('adminPass').value.trim()==='20362881') {
+                adminLogado=true; clienteLogado=null; salvarDadosLocais(); atualizarUI();
+                document.getElementById('adminLoginForm').style.display='none';
+                document.getElementById('adminContent').classList.remove('hidden');
+                renderAdmin();
+            } else alert('Credenciais inválidas.');
+        }
+
+        function renderAdmin() {
+            if(!adminLogado) return;
+            document.getElementById('adminLoginForm').style.display='none';
+            document.getElementById('adminContent').classList.remove('hidden');
+            renderAdminPedidos();
+        }
+
+        function filtrarPedidos(s) { filtroAdminStatus=s; renderAdminPedidos(); }
+
+        function renderAdminPedidos() {
+            const container = document.getElementById('adminPedidosContainer');
+            let f = pedidos;
+            if(filtroAdminStatus==='pendente') f=pedidos.filter(p=>p.status==='pendente');
+            if(filtroAdminStatus==='finalizado') f=pedidos.filter(p=>p.status==='finalizado');
+            if(!f.length) { container.innerHTML='<div class="empty-state">📭 Nenhum pedido.</div>'; return; }
+            container.innerHTML = f.map(p=>`
+                <div class="card">
+                    <div class="flex-row flex-between"><div><strong>#${p.numero}</strong> <span class="status-badge ${p.status==='pendente'?'status-pendente':'status-finalizado'}">${p.status}</span></div><div>${p.status==='pendente'?`<button class="btn btn-success btn-sm" onclick="marcarFinalizado(${p.id})">✔️ Finalizar</button>`:''} <button class="btn btn-danger btn-sm" onclick="apagarPedido(${p.id})">🗑️</button></div></div>
+                    <p>👤 ${p.clienteNome} | 📞 <a class="whatsapp-link" href="https://wa.me/55${p.clienteContato.replace(/\D/g,'')}" target="_blank">${p.clienteContato}</a></p>
+                    <p>📍 ${p.clienteEndereco}</p><p>🛍️ ${p.itens.map(i=>`${i.qtd}x ${i.nome}`).join(', ')}</p>
+                    <p>💰 <strong>R$ ${p.total.toFixed(2)}</strong></p>
+                </div>`).join('');
+        }
+
+        function marcarFinalizado(id) {
+            const p=pedidos.find(p=>p.id===id);
+            if(p){
+                p.status='finalizado';
+                atualizarPedido(id, { status: 'finalizado' });
+                renderAdminPedidos();
+            }
+        }
+
+        async function apagarPedido(id) {
+            if(confirm('Apagar pedido?')){
+                pedidos=pedidos.filter(p=>p.id!==id);
+                await deletarPedido(id);
+                renderAdminPedidos();
+            }
+        }
+
+        function renderGerenciarClientes() {
+            if(!adminLogado) return;
+            const container = document.getElementById('clientesContainer');
+            if(!usuarios.length) { container.innerHTML='<div class="empty-state">👥 Nenhum cliente cadastrado.</div>'; return; }
+            container.innerHTML = `<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="${document.getElementById('searchClientes')?.value || ''}"></div>` +
+            usuarios.filter(u=>{
+                const s = document.getElementById('searchClientes')?.value.toLowerCase() || '';
+                return u.nome.toLowerCase().includes(s) || u.cpf.includes(s) || u.contato.includes(s);
+            }).map(u=>`
+                <div class="client-card flex-row flex-between">
+                    <div>
+                        <strong>${u.nome}</strong><br>
+                        <small>CPF: ${u.cpf} | 📞 ${u.contato}</small><br>
+                        <small>📍 ${u.endereco}</small>
+                    </div>
+                    <button class="btn btn-info btn-sm" onclick="abrirModalEditarCliente(${u.id})">✏️ Editar</button>
+                </div>`).join('');
+        }
+
+        function abrirModalEditarCliente(id) {
+            const u = usuarios.find(u=>u.id===id);
+            if(!u) return;
+            clienteEditandoId = id;
+            document.getElementById('editNome').value = u.nome;
+            document.getElementById('editCpf').value = u.cpf;
+            document.getElementById('editEndereco').value = u.endereco;
+            document.getElementById('editContato').value = u.contato;
+            document.getElementById('editClienteId').value = id;
+            document.getElementById('modalEditarCliente').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalEditarCliente').classList.add('hidden');
+            clienteEditandoId = null;
+        }
+
+        async function salvarEdicaoCliente() {
+            const id = parseInt(document.getElementById('editClienteId').value);
+            const u = usuarios.find(u=>u.id===id);
+            if(!u) return;
+            u.nome = document.getElementById('editNome').value.trim();
+            u.endereco = document.getElementById('editEndereco').value.trim();
+            u.contato = document.getElementById('editContato').value.trim();
+            await atualizarUsuario(u);
+            fecharModal();
+            renderGerenciarClientes();
+            alert('Dados do cliente atualizados com sucesso!');
+        }
+
+        function renderGerenciarProdutos() {
+            if(!adminLogado) return;
+            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p=>`
+                <div class="card flex-row flex-between">
+                    <div style="display:flex;align-items:center;gap:1rem;">
+                        <img src="${p.img}" class="image-preview" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22><rect fill=%22%23131c24%22 width=%22100%22 height=%22100%22/><text fill=%22%234d9fc0%22 x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>Sem</text></svg>'">
+                        <div><strong>${p.nome}</strong><br><small>${p.marca}</small></div>
+                    </div>
+                    <div class="flex-row">
+                        <input type="text" id="imgInput-${p.id}" value="${p.img}" style="width:250px;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);color:white;border-radius:6px;">
+                        <button class="btn btn-info btn-sm" onclick="atualizarImagem(${p.id})">💾</button>
+                        <button class="btn btn-outline btn-sm" onclick="resetarImagem(${p.id})">↺</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function atualizarImagem(id) {
+            const url = document.getElementById(`imgInput-${id}`).value.trim();
+            if(!url) return alert('URL inválida.');
+            const p = produtos.find(p=>p.id===id);
+            if(p){
+                p.img=url;
+                await salvarProdutoImagem(id, url);
+                renderGerenciarProdutos();
+                renderCatalogo();
+            }
+        }
+
+        async function resetarImagem(id) {
+            const p = produtos.find(p=>p.id===id);
+            if(p){
+                p.img=`https://placehold.co/150x150/131c24/4d9fc0?text=${p.nome.substring(0,8).replace(/\s/g,'')}`;
+                await salvarProdutoImagem(id, p.img);
+                renderGerenciarProdutos();
+                renderCatalogo();
+            }
+        }
+
+        // ============ INICIALIZAÇÃO ============
+        async function init() {
+            carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            clienteLogado = JSON.parse(sessionStorage.getItem('clienteLogado')) || null;
+            adminLogado = JSON.parse(sessionStorage.getItem('adminLogado')) || false;
+
+            await carregarDados();
+
+            renderBrandFilters();
+            renderCatalogo();
+            atualizarUI();
+
+            if(adminLogado) {
+                document.getElementById('nav-admin').style.display='inline-block';
+                document.getElementById('nav-clientes').style.display='inline-block';
+                document.getElementById('nav-gerenciar').style.display='inline-block';
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
