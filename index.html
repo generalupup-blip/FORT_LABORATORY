@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FVL FORB LABORATORY</title>
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
@@ -502,7 +503,7 @@
             'MA': 90, 'PA': 90, 'AC': 90, 'AM': 90, 'TO': 90, 'RO': 95, 'RR': 95, 'AP': 95
         };
 
-        // ============ DADOS INICIAIS ============
+        // ============ DADOS INICIAIS (125 produtos) ============
         const produtos = [
             { id: 1, nome: 'Testenat 250 mg 4 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Testenat' },
             { id: 2, nome: 'Deca 5 ml 200 mg', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Deca' },
@@ -650,10 +651,10 @@
                 pedidos = pedidosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 const produtosSnap = await db.collection('produtos').get();
                 if (!produtosSnap.empty) {
-                    const firebaseProdutos = produtosSnap.docs.map(doc => doc.data());
-                    firebaseProdutos.forEach(fp => {
-                        const existing = produtos.find(p => p.id === fp.id);
-                        if (existing) existing.img = fp.img;
+                    produtosSnap.forEach(doc => {
+                        const data = doc.data();
+                        const produto = produtos.find(p => p.id === data.id);
+                        if (produto && data.img) produto.img = data.img;
                     });
                 }
             } catch (error) {
@@ -662,64 +663,83 @@
         }
 
         async function salvarUsuario(usuario) {
-            try { await db.collection('usuarios').doc(usuario.id.toString()).set(usuario); }
-            catch (error) { console.error('Erro ao salvar usuário:', error); }
+            try { await db.collection('usuarios').doc(String(usuario.id)).set(usuario); } catch (e) { console.error(e); }
         }
-
         async function atualizarUsuario(usuario) {
-            try { await db.collection('usuarios').doc(usuario.id.toString()).update(usuario); }
-            catch (error) { console.error('Erro ao atualizar usuário:', error); }
+            try { await db.collection('usuarios').doc(String(usuario.id)).update(usuario); } catch (e) { console.error(e); }
         }
-
         async function deletarUsuario(id) {
-            try { await db.collection('usuarios').doc(id.toString()).delete(); }
-            catch (error) { console.error('Erro ao deletar usuário:', error); }
+            try { await db.collection('usuarios').doc(String(id)).delete(); } catch (e) { console.error(e); }
         }
-
         async function salvarPedido(pedido) {
-            try { await db.collection('pedidos').doc(pedido.id.toString()).set(pedido); }
-            catch (error) { console.error('Erro ao salvar pedido:', error); }
+            try { await db.collection('pedidos').doc(String(pedido.id)).set(pedido); } catch (e) { console.error(e); }
         }
-
         async function atualizarPedido(pedidoId, dados) {
-            try { await db.collection('pedidos').doc(pedidoId.toString()).update(dados); }
-            catch (error) { console.error('Erro ao atualizar pedido:', error); }
+            try { await db.collection('pedidos').doc(String(pedidoId)).update(dados); } catch (e) { console.error(e); }
         }
-
         async function deletarPedido(pedidoId) {
-            try { await db.collection('pedidos').doc(pedidoId.toString()).delete(); }
-            catch (error) { console.error('Erro ao deletar pedido:', error); }
+            try { await db.collection('pedidos').doc(String(pedidoId)).delete(); } catch (e) { console.error(e); }
         }
-
         async function salvarProdutoImagem(produtoId, imgUrl) {
-            try { await db.collection('produtos').doc(produtoId.toString()).set({ id: produtoId, img: imgUrl }, { merge: true }); }
-            catch (error) { console.error('Erro ao salvar imagem:', error); }
-        }
-
-        // ============ UPLOAD DE IMAGEM ============
-        async function uploadImagemProduto(produtoId, file) {
-            if (!file) return alert('Selecione um arquivo primeiro.');
-            
-            // Mostrar loading
-            const produto = produtos.find(p => p.id === produtoId);
-            if (!produto) return alert('Produto não encontrado.');
-            
-            const storageRef = storage.ref(`produtos/${produtoId}/${Date.now()}_${file.name}`);
             try {
-                const uploadTask = await storageRef.put(file);
-                const url = await uploadTask.ref.getDownloadURL();
-                produto.img = url;
-                await salvarProdutoImagem(produtoId, url);
-                renderGerenciarProdutos();
-                renderCatalogo();
-                alert('✅ Imagem enviada com sucesso!');
-            } catch (error) {
-                console.error('Erro no upload:', error);
-                alert('❌ Falha ao enviar imagem. Tente novamente.');
-            }
+                await db.collection('produtos').doc(String(produtoId)).set({ id: produtoId, img: imgUrl }, { merge: true });
+            } catch (e) { console.error(e); }
         }
 
-        // ============ FUNÇÕES AUXILIARES ============
+        // ============ UPLOAD DE IMAGEM CORRIGIDO ============
+        async function uploadImagemProduto(produtoId, fileInput, btn) {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Selecione uma imagem primeiro.');
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Imagem muito grande. Máximo 2 MB.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Enviando...';
+
+            const storageRef = storage.ref(`produtos/${produtoId}/${Date.now()}_${file.name}`);
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed',
+                null,
+                (error) => {
+                    console.error('Erro no upload:', error);
+                    alert(`Falha ao enviar: ${error.message}`);
+                    btn.disabled = false;
+                    btn.textContent = '📤 Upload';
+                },
+                async () => {
+                    try {
+                        const url = await uploadTask.snapshot.ref.getDownloadURL();
+                        console.log('URL da imagem:', url);
+
+                        const produto = produtos.find(p => p.id === produtoId);
+                        if (produto) {
+                            produto.img = url;
+                            await salvarProdutoImagem(produtoId, url);
+                        }
+
+                        // Atualiza as telas
+                        renderGerenciarProdutos();
+                        renderCatalogo();
+                        alert('✅ Imagem atualizada com sucesso!');
+                    } catch (err) {
+                        console.error('Erro ao salvar URL:', err);
+                        alert('Erro ao salvar a imagem no banco de dados.');
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = '📤 Upload';
+                        fileInput.value = '';
+                    }
+                }
+            );
+        }
+
+        // ============ INTERFACE ============
         function salvarDadosLocais() {
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
             localStorage.setItem('seguroAtivo', JSON.stringify(seguroAtivo));
@@ -772,11 +792,7 @@
                 marcas.map(m => `<button class="toggle-brand ${filtroMarca===m?'active':''}" onclick="setFiltroMarca('${m.replace(/'/g, "\\'")}')">${m}</button>`).join('');
         }
 
-        function setFiltroMarca(m) { 
-            filtroMarca = m; 
-            renderBrandFilters(); 
-            renderCatalogo(); 
-        }
+        function setFiltroMarca(m) { filtroMarca = m; renderBrandFilters(); renderCatalogo(); }
 
         function renderCatalogo() {
             const container = document.getElementById('catalogoContainer');
@@ -787,7 +803,7 @@
                 return matchMarca && matchSearch;
             });
             if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>📦 Nenhum produto encontrado.</p></div>';
+                container.innerHTML = '<div class="empty-state">📦 Nenhum produto encontrado.</div>';
                 return;
             }
             container.innerHTML = filtered.map(p => {
@@ -872,28 +888,21 @@
             if (confirm(`PIX: Fortpharma137@gmail.com\nValor Total: R$ ${total.toFixed(2)}\n(Produtos: R$ ${subtotal.toFixed(2)} + Frete: R$ ${frete.toFixed(2)}${seguro>0?` + Seguro: R$ ${seguro.toFixed(2)}`:''})`)) {
                 const clienteEnderecoCompleto = `${clienteLogado.rua || ''}, ${clienteLogado.numero || ''} - ${clienteLogado.bairro || ''}, ${clienteLogado.regiao || ''}`;
                 const novoPedido = {
-                    id: Date.now(),
-                    numero,
+                    id: Date.now(), numero,
                     clienteId: clienteLogado.id,
                     clienteNome: clienteLogado.nome,
                     clienteContato: clienteLogado.contato,
                     clienteEndereco: clienteEnderecoCompleto,
                     clienteCpf: clienteLogado.cpf,
                     itens: carrinho.map(i => ({ ...i })),
-                    subtotal,
-                    frete,
-                    seguro,
-                    total,
+                    subtotal, frete, seguro, total,
                     status: 'pendente',
                     data: new Date().toISOString()
                 };
                 pedidos.unshift(novoPedido);
                 salvarPedido(novoPedido);
-                carrinho=[];
-                seguroAtivo=false;
-                salvarDadosLocais();
-                atualizarUI();
-                renderCarrinho();
+                carrinho=[]; seguroAtivo=false;
+                salvarDadosLocais(); atualizarUI(); renderCarrinho();
                 window.open(`https://wa.me/5593991381813?text=Pedido #${numero} - ${clienteLogado.nome} - Total: R$ ${total.toFixed(2)}`, '_blank');
             }
         }
@@ -1018,7 +1027,7 @@
         }
 
         async function excluirCliente(id) {
-            if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+            if (!confirm('Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.')) return;
             const index = usuarios.findIndex(u => u.id === id);
             if (index !== -1) {
                 usuarios.splice(index, 1);
@@ -1026,7 +1035,7 @@
                 if (clienteLogado && clienteLogado.id === id) logout();
                 renderGerenciarClientes();
                 alert('Cliente excluído com sucesso!');
-            }
+            } else alert('Cliente não encontrado.');
         }
 
         function abrirModalEditarCliente(id) {
@@ -1061,10 +1070,7 @@
             u.contato = document.getElementById('editContato').value.trim();
             u.endereco = `${u.rua}, ${u.numero} - ${u.bairro}, ${u.regiao}`;
             await atualizarUsuario(u);
-            if (clienteLogado && clienteLogado.id === id) {
-                clienteLogado = u;
-                salvarDadosLocais();
-            }
+            if (clienteLogado && clienteLogado.id === id) { clienteLogado = u; salvarDadosLocais(); }
             fecharModal();
             renderGerenciarClientes();
             alert('Dados do cliente atualizados com sucesso!');
@@ -1072,15 +1078,15 @@
 
         function renderGerenciarProdutos() {
             if(!adminLogado) return;
-            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p=>`
+            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p => `
                 <div class="card flex-row flex-between">
                     <div style="display:flex;align-items:center;gap:1rem;">
                         <img src="${p.img}" class="image-preview" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22><rect fill=%22%23131c24%22 width=%22100%22 height=%22100%22/><text fill=%22%234d9fc0%22 x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>Sem</text></svg>'">
                         <div><strong>${p.nome}</strong><br><small>${p.marca}</small></div>
                     </div>
                     <div class="upload-group">
-                        <input type="file" id="file-${p.id}" class="file-input" accept="image/*" style="width:auto; max-width:200px;">
-                        <button class="btn btn-info btn-sm" onclick="uploadImagemProduto(${p.id}, document.getElementById('file-${p.id}').files[0])">📤 Upload</button>
+                        <input type="file" id="file-${p.id}" class="file-input" accept="image/*">
+                        <button class="btn btn-info btn-sm" id="btnUpload-${p.id}" onclick="uploadImagemProduto(${p.id}, document.getElementById('file-${p.id}'), this)">📤 Upload</button>
                         <input type="text" id="imgInput-${p.id}" value="${p.img}" style="width:200px;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);color:white;border-radius:6px;">
                         <button class="btn btn-info btn-sm" onclick="atualizarImagem(${p.id})">💾</button>
                         <button class="btn btn-outline btn-sm" onclick="resetarImagem(${p.id})">↺</button>
@@ -1091,9 +1097,9 @@
         async function atualizarImagem(id) {
             const url = document.getElementById(`imgInput-${id}`).value.trim();
             if(!url) return alert('URL inválida.');
-            const p = produtos.find(p=>p.id===id);
-            if(p){
-                p.img=url;
+            const p = produtos.find(p => p.id === id);
+            if(p) {
+                p.img = url;
                 await salvarProdutoImagem(id, url);
                 renderGerenciarProdutos();
                 renderCatalogo();
@@ -1101,9 +1107,9 @@
         }
 
         async function resetarImagem(id) {
-            const p = produtos.find(p=>p.id===id);
-            if(p){
-                p.img=`https://placehold.co/150x150/131c24/4d9fc0?text=${p.nome.substring(0,8).replace(/\s/g,'')}`;
+            const p = produtos.find(p => p.id === id);
+            if(p) {
+                p.img = `https://placehold.co/150x150/131c24/4d9fc0?text=${p.nome.substring(0,8).replace(/\s/g,'')}`;
                 await salvarProdutoImagem(id, p.img);
                 renderGerenciarProdutos();
                 renderCatalogo();
@@ -1118,7 +1124,6 @@
             adminLogado = JSON.parse(sessionStorage.getItem('adminLogado')) || false;
 
             await carregarDados();
-
             renderBrandFilters();
             renderCatalogo();
             atualizarUI();
