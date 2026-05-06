@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FVL FORB LABORATORY</title>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --bg: #0a0f14;
@@ -491,7 +488,6 @@
             appId: "1:368236792295:web:a131e20afe77187cf09542"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -506,7 +502,7 @@
             'AP': 95
         };
 
-        // ============ DADOS INICIAIS DOS PRODUTOS ============
+        // ============ DADOS INICIAIS ============
         const produtos = [
             { id: 1, nome: 'Testenat 250 mg 4 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Testenat' },
             { id: 2, nome: 'Deca 5 ml 200 mg', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Deca' },
@@ -648,96 +644,76 @@
         // ============ FIREBASE FUNCTIONS ============
         async function carregarDados() {
             try {
-                console.log('🔄 Carregando dados do Firebase...');
-                
-                // Carregar usuários
                 const usuariosSnap = await db.collection('usuarios').get();
                 usuarios = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('👥 Usuários carregados:', usuarios.length);
-
-                // Carregar pedidos
                 const pedidosSnap = await db.collection('pedidos').orderBy('data', 'desc').get();
                 pedidos = pedidosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('📦 Pedidos carregados:', pedidos.length);
-
-                // Carregar apenas as IMAGENS dos produtos do Firebase (sem alterar outros dados)
                 const produtosSnap = await db.collection('produtos').get();
                 if (!produtosSnap.empty) {
                     const firebaseProdutos = produtosSnap.docs.map(doc => doc.data());
-                    console.log('🖼️ Imagens de produtos encontradas:', firebaseProdutos.length);
-                    
-                    // Atualiza APENAS as imagens, mantendo todos os outros dados
                     firebaseProdutos.forEach(fp => {
                         const existing = produtos.find(p => p.id === fp.id);
-                        if (existing && fp.img) {
-                            existing.img = fp.img; // Só atualiza a imagem
-                        }
+                        if (existing) existing.img = fp.img;
                     });
                 }
-                
-                console.log('✅ Todos os dados carregados com sucesso!');
-                console.log('📊 Total produtos:', produtos.length, '| Usuários:', usuarios.length, '| Pedidos:', pedidos.length);
-                
             } catch (error) {
-                console.error('❌ Erro ao carregar dados:', error);
+                console.error('Erro ao carregar dados:', error);
             }
         }
 
         async function salvarUsuario(usuario) {
             try {
                 await db.collection('usuarios').doc(usuario.id.toString()).set(usuario);
-                console.log('✅ Usuário salvo:', usuario.nome);
             } catch (error) {
-                console.error('❌ Erro ao salvar usuário:', error);
+                console.error('Erro ao salvar usuário:', error);
             }
         }
 
         async function atualizarUsuario(usuario) {
             try {
                 await db.collection('usuarios').doc(usuario.id.toString()).update(usuario);
-                console.log('✅ Usuário atualizado:', usuario.nome);
             } catch (error) {
-                console.error('❌ Erro ao atualizar usuário:', error);
+                console.error('Erro ao atualizar usuário:', error);
+            }
+        }
+
+        async function deletarUsuario(id) {
+            try {
+                await db.collection('usuarios').doc(id.toString()).delete();
+            } catch (error) {
+                console.error('Erro ao deletar usuário:', error);
             }
         }
 
         async function salvarPedido(pedido) {
             try {
                 await db.collection('pedidos').doc(pedido.id.toString()).set(pedido);
-                console.log('✅ Pedido salvo:', pedido.numero);
             } catch (error) {
-                console.error('❌ Erro ao salvar pedido:', error);
+                console.error('Erro ao salvar pedido:', error);
             }
         }
 
         async function atualizarPedido(pedidoId, dados) {
             try {
                 await db.collection('pedidos').doc(pedidoId.toString()).update(dados);
-                console.log('✅ Pedido atualizado:', pedidoId);
             } catch (error) {
-                console.error('❌ Erro ao atualizar pedido:', error);
+                console.error('Erro ao atualizar pedido:', error);
             }
         }
 
         async function deletarPedido(pedidoId) {
             try {
                 await db.collection('pedidos').doc(pedidoId.toString()).delete();
-                console.log('✅ Pedido deletado:', pedidoId);
             } catch (error) {
-                console.error('❌ Erro ao deletar pedido:', error);
+                console.error('Erro ao deletar pedido:', error);
             }
         }
 
         async function salvarProdutoImagem(produtoId, imgUrl) {
             try {
-                // Usa merge: true para não sobrescrever outros campos
-                await db.collection('produtos').doc(produtoId.toString()).set({ 
-                    id: produtoId, 
-                    img: imgUrl 
-                }, { merge: true });
-                console.log('✅ Imagem do produto', produtoId, 'salva com sucesso!');
+                await db.collection('produtos').doc(produtoId.toString()).set({ id: produtoId, img: imgUrl });
             } catch (error) {
-                console.error('❌ Erro ao salvar imagem do produto:', error);
+                console.error('Erro ao salvar imagem do produto:', error);
             }
         }
 
@@ -753,13 +729,8 @@
             document.getElementById('cart-count').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
             const btnFinalizar = document.getElementById('btnFinalizar');
             const msgLogin = document.getElementById('msgLoginNeeded');
-            if (clienteLogado) { 
-                btnFinalizar.disabled = false; 
-                msgLogin.style.display = 'none'; 
-            } else { 
-                btnFinalizar.disabled = true; 
-                msgLogin.style.display = 'block'; 
-            }
+            if (clienteLogado) { btnFinalizar.disabled = false; msgLogin.style.display = 'none'; }
+            else { btnFinalizar.disabled = true; msgLogin.style.display = 'block'; }
             document.getElementById('nav-admin').style.display = adminLogado ? 'inline-block' : 'none';
             document.getElementById('nav-clientes').style.display = adminLogado ? 'inline-block' : 'none';
             document.getElementById('nav-gerenciar').style.display = adminLogado ? 'inline-block' : 'none';
@@ -769,10 +740,7 @@
 
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            const section = document.getElementById(id);
-            if (section) {
-                section.classList.add('active');
-            }
+            document.getElementById(id).classList.add('active');
             if (id === 'catalogo') renderCatalogo();
             if (id === 'carrinho') renderCarrinho();
             if (id === 'admin') renderAdmin();
@@ -795,21 +763,31 @@
             atualizarUI();
         }
 
+        function renderBrandFilters() {
+            const marcas = [...new Set(produtos.map(p => p.marca))];
+            document.getElementById('brandFilters').innerHTML = 
+                `<button class="toggle-brand ${filtroMarca==='TODAS'?'active':''}" onclick="setFiltroMarca('TODAS')">TODAS</button>` + 
+                marcas.map(m => `<button class="toggle-brand ${filtroMarca===m?'active':''}" onclick="setFiltroMarca('${m.replace(/'/g, "\\'")}')">${m}</button>`).join('');
+        }
+
+        function setFiltroMarca(m) { 
+            filtroMarca = m; 
+            renderBrandFilters(); 
+            renderCatalogo(); 
+        }
+
         function renderCatalogo() {
             const container = document.getElementById('catalogoContainer');
             const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-            
             let filtered = produtos.filter(p => {
                 const matchMarca = filtroMarca === 'TODAS' || p.marca === filtroMarca;
                 const matchSearch = p.nome.toLowerCase().includes(search);
                 return matchMarca && matchSearch;
             });
-            
             if (filtered.length === 0) {
                 container.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Nenhum produto encontrado.</p></div>';
                 return;
             }
-            
             container.innerHTML = filtered.map(p => {
                 const precoExibicao = p.preco > 0 ? `R$ ${p.preco.toFixed(2)}` : (p.obs || 'Consulte');
                 return `
@@ -826,45 +804,18 @@
             }).join('');
         }
 
-        function renderBrandFilters() {
-            const marcas = [...new Set(produtos.map(p => p.marca))];
-            const brandFilters = document.getElementById('brandFilters');
-            if (brandFilters) {
-                brandFilters.innerHTML = `<button class="toggle-brand ${filtroMarca==='TODAS'?'active':''}" onclick="setFiltroMarca('TODAS')">TODAS</button>` + 
-                marcas.map(m => `<button class="toggle-brand ${filtroMarca===m?'active':''}" onclick="setFiltroMarca('${m}')">${m}</button>`).join('');
-            }
-        }
-
-        function setFiltroMarca(m) { 
-            filtroMarca = m; 
-            renderBrandFilters(); 
-            renderCatalogo(); 
-        }
-
         function adicionarAoCarrinho(prodId) {
             const qtd = parseInt(document.getElementById(`qty-${prodId}`)?.value) || 1;
             const prod = produtos.find(p => p.id === prodId);
             if (!prod) return;
-            
             const existente = carrinho.find(i => i.prodId === prodId);
-            if (existente) {
-                existente.qtd += qtd;
-            } else {
-                carrinho.push({ 
-                    prodId, 
-                    qtd, 
-                    preco: prod.preco, 
-                    nome: prod.nome, 
-                    marca: prod.marca 
-                });
-            }
-            salvarDadosLocais(); 
-            atualizarUI(); 
-            alert(`${prod.nome} adicionado ao carrinho!`);
+            if (existente) existente.qtd += qtd;
+            else carrinho.push({ prodId, qtd, preco: prod.preco, nome: prod.nome, marca: prod.marca });
+            salvarDadosLocais(); atualizarUI(); alert(`${prod.nome} adicionado!`);
         }
 
         function toggleSeguro() {
-            seguroAtivo = document.getElementById('checkboxSeguro')?.checked || false;
+            seguroAtivo = document.getElementById('checkboxSeguro').checked;
             salvarDadosLocais();
             renderCarrinho();
         }
@@ -883,35 +834,20 @@
         function renderCarrinho() {
             const container = document.getElementById('carrinhoContainer');
             const resumo = document.getElementById('carrinhoResumo');
-            
-            if (!container || !resumo) return;
-            
             if (carrinho.length === 0) {
                 container.innerHTML = '<div class="empty-state"><p>🛒 Carrinho vazio.</p></div>';
                 resumo.classList.add('hidden');
-                const checkbox = document.getElementById('checkboxSeguro');
-                if (checkbox) checkbox.checked = false;
+                document.getElementById('checkboxSeguro').checked = false;
                 seguroAtivo = false;
                 return;
             }
-            
             resumo.classList.remove('hidden');
-            const checkbox = document.getElementById('checkboxSeguro');
-            if (checkbox) checkbox.checked = seguroAtivo;
+            document.getElementById('checkboxSeguro').checked = seguroAtivo;
 
             container.innerHTML = carrinho.map((item, i) => {
                 const sub = item.preco * item.qtd;
                 const marcaTexto = item.marca ? ` (${item.marca})` : '';
-                return `<div class="card flex-row flex-between">
-                    <div>
-                        <strong>${item.nome}</strong>${marcaTexto}<br>
-                        R$ ${item.preco.toFixed(2)} x ${item.qtd} = R$ ${sub.toFixed(2)}
-                    </div>
-                    <div>
-                        <input type="number" min="1" value="${item.qtd}" class="qty-input" onchange="alterarQtdCarrinho(${i}, this.value)">
-                        <button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(${i})">🗑️</button>
-                    </div>
-                </div>`;
+                return `<div class="card flex-row flex-between"><div><strong>${item.nome}</strong>${marcaTexto}<br>R$ ${item.preco.toFixed(2)} x ${item.qtd} = R$ ${sub.toFixed(2)}</div><div><input type="number" min="1" value="${item.qtd}" class="qty-input" onchange="alterarQtdCarrinho(${i}, this.value)"><button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(${i})">🗑️</button></div></div>`;
             }).join('');
 
             const { subtotal, frete, seguro, total } = calcularTotaisCarrinho();
@@ -919,45 +855,20 @@
             document.getElementById('resumoSubtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
             document.getElementById('resumoFrete').textContent = frete > 0 ? `R$ ${frete.toFixed(2)}` : (clienteLogado ? 'R$ 0,00' : 'Faça login');
             document.getElementById('resumoSeguro').textContent = `R$ ${seguro.toFixed(2)}`;
+            document.getElementById('pSeguro').classList.toggle('hidden', !seguroAtivo);
             document.getElementById('resumoTotal').textContent = `R$ ${total.toFixed(2)}`;
-            
-            const pSeguro = document.getElementById('pSeguro');
-            if (pSeguro) {
-                pSeguro.classList.toggle('hidden', !seguroAtivo);
-            }
         }
 
-        function alterarQtdCarrinho(i, v) { 
-            carrinho[i].qtd = Math.max(1, parseInt(v)||1); 
-            salvarDadosLocais(); 
-            renderCarrinho(); 
-            atualizarUI(); 
-        }
-        
-        function removerDoCarrinho(i) { 
-            carrinho.splice(i,1); 
-            salvarDadosLocais(); 
-            renderCarrinho(); 
-            atualizarUI(); 
-        }
+        function alterarQtdCarrinho(i, v) { carrinho[i].qtd = Math.max(1, parseInt(v)||1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
+        function removerDoCarrinho(i) { carrinho.splice(i,1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
 
         function finalizarPedido() {
-            if (!clienteLogado) return alert('Faça login para finalizar a compra.');
-            if (carrinho.length === 0) return alert('Carrinho vazio.');
-            
+            if (!clienteLogado) return alert('Faça login.');
+            if (carrinho.length===0) return alert('Carrinho vazio.');
             const { subtotal, frete, seguro, total } = calcularTotaisCarrinho();
             const numero = Date.now().toString().slice(-8);
-            
-            const mensagem = `Confirme seu pedido:\n\n` +
-                `Subtotal: R$ ${subtotal.toFixed(2)}\n` +
-                `Frete: R$ ${frete.toFixed(2)}\n` +
-                (seguro > 0 ? `Seguro (30%): R$ ${seguro.toFixed(2)}\n` : '') +
-                `\nTOTAL: R$ ${total.toFixed(2)}\n\n` +
-                `PIX: Fortpharma137@gmail.com`;
-            
-            if (confirm(mensagem)) {
+            if (confirm(`PIX: Fortpharma137@gmail.com\nValor Total: R$ ${total.toFixed(2)}\n(Produtos: R$ ${subtotal.toFixed(2)} + Frete: R$ ${frete.toFixed(2)}${seguro>0?` + Seguro: R$ ${seguro.toFixed(2)}`:''})`)) {
                 const clienteEnderecoCompleto = `${clienteLogado.rua || ''}, ${clienteLogado.numero || ''} - ${clienteLogado.bairro || ''}, ${clienteLogado.regiao || ''}`;
-                
                 const novoPedido = {
                     id: Date.now(),
                     numero,
@@ -974,18 +885,14 @@
                     status: 'pendente',
                     data: new Date().toISOString()
                 };
-                
                 pedidos.unshift(novoPedido);
                 salvarPedido(novoPedido);
-                
-                carrinho = [];
-                seguroAtivo = false;
+                carrinho=[];
+                seguroAtivo=false;
                 salvarDadosLocais();
                 atualizarUI();
                 renderCarrinho();
-                
                 window.open(`https://wa.me/5593991381813?text=Pedido #${numero} - ${clienteLogado.nome} - Total: R$ ${total.toFixed(2)}`, '_blank');
-                alert('Pedido realizado com sucesso!');
             }
         }
 
@@ -996,142 +903,88 @@
 
         function loginCliente() {
             const cpf = document.getElementById('loginCpf').value.replace(/\D/g,'');
-            const u = usuarios.find(u => u.cpf === cpf);
+            const u = usuarios.find(u=>u.cpf===cpf);
             if (!u) return alert('CPF não cadastrado.');
-            
-            clienteLogado = u; 
-            adminLogado = false; 
-            salvarDadosLocais(); 
-            atualizarUI(); 
-            showSection('catalogo');
-            alert(`Bem-vindo(a), ${u.nome}!`);
+            clienteLogado=u; adminLogado=false; salvarDadosLocais(); atualizarUI(); showSection('catalogo');
         }
 
         function cadastrarCliente() {
-            const n = document.getElementById('cadNome').value.trim();
-            const c = document.getElementById('cadCpf').value.replace(/\D/g,'');
-            const rua = document.getElementById('cadRua').value.trim();
-            const num = document.getElementById('cadNumero').value.trim();
-            const bairro = document.getElementById('cadBairro').value.trim();
-            const regiao = document.getElementById('cadRegiao').value;
-            const t = document.getElementById('cadContato').value.trim();
-            
-            if(!n || !c || !rua || !num || !bairro || !regiao || !t) {
-                return alert('Preencha todos os campos obrigatórios.');
-            }
-            
-            if(usuarios.find(u => u.cpf === c)) {
-                return alert('CPF já cadastrado.');
-            }
-            
-            const novo = {
-                id: Date.now(), 
-                nome: n, 
-                cpf: c,
-                rua, 
-                numero: num, 
-                bairro, 
-                regiao,
-                contato: t,
+            const n=document.getElementById('cadNome').value.trim();
+            const c=document.getElementById('cadCpf').value.replace(/\D/g,'');
+            const rua=document.getElementById('cadRua').value.trim();
+            const num=document.getElementById('cadNumero').value.trim();
+            const bairro=document.getElementById('cadBairro').value.trim();
+            const regiao=document.getElementById('cadRegiao').value;
+            const t=document.getElementById('cadContato').value.trim();
+            if(!n||!c||!rua||!num||!bairro||!regiao||!t) return alert('Preencha todos os campos obrigatórios.');
+            if(usuarios.find(u=>u.cpf===c)) return alert('CPF já cadastrado.');
+            const novo={
+                id:Date.now(), nome:n, cpf:c,
+                rua, numero:num, bairro, regiao,
+                contato:t,
                 endereco: `${rua}, ${num} - ${bairro}, ${regiao}`
             };
-            
             usuarios.push(novo);
             salvarUsuario(novo);
-            clienteLogado = novo; 
-            adminLogado = false; 
-            salvarDadosLocais(); 
-            atualizarUI(); 
-            showSection('catalogo');
+            clienteLogado=novo; adminLogado=false; salvarDadosLocais(); atualizarUI(); showSection('catalogo');
             alert('Cadastro realizado com sucesso!');
         }
 
-        function showAdminLogin() { 
-            showSection('admin'); 
-        }
+        function showAdminLogin() { showSection('admin'); }
 
         function loginAdmin() {
-            if(document.getElementById('adminUser').value.trim() === 'Fortbomba' && 
-               document.getElementById('adminPass').value.trim() === '20362881') {
-                adminLogado = true; 
-                clienteLogado = null; 
-                salvarDadosLocais(); 
-                atualizarUI();
-                document.getElementById('adminLoginForm').style.display = 'none';
+            if(document.getElementById('adminUser').value.trim()==='Fortbomba' && document.getElementById('adminPass').value.trim()==='20362881') {
+                adminLogado=true; clienteLogado=null; salvarDadosLocais(); atualizarUI();
+                document.getElementById('adminLoginForm').style.display='none';
                 document.getElementById('adminContent').classList.remove('hidden');
                 renderAdmin();
-            } else {
-                alert('Credenciais inválidas.');
-            }
+            } else alert('Credenciais inválidas.');
         }
 
         function renderAdmin() {
             if(!adminLogado) return;
-            document.getElementById('adminLoginForm').style.display = 'none';
+            document.getElementById('adminLoginForm').style.display='none';
             document.getElementById('adminContent').classList.remove('hidden');
             renderAdminPedidos();
         }
 
-        function filtrarPedidos(s) { 
-            filtroAdminStatus = s; 
-            renderAdminPedidos(); 
-        }
+        function filtrarPedidos(s) { filtroAdminStatus=s; renderAdminPedidos(); }
 
         function renderAdminPedidos() {
             const container = document.getElementById('adminPedidosContainer');
             let f = pedidos;
-            
-            if(filtroAdminStatus === 'pendente') f = pedidos.filter(p => p.status === 'pendente');
-            if(filtroAdminStatus === 'finalizado') f = pedidos.filter(p => p.status === 'finalizado');
-            
-            if(!f.length) { 
-                container.innerHTML = '<div class="empty-state">📭 Nenhum pedido encontrado.</div>'; 
-                return; 
-            }
-            
-            container.innerHTML = f.map(p => {
-                const itensComMarca = p.itens.map(i => 
-                    `${i.qtd}x ${i.nome}${i.marca ? ` (${i.marca})` : ''}`
-                ).join(', ');
-                
+            if(filtroAdminStatus==='pendente') f=pedidos.filter(p=>p.status==='pendente');
+            if(filtroAdminStatus==='finalizado') f=pedidos.filter(p=>p.status==='finalizado');
+            if(!f.length) { container.innerHTML='<div class="empty-state">📭 Nenhum pedido.</div>'; return; }
+            container.innerHTML = f.map(p=>{
+                const itensComMarca = p.itens.map(i=> `${i.qtd}x ${i.nome}${i.marca ? ` (${i.marca})` : ''}`).join(', ');
                 const detalhes = [];
                 if (p.subtotal) detalhes.push(`Subtotal: R$ ${p.subtotal.toFixed(2)}`);
                 if (p.frete > 0) detalhes.push(`Frete: R$ ${p.frete.toFixed(2)}`);
                 if (p.seguro > 0) detalhes.push(`Seguro: R$ ${p.seguro.toFixed(2)}`);
-                
                 return `
                 <div class="card">
-                    <div class="flex-row flex-between">
-                        <div>
-                            <strong>#${p.numero}</strong> 
-                            <span class="status-badge ${p.status==='pendente'?'status-pendente':'status-finalizado'}">${p.status}</span>
-                        </div>
-                        <div>
-                            ${p.status==='pendente' ? `<button class="btn btn-success btn-sm" onclick="marcarFinalizado(${p.id})">✔️ Finalizar</button>` : ''} 
-                            <button class="btn btn-danger btn-sm" onclick="apagarPedido(${p.id})">🗑️</button>
-                        </div>
-                    </div>
+                    <div class="flex-row flex-between"><div><strong>#${p.numero}</strong> <span class="status-badge ${p.status==='pendente'?'status-pendente':'status-finalizado'}">${p.status}</span></div><div>${p.status==='pendente'?`<button class="btn btn-success btn-sm" onclick="marcarFinalizado(${p.id})">✔️ Finalizar</button>`:''} <button class="btn btn-danger btn-sm" onclick="apagarPedido(${p.id})">🗑️</button></div></div>
                     <p>👤 ${p.clienteNome} | 📞 <a class="whatsapp-link" href="https://wa.me/55${p.clienteContato.replace(/\D/g,'')}" target="_blank">${p.clienteContato}</a></p>
-                    <p>📍 ${p.clienteEndereco}</p>
-                    <p>🛍️ ${itensComMarca}</p>
-                    ${detalhes.length ? '<p>📋 ' + detalhes.join(' | ') + '</p>' : ''}
+                    <p>📍 ${p.clienteEndereco}</p><p>🛍️ ${itensComMarca}</p>
+                    ${detalhes.length ? '<p>📋 '+detalhes.join(' | ')+'</p>' : ''}
                     <p>💰 <strong>Total: R$ ${p.total.toFixed(2)}</strong></p>
                 </div>`;
             }).join('');
         }
 
         function marcarFinalizado(id) {
-            const p = pedidos.find(p => p.id === id);
+            const p=pedidos.find(p=>p.id===id);
             if(p){
-                p.status = 'finalizado';
+                p.status='finalizado';
                 atualizarPedido(id, { status: 'finalizado' });
                 renderAdminPedidos();
             }
         }
 
         async function apagarPedido(id) {
-            if(confirm('Tem certeza que deseja apagar este pedido?')){
-                pedidos = pedidos.filter(p => p.id !== id);
+            if(confirm('Apagar pedido?')){
+                pedidos=pedidos.filter(p=>p.id!==id);
                 await deletarPedido(id);
                 renderAdminPedidos();
             }
@@ -1140,20 +993,12 @@
         function renderGerenciarClientes() {
             if(!adminLogado) return;
             const container = document.getElementById('clientesContainer');
-            
-            if(!usuarios.length) { 
-                container.innerHTML = '<div class="empty-state">👥 Nenhum cliente cadastrado.</div>'; 
-                return; 
-            }
-            
-            const searchValue = document.getElementById('searchClientes')?.value.toLowerCase() || '';
-            
-            container.innerHTML = `<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="${searchValue}"></div>` +
-            usuarios.filter(u => {
-                return u.nome.toLowerCase().includes(searchValue) || 
-                       u.cpf.includes(searchValue) || 
-                       u.contato.includes(searchValue);
-            }).map(u => {
+            if(!usuarios.length) { container.innerHTML='<div class="empty-state">👥 Nenhum cliente cadastrado.</div>'; return; }
+            container.innerHTML = `<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="${document.getElementById('searchClientes')?.value || ''}"></div>` +
+            usuarios.filter(u=>{
+                const s = document.getElementById('searchClientes')?.value.toLowerCase() || '';
+                return u.nome.toLowerCase().includes(s) || u.cpf.includes(s) || u.contato.includes(s);
+            }).map(u=>{
                 const endFormatado = u.endereco || `${u.rua || ''}, ${u.numero || ''} - ${u.bairro || ''}, ${u.regiao || ''}`;
                 return `
                 <div class="client-card flex-row flex-between">
@@ -1162,15 +1007,33 @@
                         <small>CPF: ${u.cpf} | 📞 ${u.contato}</small><br>
                         <small>📍 ${endFormatado}</small>
                     </div>
-                    <button class="btn btn-info btn-sm" onclick="abrirModalEditarCliente(${u.id})">✏️ Editar</button>
+                    <div class="flex-row">
+                        <button class="btn btn-info btn-sm" onclick="abrirModalEditarCliente(${u.id})">✏️ Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirCliente(${u.id})">🗑️ Excluir</button>
+                    </div>
                 </div>`;
             }).join('');
         }
 
+        async function excluirCliente(id) {
+            if (!confirm('Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.')) return;
+            const index = usuarios.findIndex(u => u.id === id);
+            if (index !== -1) {
+                usuarios.splice(index, 1);
+                await deletarUsuario(id);
+                if (clienteLogado && clienteLogado.id === id) {
+                    logout();
+                }
+                renderGerenciarClientes();
+                alert('Cliente excluído com sucesso!');
+            } else {
+                alert('Cliente não encontrado.');
+            }
+        }
+
         function abrirModalEditarCliente(id) {
-            const u = usuarios.find(u => u.id === id);
+            const u = usuarios.find(u=>u.id===id);
             if(!u) return;
-            
             clienteEditandoId = id;
             document.getElementById('editNome').value = u.nome || '';
             document.getElementById('editCpf').value = u.cpf || '';
@@ -1190,9 +1053,8 @@
 
         async function salvarEdicaoCliente() {
             const id = parseInt(document.getElementById('editClienteId').value);
-            const u = usuarios.find(u => u.id === id);
+            const u = usuarios.find(u=>u.id===id);
             if(!u) return;
-            
             u.nome = document.getElementById('editNome').value.trim();
             u.rua = document.getElementById('editRua').value.trim();
             u.numero = document.getElementById('editNumero').value.trim();
@@ -1200,14 +1062,11 @@
             u.regiao = document.getElementById('editRegiao').value;
             u.contato = document.getElementById('editContato').value.trim();
             u.endereco = `${u.rua}, ${u.numero} - ${u.bairro}, ${u.regiao}`;
-            
             await atualizarUsuario(u);
-            
             if (clienteLogado && clienteLogado.id === id) {
                 clienteLogado = u;
                 salvarDadosLocais();
             }
-            
             fecharModal();
             renderGerenciarClientes();
             alert('Dados do cliente atualizados com sucesso!');
@@ -1215,15 +1074,11 @@
 
         function renderGerenciarProdutos() {
             if(!adminLogado) return;
-            
-            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p => `
+            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p=>`
                 <div class="card flex-row flex-between">
                     <div style="display:flex;align-items:center;gap:1rem;">
                         <img src="${p.img}" class="image-preview" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22><rect fill=%22%23131c24%22 width=%22100%22 height=%22100%22/><text fill=%22%234d9fc0%22 x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>Sem</text></svg>'">
-                        <div>
-                            <strong>${p.nome}</strong><br>
-                            <small>${p.marca} - R$ ${p.preco.toFixed(2)}</small>
-                        </div>
+                        <div><strong>${p.nome}</strong><br><small>${p.marca}</small></div>
                     </div>
                     <div class="flex-row">
                         <input type="text" id="imgInput-${p.id}" value="${p.img}" style="width:250px;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);color:white;border-radius:6px;">
@@ -1236,56 +1091,44 @@
         async function atualizarImagem(id) {
             const url = document.getElementById(`imgInput-${id}`).value.trim();
             if(!url) return alert('URL inválida.');
-            
-            const p = produtos.find(p => p.id === id);
+            const p = produtos.find(p=>p.id===id);
             if(p){
-                p.img = url;
+                p.img=url;
                 await salvarProdutoImagem(id, url);
                 renderGerenciarProdutos();
                 renderCatalogo();
-                alert('Imagem atualizada com sucesso!');
             }
         }
 
         async function resetarImagem(id) {
-            const p = produtos.find(p => p.id === id);
+            const p = produtos.find(p=>p.id===id);
             if(p){
-                p.img = `https://placehold.co/150x150/131c24/4d9fc0?text=${p.nome.substring(0,8).replace(/\s/g,'')}`;
+                p.img=`https://placehold.co/150x150/131c24/4d9fc0?text=${p.nome.substring(0,8).replace(/\s/g,'')}`;
                 await salvarProdutoImagem(id, p.img);
                 renderGerenciarProdutos();
                 renderCatalogo();
-                alert('Imagem restaurada com sucesso!');
             }
         }
 
         // ============ INICIALIZAÇÃO ============
         async function init() {
-            console.log('🚀 Iniciando sistema FVL FORB LABORATORY...');
-            
-            // Carregar dados do localStorage/sessionStorage
             carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
             seguroAtivo = JSON.parse(localStorage.getItem('seguroAtivo')) || false;
             clienteLogado = JSON.parse(sessionStorage.getItem('clienteLogado')) || null;
             adminLogado = JSON.parse(sessionStorage.getItem('adminLogado')) || false;
 
-            // Carregar dados do Firebase
             await carregarDados();
 
-            // Renderizar interface
             renderBrandFilters();
             renderCatalogo();
             atualizarUI();
 
             if(adminLogado) {
-                document.getElementById('nav-admin').style.display = 'inline-block';
-                document.getElementById('nav-clientes').style.display = 'inline-block';
-                document.getElementById('nav-gerenciar').style.display = 'inline-block';
+                document.getElementById('nav-admin').style.display='inline-block';
+                document.getElementById('nav-clientes').style.display='inline-block';
+                document.getElementById('nav-gerenciar').style.display='inline-block';
             }
-            
-            console.log('✅ Sistema inicializado com sucesso!');
         }
-        
-        // Iniciar o sistema
         init();
     </script>
 </body>
