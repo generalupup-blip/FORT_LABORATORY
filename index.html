@@ -72,6 +72,16 @@
         .upload-group { display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap; }
         .file-input { padding:0.4rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:0.8rem; width:180px; }
         .whatsapp-link { color:#25d366; text-decoration:none; font-weight:700; }
+        .alert-box {
+            background: #1a1a1a;
+            border: 1px solid #d44;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #ff8888;
+            font-size: 0.9rem;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
@@ -88,12 +98,15 @@
         </nav>
     </header>
     <main>
+        <!-- CATÁLOGO -->
         <section id="catalogo" class="section active">
             <h2>🏪 Catálogo de Produtos</h2>
             <input type="text" class="search-box" placeholder="🔍 Buscar por nome..." id="searchInput" oninput="renderCatalogo()">
             <div class="brand-filters" id="brandFilters"></div>
             <div id="catalogoContainer" class="product-grid"></div>
         </section>
+
+        <!-- CARRINHO -->
         <section id="carrinho" class="section">
             <h2>🛒 Seu Carrinho</h2>
             <div id="carrinhoContainer"></div>
@@ -111,9 +124,11 @@
                 </div>
             </div>
         </section>
+
+        <!-- LOGIN CLIENTE -->
         <section id="login" class="section">
             <h2>👤 Acesso do Cliente</h2>
-            <div class="card" style="max-width:500px;margin:0 auto;">
+            <div class="card" style="max-width:600px;margin:0 auto;">
                 <div id="loginForm">
                     <h3>Entrar</h3>
                     <div class="form-group"><label>CPF</label><input type="text" id="loginCpf" placeholder="000.000.000-00"></div>
@@ -122,13 +137,22 @@
                 </div>
                 <div id="cadastroForm" class="hidden">
                     <h3>Cadastro</h3>
-                    <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
+                    <div class="alert-box">
+                        <strong>*COPIE, COLE E PREENCHA OS DADOS NA FRENTE*</strong><br>
+                        <strong>OBS:</strong> <em>1° preencher o formulário corretamente. Não nos responsabilizamos por informações incorretas!!</em><br><br>
+                        <strong>🔴2° É OBRIGATÓRIO FAZER FOTO E VIDEO ABRINDO A CAIXA COM OS PRODUTOS. CHEGANDO ALGO ERRADO OU FALTANDO SÓ COM O VÍDEO PODERÁ SER RESSARCIDO!!</strong><br>
+                        ⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠
+                    </div>
+                    <div class="form-group"><label>NOME COMPLETO</label><input type="text" id="cadNome"></div>
                     <div class="form-group"><label>CPF</label><input type="text" id="cadCpf"></div>
-                    <div class="form-group"><label>Rua / Avenida</label><input type="text" id="cadRua"></div>
-                    <div class="form-group"><label>Número</label><input type="text" id="cadNumero"></div>
-                    <div class="form-group"><label>Bairro</label><input type="text" id="cadBairro"></div>
-                    <div class="form-group"><label>Região (Estado)</label><select id="cadRegiao"><option value="">Selecione...</option><option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option><option value="ES">ES</option><option value="DF">DF</option><option value="GO">GO</option><option value="RS">RS</option><option value="SC">SC</option><option value="PR">PR</option><option value="MT">MT</option><option value="MS">MS</option><option value="BA">BA</option><option value="CE">CE</option><option value="MA">MA</option><option value="PA">PA</option><option value="AC">AC</option><option value="AM">AM</option><option value="TO">TO</option><option value="RO">RO</option><option value="RR">RR</option><option value="AP">AP</option></select></div>
-                    <div class="form-group"><label>WhatsApp</label><input type="text" id="cadContato" placeholder="93 99138-1813"></div>
+                    <div class="form-group"><label>ENDEREÇO (Rua/Avenida)</label><input type="text" id="cadRua"></div>
+                    <div class="form-group"><label>NÚMERO</label><input type="text" id="cadNumero"></div>
+                    <div class="form-group"><label>BAIRRO</label><input type="text" id="cadBairro"></div>
+                    <div class="form-group"><label>COMPLEMENTO</label><input type="text" id="cadComplemento" placeholder="Apto, bloco, etc."></div>
+                    <div class="form-group"><label>CIDADE</label><input type="text" id="cadCidade"></div>
+                    <div class="form-group"><label>ESTADO</label><select id="cadRegiao"><option value="">Selecione...</option><option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option><option value="ES">ES</option><option value="DF">DF</option><option value="GO">GO</option><option value="RS">RS</option><option value="SC">SC</option><option value="PR">PR</option><option value="MT">MT</option><option value="MS">MS</option><option value="BA">BA</option><option value="CE">CE</option><option value="MA">MA</option><option value="PA">PA</option><option value="AC">AC</option><option value="AM">AM</option><option value="TO">TO</option><option value="RO">RO</option><option value="RR">RR</option><option value="AP">AP</option></select></div>
+                    <div class="form-group"><label>CEP</label><input type="text" id="cadCep" placeholder="00000-000"></div>
+                    <div class="form-group"><label>WhatsApp (com DDD)</label><input type="text" id="cadContato" placeholder="93 99138-1813"></div>
                     <button class="btn" onclick="cadastrarCliente()">Cadastrar</button>
                     <p style="margin-top:1rem;">Já tem conta? <a href="#" onclick="toggleCadastro()" style="color:var(--accent2);">Entrar</a></p>
                 </div>
@@ -138,6 +162,8 @@
                 <button class="btn btn-outline" onclick="showAdminLogin()">Acessar Painel Admin</button>
             </div>
         </section>
+
+        <!-- ADMIN DASHBOARD -->
         <section id="admin" class="section">
             <h2>📊 Painel Administrativo</h2>
             <div id="adminLoginForm" class="card" style="max-width:400px;margin:2rem auto;">
@@ -158,14 +184,20 @@
                 <div id="adminPedidosContainer"></div>
             </div>
         </section>
+
+        <!-- GERENCIAR CLIENTES (ADMIN) -->
         <section id="gerenciarClientes" class="section">
             <h2>👥 Gerenciar Clientes</h2>
             <div id="clientesContainer"></div>
         </section>
+
+        <!-- GERENCIAR PRODUTOS (ADMIN) -->
         <section id="gerenciarProdutos" class="section">
             <h2>🖼️ Gerenciar Imagens dos Produtos</h2>
             <div id="gerenciarContainer"></div>
         </section>
+
+        <!-- MODAL EDITAR CLIENTE -->
         <div id="modalEditarCliente" class="modal-overlay hidden">
             <div class="modal">
                 <h3>✏️ Editar Cliente</h3>
@@ -174,7 +206,10 @@
                 <div class="form-group"><label>Rua</label><input type="text" id="editRua"></div>
                 <div class="form-group"><label>Número</label><input type="text" id="editNumero"></div>
                 <div class="form-group"><label>Bairro</label><input type="text" id="editBairro"></div>
-                <div class="form-group"><label>Região</label><select id="editRegiao"><option value="">Selecione...</option><option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option><option value="ES">ES</option><option value="DF">DF</option><option value="GO">GO</option><option value="RS">RS</option><option value="SC">SC</option><option value="PR">PR</option><option value="MT">MT</option><option value="MS">MS</option><option value="BA">BA</option><option value="CE">CE</option><option value="MA">MA</option><option value="PA">PA</option><option value="AC">AC</option><option value="AM">AM</option><option value="TO">TO</option><option value="RO">RO</option><option value="RR">RR</option><option value="AP">AP</option></select></div>
+                <div class="form-group"><label>Complemento</label><input type="text" id="editComplemento"></div>
+                <div class="form-group"><label>Cidade</label><input type="text" id="editCidade"></div>
+                <div class="form-group"><label>Estado</label><select id="editRegiao"><option value="">Selecione...</option><option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option><option value="ES">ES</option><option value="DF">DF</option><option value="GO">GO</option><option value="RS">RS</option><option value="SC">SC</option><option value="PR">PR</option><option value="MT">MT</option><option value="MS">MS</option><option value="BA">BA</option><option value="CE">CE</option><option value="MA">MA</option><option value="PA">PA</option><option value="AC">AC</option><option value="AM">AM</option><option value="TO">TO</option><option value="RO">RO</option><option value="RR">RR</option><option value="AP">AP</option></select></div>
+                <div class="form-group"><label>CEP</label><input type="text" id="editCep"></div>
                 <div class="form-group"><label>WhatsApp</label><input type="text" id="editContato"></div>
                 <input type="hidden" id="editClienteId">
                 <div class="flex-row flex-between mt-2">
@@ -433,14 +468,13 @@
         function alterarQtdCarrinho(i,v){carrinho[i].qtd=Math.max(1,parseInt(v)||1);salvarDadosLocais();renderCarrinho();atualizarUI();}
         function removerDoCarrinho(i){carrinho.splice(i,1);salvarDadosLocais();renderCarrinho();atualizarUI();}
 
-        // Finalizar pedido com mensagem completa para WhatsApp
         function finalizarPedido(){
             if(!clienteLogado) return alert('Faça login.');
             if(!carrinho.length) return alert('Carrinho vazio.');
             const t = calcularTotaisCarrinho();
             const num = Date.now().toString().slice(-8);
 
-            const enderecoCompleto = `${clienteLogado.rua || ''}, ${clienteLogado.numero || ''} - ${clienteLogado.bairro || ''}, ${clienteLogado.regiao || ''}`;
+            const enderecoCompleto = `${clienteLogado.rua || ''}, ${clienteLogado.numero || ''} - ${clienteLogado.bairro || ''}, ${clienteLogado.cidade || ''} - ${clienteLogado.regiao || ''}, CEP: ${clienteLogado.cep || ''}${clienteLogado.complemento ? ' (' + clienteLogado.complemento + ')' : ''}`;
             let itensMsg = '';
             carrinho.forEach(item => {
                 itensMsg += `➡️ ${item.qtd}x ${item.nome}${item.marca ? ` (${item.marca})` : ''} - R$ ${(item.preco*item.qtd).toFixed(2)}\n`;
@@ -482,7 +516,6 @@
             }
         }
 
-        // Funções de usuário/admin (mantidas iguais)
         async function salvarUsuario(u){try{await db.collection('usuarios').doc(String(u.id)).set(u);}catch(e){console.error(e);}}
         async function atualizarUsuario(u){try{await db.collection('usuarios').doc(String(u.id)).update(u);}catch(e){console.error(e);}}
         async function deletarUsuario(id){try{await db.collection('usuarios').doc(String(id)).delete();}catch(e){console.error(e);}}
@@ -494,17 +527,26 @@
             if(!u)return alert('CPF não cadastrado.');
             clienteLogado=u;adminLogado=false;salvarDadosLocais();atualizarUI();showSection('catalogo');
         }
+
         function cadastrarCliente(){
             const n=document.getElementById('cadNome').value.trim();
             const c=document.getElementById('cadCpf').value.replace(/\D/g,'');
             const rua=document.getElementById('cadRua').value.trim();
             const num=document.getElementById('cadNumero').value.trim();
             const bairro=document.getElementById('cadBairro').value.trim();
+            const complemento=document.getElementById('cadComplemento').value.trim();
+            const cidade=document.getElementById('cadCidade').value.trim();
             const regiao=document.getElementById('cadRegiao').value;
+            const cep=document.getElementById('cadCep').value.trim();
             const t=document.getElementById('cadContato').value.trim();
-            if(!n||!c||!rua||!num||!bairro||!regiao||!t)return alert('Preencha todos os campos.');
+            if(!n||!c||!rua||!num||!bairro||!cidade||!regiao||!t) return alert('Preencha todos os campos obrigatórios (Nome, CPF, Endereço, Número, Bairro, Cidade, Estado e WhatsApp).');
             if(usuarios.find(u=>u.cpf===c))return alert('CPF já cadastrado.');
-            const novo={id:Date.now(),nome:n,cpf:c,rua,numero:num,bairro,regiao,contato:t,endereco:rua+', '+num+' - '+bairro+', '+regiao};
+            const novo={
+                id:Date.now(), nome:n, cpf:c,
+                rua, numero:num, bairro, complemento, cidade, regiao, cep,
+                contato:t,
+                endereco: `${rua}, ${num} - ${bairro}, ${cidade} - ${regiao}, CEP: ${cep}${complemento ? ' (' + complemento + ')' : ''}`
+            };
             usuarios.push(novo);salvarUsuario(novo);
             clienteLogado=novo;adminLogado=false;salvarDadosLocais();atualizarUI();showSection('catalogo');alert('Cadastro realizado!');
         }
@@ -540,12 +582,17 @@
         function marcarFinalizado(id){const p=pedidos.find(x=>x.id===id);if(p){p.status='finalizado';db.collection('pedidos').doc(String(id)).update({status:'finalizado'}).catch(e=>console.error(e));renderAdminPedidos();}}
         async function apagarPedido(id){if(confirm('Apagar pedido?')){pedidos=pedidos.filter(x=>x.id!==id);await db.collection('pedidos').doc(String(id)).delete().catch(e=>console.error(e));renderAdminPedidos();}}
 
-        // Gerenciamento de clientes (mantido)
         function renderGerenciarClientes(){
             if(!adminLogado)return;
             const c=document.getElementById('clientesContainer');
             if(!usuarios.length){c.innerHTML='<div class="empty-state">👥 Nenhum cliente.</div>';return;}
-            c.innerHTML='<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="'+(document.getElementById('searchClientes')?.value||'')+'"></div>'+usuarios.filter(u=>{const s=(document.getElementById('searchClientes')?.value||'').toLowerCase();return u.nome.toLowerCase().includes(s)||u.cpf.includes(s)||u.contato.includes(s);}).map(u=>{const end=u.endereco||(u.rua||'')+', '+(u.numero||'')+' - '+(u.bairro||'')+', '+(u.regiao||'');return '<div class="client-card flex-row flex-between"><div><strong>'+u.nome+'</strong><br><small>CPF: '+u.cpf+' | 📞 '+u.contato+'</small><br><small>📍 '+end+'</small></div><div class="flex-row"><button class="btn btn-info btn-sm" onclick="abrirModalEditarCliente('+u.id+')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="excluirCliente('+u.id+')">🗑️ Excluir</button></div></div>';}).join('');
+            c.innerHTML='<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="'+(document.getElementById('searchClientes')?.value||'')+'"></div>'+usuarios.filter(u=>{
+                const s=(document.getElementById('searchClientes')?.value||'').toLowerCase();
+                return u.nome.toLowerCase().includes(s)||u.cpf.includes(s)||u.contato.includes(s);
+            }).map(u=>{
+                const end=u.endereco||`${u.rua||''}, ${u.numero||''} - ${u.bairro||''}, ${u.cidade||''} - ${u.regiao||''}, CEP: ${u.cep||''}${u.complemento?' ('+u.complemento+')':''}`;
+                return `<div class="client-card flex-row flex-between"><div><strong>${u.nome}</strong><br><small>CPF: ${u.cpf} | 📞 ${u.contato}</small><br><small>📍 ${end}</small></div><div class="flex-row"><button class="btn btn-info btn-sm" onclick="abrirModalEditarCliente(${u.id})">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="excluirCliente(${u.id})">🗑️ Excluir</button></div></div>`;
+            }).join('');
         }
 
         async function excluirCliente(id){
@@ -556,10 +603,17 @@
 
         function abrirModalEditarCliente(id){
             const u=usuarios.find(x=>x.id===id);if(!u)return;clienteEditandoId=id;
-            document.getElementById('editNome').value=u.nome||'';document.getElementById('editCpf').value=u.cpf||'';
-            document.getElementById('editRua').value=u.rua||'';document.getElementById('editNumero').value=u.numero||'';
-            document.getElementById('editBairro').value=u.bairro||'';document.getElementById('editRegiao').value=u.regiao||'';
-            document.getElementById('editContato').value=u.contato||'';document.getElementById('editClienteId').value=id;
+            document.getElementById('editNome').value=u.nome||'';
+            document.getElementById('editCpf').value=u.cpf||'';
+            document.getElementById('editRua').value=u.rua||'';
+            document.getElementById('editNumero').value=u.numero||'';
+            document.getElementById('editBairro').value=u.bairro||'';
+            document.getElementById('editComplemento').value=u.complemento||'';
+            document.getElementById('editCidade').value=u.cidade||'';
+            document.getElementById('editRegiao').value=u.regiao||'';
+            document.getElementById('editCep').value=u.cep||'';
+            document.getElementById('editContato').value=u.contato||'';
+            document.getElementById('editClienteId').value=id;
             document.getElementById('modalEditarCliente').classList.remove('hidden');
         }
         function fecharModal(){document.getElementById('modalEditarCliente').classList.add('hidden');clienteEditandoId=null;}
@@ -567,15 +621,21 @@
         async function salvarEdicaoCliente(){
             const id=parseInt(document.getElementById('editClienteId').value);
             const u=usuarios.find(x=>x.id===id);if(!u)return;
-            u.nome=document.getElementById('editNome').value.trim();u.rua=document.getElementById('editRua').value.trim();
-            u.numero=document.getElementById('editNumero').value.trim();u.bairro=document.getElementById('editBairro').value.trim();
-            u.regiao=document.getElementById('editRegiao').value;u.contato=document.getElementById('editContato').value.trim();
-            u.endereco=u.rua+', '+u.numero+' - '+u.bairro+', '+u.regiao;
-            await atualizarUsuario(u);if(clienteLogado&&clienteLogado.id===id){clienteLogado=u;salvarDadosLocais();}
+            u.nome=document.getElementById('editNome').value.trim();
+            u.rua=document.getElementById('editRua').value.trim();
+            u.numero=document.getElementById('editNumero').value.trim();
+            u.bairro=document.getElementById('editBairro').value.trim();
+            u.complemento=document.getElementById('editComplemento').value.trim();
+            u.cidade=document.getElementById('editCidade').value.trim();
+            u.regiao=document.getElementById('editRegiao').value;
+            u.cep=document.getElementById('editCep').value.trim();
+            u.contato=document.getElementById('editContato').value.trim();
+            u.endereco=`${u.rua}, ${u.numero} - ${u.bairro}, ${u.cidade} - ${u.regiao}, CEP: ${u.cep}${u.complemento?' ('+u.complemento+')':''}`;
+            await atualizarUsuario(u);
+            if(clienteLogado&&clienteLogado.id===id){clienteLogado=u;salvarDadosLocais();}
             fecharModal();renderGerenciarClientes();alert('Dados atualizados!');
         }
 
-        // Gerenciar produtos com upload redimensionado
         function renderGerenciarProdutos(){
             if(!adminLogado)return;
             document.getElementById('gerenciarContainer').innerHTML=produtos.map(p=>`
@@ -609,22 +669,16 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     const base64 = canvas.toDataURL('image/jpeg', 0.8);
-                    console.log('Imagem redimensionada para', width, 'x', height);
                     const produto = produtos.find(p => p.id === produtoId);
                     if (produto) produto.img = base64;
                     db.collection('produtos').doc(String(produtoId)).set({ id: produtoId, img: base64 }, { merge: true })
                     .then(() => {
-                        console.log('Imagem salva no Firestore');
-                        renderGerenciarProdutos();
-                        renderCatalogo();
-                        alert('✅ Imagem atualizada com sucesso!');
+                        renderGerenciarProdutos(); renderCatalogo();
+                        alert('✅ Imagem atualizada!');
                     }).catch(error => {
-                        console.error('Erro ao salvar:', error);
                         alert('❌ Falha ao salvar: ' + error.message);
                     }).finally(() => {
-                        btn.disabled = false;
-                        btn.textContent = '📤 Upload';
-                        fileInput.value = '';
+                        btn.disabled = false; btn.textContent = '📤 Upload'; fileInput.value = '';
                     });
                 };
                 img.onerror = function() { alert('❌ Erro ao carregar imagem.'); btn.disabled = false; btn.textContent = '📤 Upload'; };
