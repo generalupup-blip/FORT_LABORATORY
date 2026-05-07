@@ -6,139 +6,74 @@
     <title>FVL FORB LABORATORY</title>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
     <style>
         :root {
-            --bg: #0a0f14;
-            --surface: #0f161c;
-            --surface2: #131c24;
-            --border: #1e2d3a;
-            --text: #e8edf2;
-            --text2: #8a9ba8;
-            --accent: #3b7c9c;
-            --accent2: #4d9fc0;
-            --danger: #b53b3b;
-            --success: #2d7a4f;
-            --info: #2b6f9c;
-            --warning: #b8860b;
-            --radius: 10px;
-            --shadow: 0 8px 30px rgba(0,0,0,0.5);
-            --transition: 0.25s ease;
+            --bg: #0a0f14; --surface: #0f161c; --surface2: #131c24; --border: #1e2d3a;
+            --text: #e8edf2; --text2: #8a9ba8; --accent: #3b7c9c; --accent2: #4d9fc0;
+            --danger: #b53b3b; --success: #2d7a4f; --info: #2b6f9c; --warning: #b8860b;
+            --radius: 10px; --shadow: 0 8px 30px rgba(0,0,0,0.5); --transition: 0.25s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-            background:var(--bg);
-            color:var(--text);
-            min-height:100vh;
-            line-height:1.5;
-            background-image:radial-gradient(ellipse at 20% 20%, #1a2c38 0%, transparent 50%), radial-gradient(ellipse at bottom, #0a0f14 0%, transparent 60%);
+            background:var(--bg); color:var(--text); min-height:100vh; line-height:1.5;
         }
         header {
-            background:var(--surface);
-            border-bottom:1px solid var(--border);
-            padding:1rem 2rem;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            flex-wrap:wrap;
-            gap:1rem;
-            position:sticky;
-            top:0;
-            z-index:100;
-            backdrop-filter:blur(12px);
-            box-shadow:0 2px 25px rgba(0,0,0,0.4);
+            background:var(--surface); border-bottom:1px solid var(--border);
+            padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:1rem; position:sticky; top:0; z-index:100;
+            backdrop-filter:blur(12px); box-shadow:0 2px 25px rgba(0,0,0,0.4);
         }
-        .logo {
-            font-size:1.9rem;
-            font-weight:700;
-            letter-spacing:2px;
-            background:linear-gradient(135deg, #5ba4c4, #2d6d8a, #1e4f66);
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            background-clip:text;
-            text-transform:uppercase;
-            display:flex;
-            align-items:center;
-            gap:0.3rem;
-            cursor:pointer;
-        }
-        .logo span { background:var(--accent); -webkit-text-fill-color:#ffffff; background-clip:text; font-weight:900; font-size:2.2rem; }
+        .logo { font-size:1.9rem; font-weight:700; letter-spacing:2px; cursor:pointer; }
+        .logo span { font-weight:900; font-size:2.2rem; }
         nav { display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; }
-        nav button, nav a {
-            background:var(--surface2);
-            border:1px solid var(--border);
-            color:var(--text);
-            padding:0.5rem 1.1rem;
-            border-radius:20px;
-            cursor:pointer;
-            font-size:0.85rem;
-            text-decoration:none;
-            transition:var(--transition);
-            font-weight:500;
-            white-space:nowrap;
-            letter-spacing:0.4px;
+        nav button {
+            background:var(--surface2); border:1px solid var(--border); color:var(--text);
+            padding:0.5rem 1.1rem; border-radius:20px; cursor:pointer; font-size:0.85rem;
+            transition:var(--transition); font-weight:500; white-space:nowrap;
         }
-        nav button:hover, nav a:hover { background:var(--border); border-color:var(--accent); color:#c0e0f0; }
-        .cart-badge { background:var(--accent); color:white; border-radius:50%; padding:0.15rem 0.45rem; font-size:0.7rem; font-weight:700; margin-left:4px; vertical-align:top; }
+        nav button:hover { background:var(--border); border-color:var(--accent); color:#c0e0f0; }
+        .cart-badge { background:var(--accent); color:white; border-radius:50%; padding:0.15rem 0.45rem; font-size:0.7rem; font-weight:700; margin-left:4px; }
         main { max-width:1300px; margin:2rem auto; padding:0 1.5rem; }
         .section { display:none; animation:fadeIn 0.4s ease; }
         .section.active { display:block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        h2 { font-size:1.8rem; margin-bottom:1.5rem; color:var(--accent2); border-bottom:2px solid var(--border); padding-bottom:0.5rem; letter-spacing:-0.5px; display:flex; align-items:center; gap:0.5rem; }
+        h2 { font-size:1.8rem; margin-bottom:1.5rem; color:var(--accent2); border-bottom:2px solid var(--border); padding-bottom:0.5rem; }
         h3 { color:var(--accent2); margin-bottom:1rem; font-size:1.2rem; }
         .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:1.5rem; }
         .product-card {
-            background:var(--surface);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:1.5rem;
-            text-align:center;
-            transition:var(--transition);
-            cursor:pointer;
-            box-shadow:var(--shadow);
-            display:flex;
-            flex-direction:column;
-            gap:0.6rem;
+            background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+            padding:1.5rem; text-align:center; transition:var(--transition); box-shadow:var(--shadow);
+            display:flex; flex-direction:column; gap:0.6rem;
         }
-        .product-card:hover { transform:translateY(-5px); border-color:var(--accent); box-shadow:0 16px 40px rgba(59,124,156,0.2); }
+        .product-card:hover { transform:translateY(-5px); border-color:var(--accent); }
         .product-card img { width:100%; height:120px; object-fit:contain; border-radius:8px; background:var(--surface2); padding:0.5rem; }
         .product-card .name { font-weight:700; font-size:0.95rem; min-height:2.4rem; color:#fff; }
-        .product-card .price { font-size:1.4rem; font-weight:800; color:var(--accent2); letter-spacing:-0.5px; }
-        .product-card .brand-tag { font-size:0.65rem; background:var(--surface2); padding:0.2rem 0.6rem; border-radius:12px; display:inline-block; color:var(--text2); text-transform:uppercase; letter-spacing:1px; }
-        .qty-input { width:55px; padding:0.4rem; background:var(--surface2); border:1px solid var(--border); color:#fff; border-radius:6px; text-align:center; font-size:0.9rem; }
-        .btn { background:var(--accent); color:white; border:none; padding:0.5rem 1.2rem; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:var(--transition); letter-spacing:0.5px; }
+        .product-card .price { font-size:1.4rem; font-weight:800; color:var(--accent2); }
+        .product-card .brand-tag { font-size:0.65rem; background:var(--surface2); padding:0.2rem 0.6rem; border-radius:12px; display:inline-block; color:var(--text2); text-transform:uppercase; }
+        .qty-input { width:55px; padding:0.4rem; background:var(--surface2); border:1px solid var(--border); color:#fff; border-radius:6px; text-align:center; }
+        .btn { background:var(--accent); color:white; border:none; padding:0.5rem 1.2rem; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:var(--transition); }
         .btn:hover { background:#4d9fc0; transform:scale(1.03); }
+        .btn-danger { background:var(--danger); }
+        .btn-success { background:var(--success); }
+        .btn-info { background:var(--info); }
         .btn-outline { background:transparent; border:2px solid var(--accent); color:var(--accent); }
-        .btn-outline:hover { background:var(--accent); color:white; }
-        .btn-danger { background:var(--danger); color:white; }
-        .btn-danger:hover { background:#d44; }
-        .btn-success { background:var(--success); color:white; }
-        .btn-success:hover { background:#3d8b5f; }
-        .btn-info { background:var(--info); color:white; }
-        .btn-info:hover { background:#3a8ab5; }
         .btn-sm { padding:0.3rem 0.8rem; font-size:0.75rem; }
         .form-group { margin-bottom:1rem; }
         .form-group label { display:block; margin-bottom:0.3rem; font-weight:600; color:var(--text2); font-size:0.8rem; }
-        .form-group input, .form-group select { width:100%; padding:0.6rem 1rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:1rem; transition:var(--transition); }
-        .form-group input:focus, .form-group select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,124,156,0.25); }
+        .form-group input, .form-group select { width:100%; padding:0.6rem 1rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:1rem; }
         .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow); }
-        .whatsapp-link { color:#25d366; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:4px; }
-        .whatsapp-link:hover { text-decoration:underline; }
-        .search-box { width:100%; padding:0.7rem 1.2rem; background:var(--surface2); border:1px solid var(--border); border-radius:25px; color:#fff; font-size:1rem; margin-bottom:1.5rem; transition:var(--transition); }
-        .search-box:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,124,156,0.25); }
-        .status-badge { padding:0.2rem 0.7rem; border-radius:20px; font-weight:700; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.4px; }
+        .search-box { width:100%; padding:0.7rem 1.2rem; background:var(--surface2); border:1px solid var(--border); border-radius:25px; color:#fff; font-size:1rem; margin-bottom:1.5rem; }
+        .status-badge { padding:0.2rem 0.7rem; border-radius:20px; font-weight:700; font-size:0.7rem; text-transform:uppercase; }
         .status-pendente { background:#b8860b20; color:#d4a017; border:1px solid #b8860b40; }
         .status-finalizado { background:#2d7a4f20; color:#2ecc71; border:1px solid #2d7a4f40; }
-        .toggle-brand { background:var(--surface2); border:1px solid var(--border); color:var(--accent2); padding:0.5rem 1.2rem; border-radius:20px; cursor:pointer; font-weight:600; font-size:0.8rem; margin:0.2rem; transition:var(--transition); text-transform:uppercase; letter-spacing:1px; }
+        .toggle-brand { background:var(--surface2); border:1px solid var(--border); color:var(--accent2); padding:0.5rem 1.2rem; border-radius:20px; cursor:pointer; font-weight:600; font-size:0.8rem; margin:0.2rem; }
         .toggle-brand.active { background:var(--accent); color:white; border-color:var(--accent); }
         .brand-filters { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:1.5rem; }
-        .image-preview { width:100px; height:100px; object-fit:contain; border:1px solid var(--border); border-radius:8px; background:var(--surface2); margin-bottom:0.5rem; }
-        .client-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; transition:var(--transition); }
-        .client-card:hover { border-color:var(--accent); }
+        .image-preview { width:100px; height:100px; object-fit:contain; border:1px solid var(--border); border-radius:8px; background:var(--surface2); }
+        .client-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; }
         .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:200; backdrop-filter:blur(4px); }
-        .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; max-width:500px; width:90%; box-shadow:0 20px 50px rgba(0,0,0,0.8); animation:fadeIn 0.3s ease; }
-        @media (max-width:768px) { header { padding:1rem; flex-direction:column; text-align:center; } nav { justify-content:center; } .product-grid { grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); } .modal { padding:1.5rem; } }
+        .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; max-width:500px; width:90%; }
         .empty-state { text-align:center; padding:3rem; color:var(--text2); }
         .hidden { display:none !important; }
         .flex-row { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
@@ -146,17 +81,17 @@
         .mt-2 { margin-top:1rem; }
         .mb-2 { margin-bottom:1rem; }
         .seguro-checkbox { display:flex; align-items:center; gap:0.5rem; margin:0.8rem 0; color:var(--text2); }
-        .seguro-checkbox input { accent-color:var(--accent); width:18px; height:18px; }
         .upload-group { display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap; }
         .file-input { padding:0.4rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:0.8rem; width:180px; }
+        .whatsapp-link { color:#25d366; text-decoration:none; font-weight:700; }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo" onclick="showSection('catalogo')"><span>FVL</span> FORB <span style="font-size:1rem; -webkit-text-fill-color: var(--text2);">LABORATORY</span></div>
+        <div class="logo" onclick="showSection('catalogo')"><span>FVL</span> FORB <span style="font-size:1rem;">LABORATORY</span></div>
         <nav>
-            <button onclick="showSection('catalogo')" id="nav-catalogo">🏪 Produtos</button>
-            <button onclick="showSection('carrinho')" id="nav-carrinho">🛒 Carrinho <span class="cart-badge" id="cart-count">0</span></button>
+            <button onclick="showSection('catalogo')">🏪 Produtos</button>
+            <button onclick="showSection('carrinho')">🛒 Carrinho <span class="cart-badge" id="cart-count">0</span></button>
             <button onclick="showSection('login')" id="nav-login">👤 Entrar / Cadastro</button>
             <button onclick="showSection('admin')" id="nav-admin" style="display:none;">📊 Dashboard</button>
             <button onclick="showSection('gerenciarClientes')" id="nav-clientes" style="display:none;">👥 Clientes</button>
@@ -180,7 +115,7 @@
                     <p><strong>Total de itens:</strong> <span id="resumoItens">0</span></p>
                     <p><strong>Subtotal:</strong> <span id="resumoSubtotal">R$ 0,00</span></p>
                     <p><strong>Frete:</strong> <span id="resumoFrete">R$ 0,00</span></p>
-                    <div class="seguro-checkbox"><input type="checkbox" id="checkboxSeguro" onchange="toggleSeguro()"><label for="checkboxSeguro">Contratar Seguro (30%)</label></div>
+                    <div class="seguro-checkbox"><input type="checkbox" id="checkboxSeguro" onchange="toggleSeguro()"><label>Contratar Seguro (30%)</label></div>
                     <p id="pSeguro" class="hidden"><strong>Seguro (30%):</strong> <span id="resumoSeguro">R$ 0,00</span></p>
                     <p><strong>Valor Total:</strong> <span id="resumoTotal" style="font-size:1.5rem;color:var(--accent2);">R$ 0,00</span></p>
                     <button class="btn" onclick="finalizarPedido()" id="btnFinalizar" disabled>✅ Finalizar Compra</button>
@@ -272,7 +207,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const storage = firebase.storage();
 
         const fretePorRegiao = { 'SP':50,'DF':70,'RJ':70,'MG':80,'GO':80,'ES':80,'RS':80,'MT':90,'MS':90,'BA':90,'CE':90,'PR':90,'SC':90,'MA':90,'PA':90,'AC':90,'AM':90,'TO':90,'RO':95,'RR':95,'AP':95 };
 
@@ -286,44 +220,10 @@
             {id:7,nome:'Primobolan 100 mg 10 ml',preco:410,marca:'LANDER LAN INJETÁVEL',img:'https://placehold.co/150x150/1a1a2e/d4af37?text=Primo'},
             {id:8,nome:'Propionato 100 mg 10 ml',preco:175,marca:'LANDER LAN INJETÁVEL',img:'https://placehold.co/150x150/1a1a2e/d4af37?text=Prop'},
             {id:9,nome:'Oxandrolona 10 mg 50 compr',preco:310,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan10'},
-            {id:10,nome:'Oxandrolona 5 mg 100 compr',preco:300,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan5'},
-            {id:11,nome:'Stanozolol 10 Mg 100 compr',preco:135,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=StanoC'},
-            {id:12,nome:'Diana compr 10 Mg 100 compr',preco:135,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Diana'},
-            {id:13,nome:'Hemog lander 50 mg 20 comp',preco:135,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Hemog'},
-            {id:14,nome:'Clembuterol oral',preco:150,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Clemb'},
-            {id:15,nome:'Masteron oral',preco:250,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=MastOral'},
-            {id:16,nome:'Proviron 20comp/25mg',preco:160,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Prov'},
-            {id:17,nome:'Deca nandrolona 200 mg 10ml',preco:210,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=DecaGold'},
-            {id:18,nome:'Boldenona 250 mg 10 ml',preco:210,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=BoldGold'},
-            {id:19,nome:'Masteron 100 mg 10 ml',preco:210,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=MastGold'},
-            {id:20,nome:'Npp 100 mg 10 ml',preco:210,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=NppGold'},
-            {id:21,nome:'Enantato 250 mg 10 ml',preco:210,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=EnantGold'},
-            {id:22,nome:'Durateston 250 mg 10 ml',preco:210,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=DuraGold'},
-            {id:23,nome:'Trembo acetato 100 Mg 10 ml',preco:240,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=TremA'},
-            {id:24,nome:'Trembo enantato 200 mg 10 ml',preco:220,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=TremE'},
-            {id:25,nome:'Trembo hexahydro 51 mg 10 ml',preco:300,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=TremH'},
-            {id:26,nome:'Sales de Trembo 200 mg 10 ml',preco:330,marca:'LANDERLAN GOLD',img:'https://placehold.co/150x150/1e2a1e/d4af37?text=SalesTrem'},
-            {id:27,nome:'Deca nandrolona 200 mg 10ml',preco:170,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=DecaMP'},
-            {id:28,nome:'Boldenona 250 mg 10 ml',preco:170,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=BoldMP'},
-            {id:29,nome:'Masteron 100 mg 10 ml',preco:170,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=MastMP'},
-            {id:30,nome:'Npp 100 mg 10 ml',preco:170,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=NppMP'},
-            {id:31,nome:'Enantato 250 mg 10 ml',preco:170,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantMP'},
-            {id:32,nome:'Durateston 250 mg 10 ml',preco:170,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=DuraMP'},
-            {id:33,nome:'Trembo acetato 100 Mg 10 ml',preco:180,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=TremAMP'},
-            {id:34,nome:'Trembo enantato 200 mg 10 ml',preco:200,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=TremEMP'},
-            {id:35,nome:'Trembo hexahydro 51 mg 10 ml',preco:300,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=TremHMP'},
-            {id:36,nome:'Sales de Trembo 200 mg 10 ml',preco:300,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=SalesTremMP'},
-            {id:37,nome:'Oxan 5,10mg',preco:250,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=OxanMP'},
-            {id:38,nome:'Stano oral',preco:140,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=StanoMP'},
-            {id:39,nome:'Hemogenin',preco:140,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=HemoMP'},
-            {id:40,nome:'Diana',preco:140,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=DianaMP'},
-            {id:41,nome:'Turinabol',preco:190,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=TuriMP'},
-            {id:42,nome:'Proviron 40caps/25mg',preco:150,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=ProvMP'},
-            {id:43,nome:'Cutstack',preco:200,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=CutMP'},
-            {id:44,nome:'Primobolan',preco:380,marca:'MUSCLE PHARMA',img:'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoMP'}
+            {id:10,nome:'Oxandrolona 5 mg 100 compr',preco:300,marca:'LANDER LAN COMPRIMIDO',img:'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan5'}
         ];
 
-        let carrinho=[],usuarios=[],pedidos=[],clienteLogado=null,adminLogado=false,filtroMarca='TODAS',filtroAdminStatus='todos',clienteEditandoId=null,seguroAtivo=false;
+        let carrinho=[],usuarios=[],pedidos=[],clienteLogado=null,adminLogado=false,filtroMarca='TODAS',filtroAdminStatus='todos',seguroAtivo=false;
 
         async function carregarDados(){
             try{
@@ -340,62 +240,54 @@
             }catch(e){console.error(e);}
         }
 
-        async function salvarProdutoImagem(pid,url){
-            try{await db.collection('produtos').doc(String(pid)).set({id:pid,img:url},{merge:true});}catch(e){console.error(e);}
-        }
-
-        // ========== FUNÇÃO DE UPLOAD CORRIGIDA ==========
-        async function uploadImagemProduto(produtoId, fileInput, btn) {
+        // ========== NOVA FUNÇÃO DE UPLOAD POR BASE64 ==========
+        function uploadImagemProduto(produtoId, fileInput, btn) {
             const file = fileInput.files[0];
             if (!file) { alert('Selecione uma imagem primeiro.'); return; }
+            if (file.size > 1 * 1024 * 1024) { alert('Imagem muito grande. Máximo 1 MB.'); return; }
 
             btn.disabled = true;
-            btn.textContent = '⏳ Enviando...';
+            btn.textContent = '⏳ Processando...';
 
-            try {
-                // Cria referência no Storage
-                const storageRef = storage.ref(`produtos/${produtoId}/${Date.now()}_${file.name}`);
-                
-                // Faz o upload
-                const snapshot = await storageRef.put(file);
-                console.log('Upload concluído, obtendo URL...');
-                
-                // Obtém a URL de download
-                const downloadURL = await snapshot.ref.getDownloadURL();
-                console.log('URL da imagem:', downloadURL);
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const base64 = e.target.result; // resultado como data:image/jpeg;base64,...
+                    console.log('Imagem convertida para base64');
 
-                // Atualiza o produto no array local
-                const produto = produtos.find(p => p.id === produtoId);
-                if (produto) {
-                    produto.img = downloadURL;
+                    // Atualiza produto local
+                    const produto = produtos.find(p => p.id === produtoId);
+                    if (produto) {
+                        produto.img = base64;
+                    }
+
+                    // Salva no Firestore
+                    await db.collection('produtos').doc(String(produtoId)).set({
+                        id: produtoId,
+                        img: base64
+                    }, { merge: true });
+
+                    console.log('Imagem salva no Firestore');
+
+                    // Atualiza as telas
+                    renderGerenciarProdutos();
+                    renderCatalogo();
+                    alert('✅ Imagem atualizada com sucesso!');
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('❌ Falha ao salvar: ' + (error.message || 'Erro desconhecido'));
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '📤 Upload';
+                    fileInput.value = '';
                 }
-
-                // Salva no Firestore
-                await salvarProdutoImagem(produtoId, downloadURL);
-
-                // Atualiza as telas
-                renderGerenciarProdutos();
-                renderCatalogo();
-                
-                alert('✅ Imagem atualizada com sucesso!');
-            } catch (error) {
-                console.error('Erro detalhado:', error);
-                
-                // Mensagens específicas para erros comuns
-                if (error.code === 'storage/unauthorized') {
-                    alert('❌ ERRO: Permissão negada no Storage. Verifique as regras em: Console Firebase > Storage > Rules');
-                } else if (error.code === 'storage/canceled') {
-                    alert('❌ Upload cancelado.');
-                } else if (error.code === 'storage/unknown') {
-                    alert('❌ Erro desconhecido. Verifique sua conexão e tente novamente.');
-                } else {
-                    alert('❌ Falha ao enviar: ' + (error.message || 'Erro desconhecido'));
-                }
-            } finally {
+            };
+            reader.onerror = function() {
+                alert('❌ Erro ao ler o arquivo.');
                 btn.disabled = false;
                 btn.textContent = '📤 Upload';
-                fileInput.value = ''; // limpa o input
-            }
+            };
+            reader.readAsDataURL(file);
         }
 
         function salvarDadosLocais(){
@@ -409,8 +301,7 @@
             document.getElementById('cart-count').textContent=carrinho.reduce((s,i)=>s+i.qtd,0);
             const bf=document.getElementById('btnFinalizar');
             const ml=document.getElementById('msgLoginNeeded');
-            if(clienteLogado){bf.disabled=false;ml.style.display='none';}
-            else{bf.disabled=true;ml.style.display='block';}
+            if(clienteLogado){bf.disabled=false;ml.style.display='none';} else{bf.disabled=true;ml.style.display='block';}
             document.getElementById('nav-admin').style.display=adminLogado?'inline-block':'none';
             document.getElementById('nav-clientes').style.display=adminLogado?'inline-block':'none';
             document.getElementById('nav-gerenciar').style.display=adminLogado?'inline-block':'none';
@@ -441,20 +332,16 @@
         function renderCatalogo(){
             const c=document.getElementById('catalogoContainer');
             const s=(document.getElementById('searchInput')?.value||'').toLowerCase();
-            let f=produtos.filter(p=>(filtroMarca==='TODAS'||p.marca===filtroMarca)&&p.nome.toLowerCase().includes(s));
+            let f=produtos.filter(p=>(filtroMarca==='TODAS'||p.marca===filtroMarca) && p.nome.toLowerCase().includes(s));
             if(!f.length){c.innerHTML='<div class="empty-state">📦 Nenhum produto encontrado.</div>';return;}
-            c.innerHTML=f.map(p=>{
-                const pr=p.preco>0?'R$ '+p.preco.toFixed(2):(p.obs||'Consulte');
-                return '<div class="product-card"><img src="'+p.img+'" alt="'+p.nome+'" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22><rect fill=%22%23131c24%22 width=%22150%22 height=%22150%22/><text fill=%22%234d9fc0%22 x=%2275%22 y=%2275%22 text-anchor=%22middle%22 dy=%22.3em%22>Sem</text></svg>\'"><span class="brand-tag">'+p.marca+'</span><span class="name">'+p.nome+'</span><span class="price">'+pr+'</span><div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;margin-top:auto;"><input type="number" min="1" value="1" class="qty-input" id="qty-'+p.id+'"><button class="btn" onclick="adicionarAoCarrinho('+p.id+')">🛒</button></div></div>';
-            }).join('');
+            c.innerHTML=f.map(p=>'<div class="product-card"><img src="'+p.img+'" alt="'+p.nome+'" onerror="this.src=\'https://placehold.co/150x150/131c24/4d9fc0?text=Sem\'"><span class="brand-tag">'+p.marca+'</span><span class="name">'+p.nome+'</span><span class="price">'+(p.preco>0?'R$ '+p.preco.toFixed(2):(p.obs||'Consulte'))+'</span><div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;margin-top:auto;"><input type="number" min="1" value="1" class="qty-input" id="qty-'+p.id+'"><button class="btn" onclick="adicionarAoCarrinho('+p.id+')">🛒</button></div></div>').join('');
         }
 
         function adicionarAoCarrinho(pid){
             const q=parseInt(document.getElementById('qty-'+pid)?.value)||1;
-            const p=produtos.find(x=>x.id===pid);
-            if(!p)return;
+            const p=produtos.find(x=>x.id===pid); if(!p)return;
             const e=carrinho.find(i=>i.prodId===pid);
-            if(e)e.qtd+=q;else carrinho.push({prodId:pid,qtd:q,preco:p.preco,nome:p.nome,marca:p.marca});
+            if(e)e.qtd+=q; else carrinho.push({prodId:pid,qtd:q,preco:p.preco,nome:p.nome,marca:p.marca});
             salvarDadosLocais();atualizarUI();alert(p.nome+' adicionado!');
         }
 
@@ -473,11 +360,7 @@
             const r=document.getElementById('carrinhoResumo');
             if(!carrinho.length){c.innerHTML='<div class="empty-state"><p>🛒 Carrinho vazio.</p></div>';r.classList.add('hidden');document.getElementById('checkboxSeguro').checked=false;seguroAtivo=false;return;}
             r.classList.remove('hidden');document.getElementById('checkboxSeguro').checked=seguroAtivo;
-            c.innerHTML=carrinho.map((item,i)=>{
-                const sub=item.preco*item.qtd;
-                const mt=item.marca?' ('+item.marca+')':'';
-                return '<div class="card flex-row flex-between"><div><strong>'+item.nome+'</strong>'+mt+'<br>R$ '+item.preco.toFixed(2)+' x '+item.qtd+' = R$ '+sub.toFixed(2)+'</div><div><input type="number" min="1" value="'+item.qtd+'" class="qty-input" onchange="alterarQtdCarrinho('+i+', this.value)"><button class="btn btn-danger btn-sm" onclick="removerDoCarrinho('+i+')">🗑️</button></div></div>';
-            }).join('');
+            c.innerHTML=carrinho.map((item,i)=>{const sub=item.preco*item.qtd;const mt=item.marca?' ('+item.marca+')':'';return '<div class="card flex-row flex-between"><div><strong>'+item.nome+'</strong>'+mt+'<br>R$ '+item.preco.toFixed(2)+' x '+item.qtd+' = R$ '+sub.toFixed(2)+'</div><div><input type="number" min="1" value="'+item.qtd+'" class="qty-input" onchange="alterarQtdCarrinho('+i+', this.value)"><button class="btn btn-danger btn-sm" onclick="removerDoCarrinho('+i+')">🗑️</button></div></div>';}).join('');
             const t=calcularTotaisCarrinho();
             document.getElementById('resumoItens').textContent=carrinho.reduce((s,i)=>s+i.qtd,0);
             document.getElementById('resumoSubtotal').textContent='R$ '+t.subtotal.toFixed(2);
@@ -499,15 +382,12 @@
                 const end=(clienteLogado.rua||'')+', '+(clienteLogado.numero||'')+' - '+(clienteLogado.bairro||'')+', '+(clienteLogado.regiao||'');
                 const np={id:Date.now(),numero:num,clienteId:clienteLogado.id,clienteNome:clienteLogado.nome,clienteContato:clienteLogado.contato,clienteEndereco:end,clienteCpf:clienteLogado.cpf,itens:carrinho.map(i=>{return{...i};}),subtotal:t.subtotal,frete:t.frete,seguro:t.seguro,total:t.total,status:'pendente',data:new Date().toISOString()};
                 pedidos.unshift(np);
-                salvarPedido(np);
+                db.collection('pedidos').doc(String(np.id)).set(np).catch(e=>console.error(e));
                 carrinho=[];seguroAtivo=false;salvarDadosLocais();atualizarUI();renderCarrinho();
                 window.open('https://wa.me/5593991381813?text=Pedido #'+num+' - '+clienteLogado.nome+' - Total: R$ '+t.total.toFixed(2),'_blank');
             }
         }
 
-        async function salvarPedido(p){try{await db.collection('pedidos').doc(String(p.id)).set(p);}catch(e){console.error(e);}}
-        async function atualizarPedido(id,d){try{await db.collection('pedidos').doc(String(id)).update(d);}catch(e){console.error(e);}}
-        async function deletarPedido(id){try{await db.collection('pedidos').doc(String(id)).delete();}catch(e){console.error(e);}}
         async function salvarUsuario(u){try{await db.collection('usuarios').doc(String(u.id)).set(u);}catch(e){console.error(e);}}
         async function atualizarUsuario(u){try{await db.collection('usuarios').doc(String(u.id)).update(u);}catch(e){console.error(e);}}
         async function deletarUsuario(id){try{await db.collection('usuarios').doc(String(id)).delete();}catch(e){console.error(e);}}
@@ -539,7 +419,7 @@
         function showAdminLogin(){showSection('admin');}
 
         function loginAdmin(){
-            if(document.getElementById('adminUser').value.trim()==='Fortbomba'&&document.getElementById('adminPass').value.trim()==='20362881'){
+            if(document.getElementById('adminUser').value.trim()==='Fortbomba' && document.getElementById('adminPass').value.trim()==='20362881'){
                 adminLogado=true;clienteLogado=null;salvarDadosLocais();atualizarUI();
                 document.getElementById('adminLoginForm').style.display='none';
                 document.getElementById('adminContent').classList.remove('hidden');renderAdmin();
@@ -565,8 +445,8 @@
             }).join('');
         }
 
-        function marcarFinalizado(id){const p=pedidos.find(x=>x.id===id);if(p){p.status='finalizado';atualizarPedido(id,{status:'finalizado'});renderAdminPedidos();}}
-        async function apagarPedido(id){if(confirm('Apagar pedido?')){pedidos=pedidos.filter(x=>x.id!==id);await deletarPedido(id);renderAdminPedidos();}}
+        function marcarFinalizado(id){const p=pedidos.find(x=>x.id===id);if(p){p.status='finalizado';db.collection('pedidos').doc(String(id)).update({status:'finalizado'}).catch(e=>console.error(e));renderAdminPedidos();}}
+        async function apagarPedido(id){if(confirm('Apagar pedido?')){pedidos=pedidos.filter(x=>x.id!==id);await db.collection('pedidos').doc(String(id)).delete().catch(e=>console.error(e));renderAdminPedidos();}}
 
         function renderGerenciarClientes(){
             if(!adminLogado)return;
@@ -605,19 +485,7 @@
 
         function renderGerenciarProdutos(){
             if(!adminLogado)return;
-            document.getElementById('gerenciarContainer').innerHTML=produtos.map(p=>'<div class="card flex-row flex-between"><div style="display:flex;align-items:center;gap:1rem;"><img src="'+p.img+'" class="image-preview" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22><rect fill=%22%23131c24%22 width=%22100%22 height=%22100%22/><text fill=%22%234d9fc0%22 x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>Sem</text></svg>\'"><div><strong>'+p.nome+'</strong><br><small>'+p.marca+'</small></div></div><div class="upload-group"><input type="file" id="file-'+p.id+'" class="file-input" accept="image/*"><button class="btn btn-info btn-sm" id="btnUpload-'+p.id+'" onclick="uploadImagemProduto('+p.id+', document.getElementById(\'file-'+p.id+'\'), this)">📤 Upload</button><input type="text" id="imgInput-'+p.id+'" value="'+p.img+'" style="width:200px;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);color:white;border-radius:6px;"><button class="btn btn-info btn-sm" onclick="atualizarImagem('+p.id+')">💾</button><button class="btn btn-outline btn-sm" onclick="resetarImagem('+p.id+')">↺</button></div></div>').join('');
-        }
-
-        async function atualizarImagem(id){
-            const url=document.getElementById('imgInput-'+id).value.trim();
-            if(!url)return alert('URL inválida.');
-            const p=produtos.find(x=>x.id===id);
-            if(p){p.img=url;await salvarProdutoImagem(id,url);renderGerenciarProdutos();renderCatalogo();}
-        }
-
-        async function resetarImagem(id){
-            const p=produtos.find(x=>x.id===id);
-            if(p){p.img='https://placehold.co/150x150/131c24/4d9fc0?text='+p.nome.substring(0,8).replace(/\s/g,'');await salvarProdutoImagem(id,p.img);renderGerenciarProdutos();renderCatalogo();}
+            document.getElementById('gerenciarContainer').innerHTML=produtos.map(p=>'<div class="card flex-row flex-between"><div style="display:flex;align-items:center;gap:1rem;"><img src="'+p.img+'" class="image-preview" onerror="this.src=\'https://placehold.co/100x100/131c24/4d9fc0?text=Sem\'"><div><strong>'+p.nome+'</strong><br><small>'+p.marca+'</small></div></div><div class="upload-group"><input type="file" id="file-'+p.id+'" class="file-input" accept="image/*"><button class="btn btn-info btn-sm" id="btnUpload-'+p.id+'" onclick="uploadImagemProduto('+p.id+', document.getElementById(\'file-'+p.id+'\'), this)">📤 Upload</button></div></div>').join('');
         }
 
         async function init(){
