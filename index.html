@@ -8,17 +8,53 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
-            --bg: #0a0f14; --surface: #0f161c; --surface2: #131c24; --border: #1e2d3a;
-            --text: #e8edf2; --text2: #8a9ba8; --accent: #3b7c9c; --accent2: #4d9fc0;
-            --danger: #b53b3b; --success: #2d7a4f; --info: #2b6f9c; --radius: 10px;
-            --shadow: 0 8px 30px rgba(0,0,0,0.5); --transition: 0.25s ease;
+            --bg: #ffffff;
+            --surface: #f8f9fa;
+            --surface2: #e9ecef;
+            --border: #ced4da;
+            --text: #212529;
+            --text2: #495057;
+            --accent: #0d6efd;
+            --accent2: #0b5ed7;
+            --danger: #dc3545;
+            --success: #198754;
+            --info: #0dcaf0;
+            --warning: #ffc107;
+            --radius: 10px;
+            --shadow: 0 8px 30px rgba(0,0,0,0.1);
+            --transition: 0.25s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; line-height:1.5; }
-        header { background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; position:sticky; top:0; z-index:100; backdrop-filter:blur(12px); box-shadow:0 2px 25px rgba(0,0,0,0.4); }
+        body {
+            font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            line-height:1.5;
+        }
+        header {
+            background:var(--surface);
+            border-bottom:1px solid var(--border);
+            padding:1rem 2rem;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            gap:1rem;
+            position:sticky;
+            top:0;
+            z-index:100;
+            backdrop-filter:blur(12px);
+            box-shadow:0 2px 15px rgba(0,0,0,0.05);
+        }
         .logo {
-            font-size: 2rem; font-weight: 800; cursor: pointer; text-transform: uppercase;
-            letter-spacing: 2px; color: #FFD700; animation: blink 1.5s infinite;
+            font-size: 2rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #FFD700;
+            animation: blink 1.5s infinite;
             text-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
         @keyframes blink {
@@ -27,42 +63,245 @@
             100% { opacity: 1; }
         }
         nav { display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; }
-        nav button { background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:0.5rem 1.1rem; border-radius:20px; cursor:pointer; font-size:0.85rem; transition:var(--transition); font-weight:500; white-space:nowrap; }
-        nav button:hover { background:var(--border); border-color:var(--accent); color:#c0e0f0; }
-        .cart-badge { background:var(--accent); color:white; border-radius:50%; padding:0.15rem 0.45rem; font-size:0.7rem; font-weight:700; margin-left:4px; }
+        nav button {
+            background:var(--surface2);
+            border:1px solid var(--border);
+            color:var(--text);
+            padding:0.5rem 1.1rem;
+            border-radius:20px;
+            cursor:pointer;
+            font-size:0.85rem;
+            transition:var(--transition);
+            font-weight:500;
+            white-space:nowrap;
+        }
+        nav button:hover {
+            background:var(--border);
+            border-color:var(--accent);
+            color:#0b5ed7;
+        }
+        .cart-badge {
+            background:var(--accent);
+            color:white;
+            border-radius:50%;
+            padding:0.15rem 0.45rem;
+            font-size:0.7rem;
+            font-weight:700;
+            margin-left:4px;
+        }
         main { max-width:1300px; margin:2rem auto; padding:0 1.5rem; }
         .section { display:none; animation:fadeIn 0.4s ease; }
         .section.active { display:block; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        h2 { font-size:1.8rem; margin-bottom:1.5rem; color:var(--accent2); border-bottom:2px solid var(--border); padding-bottom:0.5rem; }
+        h2 {
+            font-size:1.8rem;
+            margin-bottom:1.5rem;
+            color:var(--text);
+            border-bottom:2px solid var(--border);
+            padding-bottom:0.5rem;
+        }
+        h3 { color:var(--text); margin-bottom:1rem; font-size:1.2rem; }
         .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:1.5rem; }
-        .product-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; text-align:center; transition:var(--transition); box-shadow:var(--shadow); display:flex; flex-direction:column; gap:0.6rem; }
-        .product-card:hover { transform:translateY(-5px); border-color:var(--accent); }
-        .product-card img { width:100%; height:120px; object-fit:contain; border-radius:8px; background:var(--surface2); padding:0.5rem; }
-        .product-card .name { font-weight:700; font-size:0.95rem; min-height:2.4rem; color:#fff; }
-        .product-card .price { font-size:1.4rem; font-weight:800; color:var(--accent2); }
-        .product-card .brand-tag { font-size:0.65rem; background:var(--surface2); padding:0.2rem 0.6rem; border-radius:12px; display:inline-block; color:var(--text2); text-transform:uppercase; }
-        .qty-input { width:55px; padding:0.4rem; background:var(--surface2); border:1px solid var(--border); color:#fff; border-radius:6px; text-align:center; }
-        .btn { background:var(--accent); color:white; border:none; padding:0.5rem 1.2rem; border-radius:20px; cursor:pointer; font-weight:700; font-size:0.85rem; transition:var(--transition); }
-        .btn:hover { background:#4d9fc0; }
-        .btn-danger { background:var(--danger); } .btn-success { background:var(--success); } .btn-info { background:var(--info); }
-        .btn-outline { background:transparent; border:2px solid var(--accent); color:var(--accent); }
+        .product-card {
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:1.5rem;
+            text-align:center;
+            transition:var(--transition);
+            box-shadow:var(--shadow);
+            display:flex;
+            flex-direction:column;
+            gap:0.6rem;
+            color:var(--text);
+        }
+        .product-card:hover {
+            transform:translateY(-5px);
+            border-color:var(--accent);
+            box-shadow:0 16px 40px rgba(13,110,253,0.1);
+        }
+        .product-card img {
+            width:100%;
+            height:120px;
+            object-fit:contain;
+            border-radius:8px;
+            background:#f1f3f5;
+            padding:0.5rem;
+        }
+        .product-card .name {
+            font-weight:700;
+            font-size:0.95rem;
+            min-height:2.4rem;
+            color:#212529;
+        }
+        .product-card .price {
+            font-size:1.4rem;
+            font-weight:800;
+            color:var(--accent2);
+        }
+        .product-card .brand-tag {
+            font-size:0.65rem;
+            background:#fff3cd;
+            padding:0.2rem 0.6rem;
+            border-radius:12px;
+            display:inline-block;
+            color:#856404;
+            text-transform:uppercase;
+            letter-spacing:1px;
+            font-weight:600;
+            animation: blink 1.5s infinite;
+        }
+        .qty-input {
+            width:55px;
+            padding:0.4rem;
+            background:white;
+            border:1px solid var(--border);
+            color:var(--text);
+            border-radius:6px;
+            text-align:center;
+        }
+        .btn {
+            background:var(--accent);
+            color:white;
+            border:none;
+            padding:0.5rem 1.2rem;
+            border-radius:20px;
+            cursor:pointer;
+            font-weight:700;
+            font-size:0.85rem;
+            transition:var(--transition);
+        }
+        .btn:hover { background:#0b5ed7; }
+        .btn-danger { background:var(--danger); }
+        .btn-danger:hover { background:#bb2d3b; }
+        .btn-success { background:var(--success); }
+        .btn-success:hover { background:#157347; }
+        .btn-info { background:var(--info); color:#000; }
+        .btn-info:hover { background:#0aa2c0; }
+        .btn-outline {
+            background:transparent;
+            border:2px solid var(--accent);
+            color:var(--accent);
+            font-weight:600;
+        }
+        .btn-outline:hover { background:var(--accent); color:white; }
         .btn-sm { padding:0.3rem 0.8rem; font-size:0.75rem; }
         .form-group { margin-bottom:1rem; }
-        .form-group label { display:block; margin-bottom:0.3rem; font-weight:600; color:var(--text2); font-size:0.8rem; }
-        .form-group input, .form-group select { width:100%; padding:0.6rem 1rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:1rem; }
-        .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow); }
-        .search-box { width:100%; padding:0.7rem 1.2rem; background:var(--surface2); border:1px solid var(--border); border-radius:25px; color:#fff; font-size:1rem; margin-bottom:1.5rem; }
-        .status-badge { padding:0.2rem 0.7rem; border-radius:20px; font-weight:700; font-size:0.7rem; text-transform:uppercase; }
-        .status-pendente { background:#b8860b20; color:#d4a017; border:1px solid #b8860b40; }
-        .status-finalizado { background:#2d7a4f20; color:#2ecc71; border:1px solid #2d7a4f40; }
-        .toggle-brand { background:var(--surface2); border:1px solid var(--border); color:var(--accent2); padding:0.5rem 1.2rem; border-radius:20px; cursor:pointer; font-weight:600; font-size:0.8rem; margin:0.2rem; }
-        .toggle-brand.active { background:var(--accent); color:white; border-color:var(--accent); }
+        .form-group label {
+            display:block;
+            margin-bottom:0.3rem;
+            font-weight:600;
+            color:var(--text2);
+            font-size:0.8rem;
+        }
+        .form-group input, .form-group select {
+            width:100%;
+            padding:0.6rem 1rem;
+            background:white;
+            border:1px solid var(--border);
+            border-radius:6px;
+            color:var(--text);
+            font-size:1rem;
+            transition:var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline:none;
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px rgba(13,110,253,0.15);
+        }
+        .card {
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:1.5rem;
+            margin-bottom:1.5rem;
+            box-shadow:var(--shadow);
+            color:var(--text);
+        }
+        .whatsapp-link { color:#25d366; text-decoration:none; font-weight:700; }
+        .whatsapp-link:hover { text-decoration:underline; }
+        .search-box {
+            width:100%;
+            padding:0.7rem 1.2rem;
+            background:white;
+            border:1px solid var(--border);
+            border-radius:25px;
+            color:var(--text);
+            font-size:1rem;
+            margin-bottom:1.5rem;
+            transition:var(--transition);
+        }
+        .search-box:focus {
+            outline:none;
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px rgba(13,110,253,0.15);
+        }
+        .status-badge {
+            padding:0.2rem 0.7rem;
+            border-radius:20px;
+            font-weight:700;
+            font-size:0.7rem;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+        }
+        .status-pendente { background:#fff3cd; color:#856404; border:1px solid #ffc107; }
+        .status-finalizado { background:#d1e7dd; color:#0f5132; border:1px solid #198754; }
+        .toggle-brand {
+            background:var(--surface2);
+            border:1px solid var(--border);
+            color:var(--text);
+            padding:0.5rem 1.2rem;
+            border-radius:20px;
+            cursor:pointer;
+            font-weight:600;
+            font-size:0.8rem;
+            margin:0.2rem;
+            transition:var(--transition);
+            text-transform:uppercase;
+            letter-spacing:1px;
+        }
+        .toggle-brand.active {
+            background:var(--accent);
+            color:white;
+            border-color:var(--accent);
+        }
         .brand-filters { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:1.5rem; }
-        .image-preview { width:100px; height:100px; object-fit:contain; border:1px solid var(--border); border-radius:8px; background:var(--surface2); }
-        .client-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1rem; }
-        .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:200; backdrop-filter:blur(4px); }
-        .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; max-width:500px; width:90%; }
+        .image-preview {
+            width:100px;
+            height:100px;
+            object-fit:contain;
+            border:1px solid var(--border);
+            border-radius:8px;
+            background:#f1f3f5;
+        }
+        .client-card {
+            background:white;
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:1.2rem;
+            margin-bottom:1rem;
+            transition:var(--transition);
+            color:var(--text);
+        }
+        .client-card:hover { border-color:var(--accent); }
+        .modal-overlay {
+            position:fixed;
+            top:0; left:0; right:0; bottom:0;
+            background:rgba(0,0,0,0.5);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:200;
+            backdrop-filter:blur(4px);
+        }
+        .modal {
+            background:white;
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:2rem;
+            max-width:500px;
+            width:90%;
+        }
         .empty-state { text-align:center; padding:3rem; color:var(--text2); }
         .hidden { display:none !important; }
         .flex-row { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
@@ -70,17 +309,30 @@
         .mt-2 { margin-top:1rem; } .mb-2 { margin-bottom:1rem; }
         .seguro-checkbox { display:flex; align-items:center; gap:0.5rem; margin:0.8rem 0; color:var(--text2); }
         .upload-group { display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap; }
-        .file-input { padding:0.4rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:0.8rem; width:180px; }
-        .whatsapp-link { color:#25d366; text-decoration:none; font-weight:700; }
+        .file-input {
+            padding:0.4rem;
+            background:white;
+            border:1px solid var(--border);
+            border-radius:6px;
+            color:var(--text);
+            font-size:0.8rem;
+            width:180px;
+        }
         .alert-box {
-            background: #1a1a1a;
-            border: 1px solid #d44;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
             border-radius: var(--radius);
             padding: 1rem;
             margin-bottom: 1.5rem;
-            color: #ff8888;
+            color: #856404;
             font-size: 0.9rem;
             white-space: pre-line;
+        }
+        @media (max-width:768px) {
+            header { padding:1rem; flex-direction:column; text-align:center; }
+            nav { justify-content:center; }
+            .product-grid { grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); }
+            .modal { padding:1.5rem; }
         }
     </style>
 </head>
@@ -120,7 +372,7 @@
                     <p id="pSeguro" class="hidden"><strong>Seguro (30%):</strong> <span id="resumoSeguro">R$ 0,00</span></p>
                     <p><strong>Valor Total:</strong> <span id="resumoTotal" style="font-size:1.5rem;color:var(--accent2);">R$ 0,00</span></p>
                     <button class="btn" onclick="finalizarPedido()" id="btnFinalizar" disabled>✅ Finalizar Compra</button>
-                    <p id="msgLoginNeeded" style="color:#e74c3c;margin-top:0.5rem;">⚠️ Faça login para finalizar.</p>
+                    <p id="msgLoginNeeded" style="color:#dc3545;margin-top:0.5rem;">⚠️ Faça login para finalizar.</p>
                 </div>
             </div>
         </section>
@@ -177,21 +429,21 @@
                     <h2>📋 Pedidos</h2>
                     <div>
                         <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('todos')">Todos</button>
-                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('pendente')" style="color:#d4a017;">Pendentes</button>
-                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('finalizado')" style="color:#2ecc71;">Finalizados</button>
+                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('pendente')" style="color:#856404;">Pendentes</button>
+                        <button class="btn btn-outline btn-sm" onclick="filtrarPedidos('finalizado')" style="color:#0f5132;">Finalizados</button>
                     </div>
                 </div>
                 <div id="adminPedidosContainer"></div>
             </div>
         </section>
 
-        <!-- GERENCIAR CLIENTES (ADMIN) -->
+        <!-- GERENCIAR CLIENTES -->
         <section id="gerenciarClientes" class="section">
             <h2>👥 Gerenciar Clientes</h2>
             <div id="clientesContainer"></div>
         </section>
 
-        <!-- GERENCIAR PRODUTOS (ADMIN) -->
+        <!-- GERENCIAR PRODUTOS -->
         <section id="gerenciarProdutos" class="section">
             <h2>🖼️ Gerenciar Imagens dos Produtos</h2>
             <div id="gerenciarContainer"></div>
@@ -424,7 +676,7 @@
             if(!f.length){c.innerHTML='<div class="empty-state">📦 Nenhum produto encontrado.</div>';return;}
             c.innerHTML=f.map(p=>{
                 const pr=p.preco>0?'R$ '+p.preco.toFixed(2):(p.obs||'Consulte');
-                return `<div class="product-card"><img src="${p.img}" alt="${p.nome}" onerror="this.src='https://placehold.co/150x150/131c24/4d9fc0?text=Sem'"><span class="brand-tag">${p.marca}</span><span class="name">${p.nome}</span><span class="price">${pr}</span><div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;margin-top:auto;"><input type="number" min="1" value="1" class="qty-input" id="qty-${p.id}"><button class="btn" onclick="adicionarAoCarrinho(${p.id})">🛒</button></div></div>`;
+                return `<div class="product-card"><img src="${p.img}" alt="${p.nome}" onerror="this.src='https://placehold.co/150x150/ffffff/0d6efd?text=Sem'"><span class="brand-tag">${p.marca}</span><span class="name">${p.nome}</span><span class="price">${pr}</span><div style="display:flex;gap:0.5rem;justify-content:center;align-items:center;margin-top:auto;"><input type="number" min="1" value="1" class="qty-input" id="qty-${p.id}"><button class="btn" onclick="adicionarAoCarrinho(${p.id})">🛒</button></div></div>`;
             }).join('');
         }
 
@@ -641,7 +893,7 @@
             document.getElementById('gerenciarContainer').innerHTML=produtos.map(p=>`
                 <div class="card flex-row flex-between">
                     <div style="display:flex;align-items:center;gap:1rem;">
-                        <img src="${p.img}" class="image-preview" onerror="this.src='https://placehold.co/100x100/131c24/4d9fc0?text=Sem'">
+                        <img src="${p.img}" class="image-preview" onerror="this.src='https://placehold.co/100x100/ffffff/0d6efd?text=Sem'">
                         <div><strong>${p.nome}</strong><br><small>${p.marca}</small></div>
                     </div>
                     <div class="upload-group">
