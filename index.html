@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FORT LABORATORY ⚡</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --bg: #0a0a0f;
@@ -46,7 +44,6 @@
             position: relative;
         }
 
-        /* ============ CANVAS DE RAIOS NO FUNDO ============ */
         #lightningCanvas {
             position: fixed;
             top: 0;
@@ -58,7 +55,6 @@
             opacity: 0.55;
         }
 
-        /* ============ HEADER ============ */
         header {
             background: linear-gradient(180deg, rgba(20, 20, 30, 0.95) 0%, rgba(10, 10, 18, 0.9) 100%);
             border-bottom: 1px solid #2a2a38;
@@ -78,7 +74,6 @@
             overflow: visible;
         }
 
-        /* Linha de energia no header */
         header::after {
             content: '';
             position: absolute;
@@ -101,15 +96,8 @@
         }
 
         @keyframes energyLine {
-            0%,
-            100% {
-                opacity: 0.5;
-                transform: scaleX(0.8);
-            }
-            50% {
-                opacity: 1;
-                transform: scaleX(1);
-            }
+            0%, 100% { opacity: 0.5; transform: scaleX(0.8); }
+            50% { opacity: 1; transform: scaleX(1); }
         }
 
         .logo {
@@ -131,19 +119,11 @@
         }
 
         @keyframes logoPulse {
-            0%,
-            100% {
-                text-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 200, 50, 0.4);
-            }
-            30% {
-                text-shadow: 0 0 35px rgba(255, 230, 80, 1), 0 0 70px rgba(255, 200, 50, 0.7), 0 0 120px rgba(255, 160, 20, 0.3);
-            }
-            60% {
-                text-shadow: 0 0 8px rgba(255, 200, 40, 0.5), 0 0 25px rgba(255, 180, 30, 0.3);
-            }
+            0%, 100% { text-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 200, 50, 0.4); }
+            30% { text-shadow: 0 0 35px rgba(255, 230, 80, 1), 0 0 70px rgba(255, 200, 50, 0.7), 0 0 120px rgba(255, 160, 20, 0.3); }
+            60% { text-shadow: 0 0 8px rgba(255, 200, 40, 0.5), 0 0 25px rgba(255, 180, 30, 0.3); }
         }
 
-        /* Raios decorativos no logo */
         .logo::before {
             content: '⚡';
             position: absolute;
@@ -166,32 +146,17 @@
         }
 
         @keyframes boltFlicker {
-            0%,
-            100% {
-                opacity: 0.4;
-                transform: translateY(-50%) scale(0.8);
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-50%) scale(1.3);
-            }
+            0%, 100% { opacity: 0.4; transform: translateY(-50%) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-50%) scale(1.3); }
         }
         .logo::after {
             animation: boltFlicker2 0.8s ease-in-out 0.4s infinite;
         }
         @keyframes boltFlicker2 {
-            0%,
-            100% {
-                opacity: 0.4;
-                transform: translateY(-50%) scaleX(-1) scale(0.8);
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-50%) scaleX(-1) scale(1.3);
-            }
+            0%, 100% { opacity: 0.4; transform: translateY(-50%) scaleX(-1) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-50%) scaleX(-1) scale(1.3); }
         }
 
-        /* ============ NAVEGAÇÃO ============ */
         nav {
             display: flex;
             gap: 0.5rem;
@@ -220,9 +185,7 @@
             box-shadow: 0 0 18px rgba(240, 192, 64, 0.25);
             transform: translateY(-2px);
         }
-        nav button:active {
-            transform: scale(0.96);
-        }
+        nav button:active { transform: scale(0.96); }
         .cart-badge {
             background: var(--accent);
             color: #000;
@@ -235,16 +198,10 @@
             animation: badgeGlow 2s ease-in-out infinite;
         }
         @keyframes badgeGlow {
-            0%,
-            100% {
-                box-shadow: 0 0 8px rgba(240, 192, 64, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 20px rgba(255, 210, 60, 0.9);
-            }
+            0%, 100% { box-shadow: 0 0 8px rgba(240, 192, 64, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 210, 60, 0.9); }
         }
 
-        /* ============ MAIN ============ */
         main {
             max-width: 1320px;
             margin: 2rem auto;
@@ -252,22 +209,11 @@
             position: relative;
             z-index: 1;
         }
-        .section {
-            display: none;
-            animation: fadeInUp 0.5s ease;
-        }
-        .section.active {
-            display: block;
-        }
+        .section { display: none; animation: fadeInUp 0.5s ease; }
+        .section.active { display: block; }
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
@@ -279,14 +225,8 @@
             text-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
             letter-spacing: 1px;
         }
-        h3 {
-            color: var(--text);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            letter-spacing: 0.5px;
-        }
+        h3 { color: var(--text); margin-bottom: 1rem; font-size: 1.2rem; letter-spacing: 0.5px; }
 
-        /* ============ GRID DE PRODUTOS ============ */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -310,13 +250,9 @@
         .product-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center,
-                    rgba(240, 192, 64, 0.06) 0%,
-                    transparent 70%);
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(240, 192, 64, 0.06) 0%, transparent 70%);
             opacity: 0;
             transition: opacity 0.4s;
         }
@@ -325,9 +261,7 @@
             border-color: var(--accent);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), var(--glow);
         }
-        .product-card:hover::before {
-            opacity: 1;
-        }
+        .product-card:hover::before { opacity: 1; }
         .product-card img {
             width: 100%;
             height: 130px;
@@ -369,14 +303,8 @@
             animation: tagPulse 2s ease-in-out infinite;
         }
         @keyframes tagPulse {
-            0%,
-            100% {
-                border-color: #3a3a18;
-            }
-            50% {
-                border-color: #6a6a28;
-                box-shadow: 0 0 12px rgba(200, 160, 40, 0.3);
-            }
+            0%, 100% { border-color: #3a3a18; }
+            50% { border-color: #6a6a28; box-shadow: 0 0 12px rgba(200, 160, 40, 0.3); }
         }
 
         .qty-input {
@@ -396,7 +324,6 @@
             box-shadow: 0 0 10px rgba(240, 192, 64, 0.2);
         }
 
-        /* ============ BOTÕES ============ */
         .btn {
             background: linear-gradient(135deg, #d4a020, #b8860b);
             color: #000;
@@ -417,65 +344,20 @@
             box-shadow: 0 6px 25px rgba(200, 150, 30, 0.5), var(--glow);
             transform: translateY(-2px);
         }
-        .btn:active {
-            transform: scale(0.95);
-        }
-        .btn-danger {
-            background: linear-gradient(135deg, #c0392b, #8b0000);
-            box-shadow: 0 4px 15px rgba(180, 40, 40, 0.3);
-        }
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #e04040, #a01010);
-            box-shadow: 0 6px 25px rgba(200, 50, 50, 0.5);
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #1a7a40);
-            box-shadow: 0 4px 15px rgba(30, 150, 60, 0.3);
-        }
-        .btn-success:hover {
-            background: linear-gradient(135deg, #2ecc71, #1f8f4a);
-            box-shadow: 0 6px 25px rgba(40, 180, 70, 0.5);
-        }
-        .btn-info {
-            background: linear-gradient(135deg, #2980b9, #1a5080);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(30, 100, 180, 0.3);
-        }
-        .btn-info:hover {
-            background: linear-gradient(135deg, #3498db, #206090);
-            box-shadow: 0 6px 25px rgba(40, 120, 200, 0.5);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            font-weight: 700;
-            box-shadow: none;
-        }
-        .btn-outline:hover {
-            background: rgba(240, 192, 64, 0.1);
-            color: #FFD700;
-            box-shadow: var(--glow);
-        }
-        .btn-sm {
-            padding: 0.35rem 0.9rem;
-            font-size: 0.75rem;
-        }
+        .btn:active { transform: scale(0.95); }
+        .btn-danger { background: linear-gradient(135deg, #c0392b, #8b0000); box-shadow: 0 4px 15px rgba(180, 40, 40, 0.3); }
+        .btn-danger:hover { background: linear-gradient(135deg, #e04040, #a01010); box-shadow: 0 6px 25px rgba(200, 50, 50, 0.5); }
+        .btn-success { background: linear-gradient(135deg, #27ae60, #1a7a40); box-shadow: 0 4px 15px rgba(30, 150, 60, 0.3); }
+        .btn-success:hover { background: linear-gradient(135deg, #2ecc71, #1f8f4a); box-shadow: 0 6px 25px rgba(40, 180, 70, 0.5); }
+        .btn-info { background: linear-gradient(135deg, #2980b9, #1a5080); color: #fff; box-shadow: 0 4px 15px rgba(30, 100, 180, 0.3); }
+        .btn-info:hover { background: linear-gradient(135deg, #3498db, #206090); box-shadow: 0 6px 25px rgba(40, 120, 200, 0.5); }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; box-shadow: none; }
+        .btn-outline:hover { background: rgba(240, 192, 64, 0.1); color: #FFD700; box-shadow: var(--glow); }
+        .btn-sm { padding: 0.35rem 0.9rem; font-size: 0.75rem; }
 
-        /* ============ FORMULÁRIOS ============ */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.35rem;
-            font-weight: 700;
-            color: #c0c0d0;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-        }
-        .form-group input,
-        .form-group select {
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.35rem; font-weight: 700; color: #c0c0d0; font-size: 0.8rem; letter-spacing: 0.5px; }
+        .form-group input, .form-group select {
             width: 100%;
             padding: 0.7rem 1.1rem;
             background: #1a1a25;
@@ -486,14 +368,12 @@
             transition: var(--transition);
             font-family: var(--font);
         }
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(240, 192, 64, 0.12), 0 0 20px rgba(240, 192, 64, 0.08);
         }
 
-        /* ============ CARDS ============ */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -504,20 +384,10 @@
             color: var(--text);
             transition: var(--transition);
         }
-        .card:hover {
-            border-color: #3a3a4a;
-        }
+        .card:hover { border-color: #3a3a4a; }
 
-        .whatsapp-link {
-            color: #25d366;
-            text-decoration: none;
-            font-weight: 700;
-            transition: var(--transition);
-        }
-        .whatsapp-link:hover {
-            text-decoration: underline;
-            text-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
-        }
+        .whatsapp-link { color: #25d366; text-decoration: none; font-weight: 700; transition: var(--transition); }
+        .whatsapp-link:hover { text-decoration: underline; text-shadow: 0 0 10px rgba(37, 211, 102, 0.5); }
 
         .search-box {
             width: 100%;
@@ -537,24 +407,9 @@
             box-shadow: 0 0 0 3px rgba(240, 192, 64, 0.12), 0 0 25px rgba(240, 192, 64, 0.08);
         }
 
-        .status-badge {
-            padding: 0.25rem 0.8rem;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-        .status-pendente {
-            background: #2a1a08;
-            color: #f0a020;
-            border: 1px solid #5a3a10;
-        }
-        .status-finalizado {
-            background: #0a1a10;
-            color: #2ecc71;
-            border: 1px solid #1a4a2a;
-        }
+        .status-badge { padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.6px; }
+        .status-pendente { background: #2a1a08; color: #f0a020; border: 1px solid #5a3a10; }
+        .status-finalizado { background: #0a1a10; color: #2ecc71; border: 1px solid #1a4a2a; }
 
         .toggle-brand {
             background: var(--surface2);
@@ -570,57 +425,18 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .toggle-brand.active {
-            background: linear-gradient(135deg, #d4a020, #b8860b);
-            color: #000;
-            border-color: var(--accent);
-            box-shadow: var(--glow);
-            font-weight: 700;
-        }
-        .toggle-brand:hover:not(.active) {
-            border-color: #5a5a40;
-            color: #d4a020;
-            box-shadow: 0 0 15px rgba(200, 160, 40, 0.2);
-        }
-        .brand-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            margin-bottom: 1.8rem;
-        }
+        .toggle-brand.active { background: linear-gradient(135deg, #d4a020, #b8860b); color: #000; border-color: var(--accent); box-shadow: var(--glow); font-weight: 700; }
+        .toggle-brand:hover:not(.active) { border-color: #5a5a40; color: #d4a020; box-shadow: 0 0 15px rgba(200, 160, 40, 0.2); }
+        .brand-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.8rem; }
 
-        .image-preview {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: #1a1a25;
-        }
-        .client-card {
-            background: #151520;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.3rem;
-            margin-bottom: 1rem;
-            transition: var(--transition);
-            color: var(--text);
-        }
-        .client-card:hover {
-            border-color: var(--accent);
-            box-shadow: var(--glow);
-        }
+        .image-preview { width: 100px; height: 100px; object-fit: contain; border: 1px solid var(--border); border-radius: 8px; background: #1a1a25; }
+        .client-card { background: #151520; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.3rem; margin-bottom: 1rem; transition: var(--transition); color: var(--text); }
+        .client-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
 
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             z-index: 200;
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
@@ -635,160 +451,46 @@
             box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3.5rem;
-            color: var(--text2);
-            font-size: 1.1rem;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .flex-row {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .flex-between {
-            justify-content: space-between;
-        }
-        .mt-2 {
-            margin-top: 1rem;
-        }
-        .mb-2 {
-            margin-bottom: 1rem;
-        }
-        .seguro-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 0.8rem 0;
-            color: var(--text2);
-            font-weight: 600;
-        }
-        .seguro-checkbox input {
-            accent-color: var(--accent);
-            width: 18px;
-            height: 18px;
-        }
-        .upload-group {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .file-input {
-            padding: 0.45rem;
-            background: #1a1a25;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.8rem;
-            width: 180px;
-        }
-        .alert-box {
-            background: #1a1a08;
-            border: 1px solid #4a4a18;
-            border-radius: var(--radius);
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
-            color: #d4a020;
-            font-size: 0.9rem;
-            white-space: pre-line;
-            line-height: 1.6;
-        }
-        .produto-editar-item {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            align-items: center;
-            padding: 1.1rem;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 0.8rem;
-            background: #151520;
-            transition: var(--transition);
-        }
-        .produto-editar-item:hover {
-            border-color: #4a4a4a;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        }
-        .produto-editar-item input {
-            padding: 0.5rem 0.7rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            background: #1a1a25;
-            color: var(--text);
-        }
-        .produto-editar-item input.nome-prod {
-            width: 200px;
-        }
-        .produto-editar-item input.preco-prod {
-            width: 90px;
-        }
-        .produto-editar-item input.marca-prod {
-            width: 160px;
-        }
+        .empty-state { text-align: center; padding: 3.5rem; color: var(--text2); font-size: 1.1rem; }
+        .hidden { display: none !important; }
+        .flex-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+        .flex-between { justify-content: space-between; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .seguro-checkbox { display: flex; align-items: center; gap: 0.5rem; margin: 0.8rem 0; color: var(--text2); font-weight: 600; }
+        .seguro-checkbox input { accent-color: var(--accent); width: 18px; height: 18px; }
+        .upload-group { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+        .file-input { padding: 0.45rem; background: #1a1a25; border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.8rem; width: 180px; }
+        .alert-box { background: #1a1a08; border: 1px solid #4a4a18; border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1.5rem; color: #d4a020; font-size: 0.9rem; white-space: pre-line; line-height: 1.6; }
+        .produto-editar-item { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; padding: 1.1rem; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 0.8rem; background: #151520; transition: var(--transition); }
+        .produto-editar-item:hover { border-color: #4a4a4a; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); }
+        .produto-editar-item input { padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #1a1a25; color: var(--text); }
+        .produto-editar-item input.nome-prod { width: 200px; }
+        .produto-editar-item input.preco-prod { width: 90px; }
+        .produto-editar-item input.marca-prod { width: 160px; }
 
-        /* ============ SCROLLBAR ============ */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0a0f;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2a2a38;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3a3a48;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #2a2a38; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3a48; }
 
-        /* ============ RESPONSIVO ============ */
         @media (max-width:768px) {
-            header {
-                padding: 1rem;
-                flex-direction: column;
-                text-align: center;
-            }
-            .logo {
-                font-size: 1.5rem;
-            }
-            .logo::before,
-            .logo::after {
-                font-size: 1rem;
-                left: -20px;
-            }
-            .logo::after {
-                right: -20px;
-            }
-            nav {
-                justify-content: center;
-            }
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            }
-            .modal {
-                padding: 1.5rem;
-            }
-            .produto-editar-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
+            header { padding: 1rem; flex-direction: column; text-align: center; }
+            .logo { font-size: 1.5rem; }
+            .logo::before, .logo::after { font-size: 1rem; left: -20px; }
+            .logo::after { right: -20px; }
+            nav { justify-content: center; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .modal { padding: 1.5rem; }
+            .produto-editar-item { flex-direction: column; align-items: stretch; }
             .produto-editar-item input.nome-prod,
             .produto-editar-item input.preco-prod,
-            .produto-editar-item input.marca-prod {
-                width: 100%;
-            }
+            .produto-editar-item input.marca-prod { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- CANVAS DE RAIOS NO FUNDO -->
     <canvas id="lightningCanvas"></canvas>
 
     <header>
@@ -805,7 +507,6 @@
     </header>
 
     <main>
-        <!-- CATÁLOGO -->
         <section id="catalogo" class="section active">
             <h2>🏪 Catálogo de Produtos</h2>
             <input type="text" class="search-box" placeholder="🔍 Buscar por nome..." id="searchInput" oninput="renderCatalogo()">
@@ -813,7 +514,6 @@
             <div id="catalogoContainer" class="product-grid"></div>
         </section>
 
-        <!-- CARRINHO -->
         <section id="carrinho" class="section">
             <h2>🛒 Seu Carrinho</h2>
             <div id="carrinhoContainer"></div>
@@ -832,7 +532,6 @@
             </div>
         </section>
 
-        <!-- LOGIN CLIENTE -->
         <section id="login" class="section">
             <h2>👤 Acesso do Cliente</h2>
             <div class="card" style="max-width:600px;margin:0 auto;">
@@ -870,7 +569,6 @@
             </div>
         </section>
 
-        <!-- ADMIN DASHBOARD -->
         <section id="admin" class="section">
             <h2>📊 Painel Administrativo</h2>
             <div id="adminLoginForm" class="card" style="max-width:400px;margin:2rem auto;">
@@ -892,13 +590,11 @@
             </div>
         </section>
 
-        <!-- GERENCIAR CLIENTES -->
         <section id="gerenciarClientes" class="section">
             <h2>👥 Gerenciar Clientes</h2>
             <div id="clientesContainer"></div>
         </section>
 
-        <!-- GERENCIAR PRODUTOS (CATÁLOGO ADMIN) -->
         <section id="gerenciarProdutos" class="section">
             <h2>📦 Gerenciar Catálogo de Produtos</h2>
             <div class="card mb-2">
@@ -914,7 +610,6 @@
             <div id="gerenciarContainer"></div>
         </section>
 
-        <!-- MODAL EDITAR CLIENTE -->
         <div id="modalEditarCliente" class="modal-overlay hidden">
             <div class="modal">
                 <h3>✏️ Editar Cliente</h3>
@@ -938,7 +633,6 @@
     </main>
 
     <script>
-        // ==================== CONFIG FIREBASE ====================
         const firebaseConfig = {
             apiKey: "AIzaSyAMXzy9rvOg_OiosG-j83nxGdEEcBwMfeo",
             authDomain: "fort-laboratory.firebaseapp.com",
@@ -951,283 +645,141 @@
         const db = firebase.firestore();
 
         const fretePorRegiao = {
-            'SP': 50,
-            'DF': 70,
-            'RJ': 70,
-            'MG': 80,
-            'GO': 80,
-            'ES': 80,
-            'RS': 80,
-            'MT': 90,
-            'MS': 90,
-            'BA': 90,
-            'CE': 90,
-            'PR': 90,
-            'SC': 90,
-            'MA': 90,
-            'PA': 90,
-            'AC': 90,
-            'AM': 90,
-            'TO': 90,
-            'RO': 95,
-            'RR': 95,
-            'AP': 95
+            'SP': 50, 'DF': 70, 'RJ': 70, 'MG': 80, 'GO': 80, 'ES': 80, 'RS': 80,
+            'MT': 90, 'MS': 90, 'BA': 90, 'CE': 90, 'PR': 90, 'SC': 90, 'MA': 90,
+            'PA': 90, 'AC': 90, 'AM': 90, 'TO': 90, 'RO': 95, 'RR': 95, 'AP': 95
         };
 
         const produtosBase = [
-            { id: 1, nome: 'Testenat 250 mg 4 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Testenat' },
-            { id: 2, nome: 'Deca 5 ml 200 mg', preco: 125, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Deca' },
-            { id: 3, nome: 'Depo Lander 3 x 2 ml 6 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Depo' },
-            { id: 4, nome: 'Dura Lander 1 ml 250 Mg', preco: 50, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Dura' },
-            { id: 5, nome: 'Stanozolol 30 ml aquoso 50 Mg', preco: 175, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Stano' },
-            { id: 6, nome: 'Stanozolol 15 ml aquoso 50 Mg', preco: 125, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Stano15' },
-            { id: 7, nome: 'Primobolan 100 mg 10 ml', preco: 410, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Primo' },
-            { id: 8, nome: 'Propionato 100 mg 10 ml', preco: 175, marca: 'LANDER LAN INJETÁVEL',
-                img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Prop' },
-            { id: 9, nome: 'Oxandrolona 10 mg 50 compr', preco: 310, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan10' },
-            { id: 10, nome: 'Oxandrolona 5 mg 100 compr', preco: 300, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan5' },
-            { id: 11, nome: 'Stanozolol 10 Mg 100 compr', preco: 135, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=StanoC' },
-            { id: 12, nome: 'Diana compr 10 Mg 100 compr', preco: 135, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Diana' },
-            { id: 13, nome: 'Hemog lander 50 mg 20 comp', preco: 135, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Hemog' },
-            { id: 14, nome: 'Clembuterol oral', preco: 150, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Clemb' },
-            { id: 15, nome: 'Masteron oral', preco: 250, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=MastOral' },
-            { id: 16, nome: 'Proviron 20comp/25mg', preco: 160, marca: 'LANDER LAN COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Prov' },
-            { id: 17, nome: 'Deca nandrolona 200 mg 10ml', preco: 210, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=DecaGold' },
-            { id: 18, nome: 'Boldenona 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=BoldGold' },
-            { id: 19, nome: 'Masteron 100 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=MastGold' },
-            { id: 20, nome: 'Npp 100 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=NppGold' },
-            { id: 21, nome: 'Enantato 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=EnantGold' },
-            { id: 22, nome: 'Durateston 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=DuraGold' },
-            { id: 23, nome: 'Trembo acetato 100 Mg 10 ml', preco: 240, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremA' },
-            { id: 24, nome: 'Trembo enantato 200 mg 10 ml', preco: 220, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremE' },
-            { id: 25, nome: 'Trembo hexahydro 51 mg 10 ml', preco: 300, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremH' },
-            { id: 26, nome: 'Sales de Trembo 200 mg 10 ml', preco: 330, marca: 'LANDERLAN GOLD',
-                img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=SalesTrem' },
-            { id: 27, nome: 'Deca nandrolona 200 mg 10ml', preco: 170, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DecaMP' },
-            { id: 28, nome: 'Boldenona 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=BoldMP' },
-            { id: 29, nome: 'Masteron 100 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=MastMP' },
-            { id: 30, nome: 'Npp 100 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=NppMP' },
-            { id: 31, nome: 'Enantato 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantMP' },
-            { id: 32, nome: 'Durateston 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DuraMP' },
-            { id: 33, nome: 'Trembo acetato 100 Mg 10 ml', preco: 180, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremAMP' },
-            { id: 34, nome: 'Trembo enantato 200 mg 10 ml', preco: 200, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremEMP' },
-            { id: 35, nome: 'Trembo hexahydro 51 mg 10 ml', preco: 300, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremHMP' },
-            { id: 36, nome: 'Sales de Trembo 200 mg 10 ml', preco: 300, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=SalesTremMP' },
-            { id: 37, nome: 'Oxan 5,10mg', preco: 250, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=OxanMP' },
-            { id: 38, nome: 'Stano oral', preco: 140, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=StanoMP' },
-            { id: 39, nome: 'Hemogenin', preco: 140, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=HemoMP' },
-            { id: 40, nome: 'Diana', preco: 140, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DianaMP' },
-            { id: 41, nome: 'Turinabol', preco: 190, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TuriMP' },
-            { id: 42, nome: 'Proviron 40caps/25mg', preco: 150, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=ProvMP' },
-            { id: 43, nome: 'Cutstack', preco: 200, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=CutMP' },
-            { id: 44, nome: 'Primobolan', preco: 380, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoMP' },
-            { id: 45, nome: 'Primo muscle black 5ML', preco: 250, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoBlack' },
-            { id: 46, nome: 'Enantato muscle black 5ML', preco: 200, marca: 'MUSCLE PHARMA',
-                img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantBlack' },
-            { id: 47, nome: 'Boldenona 300 mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=BoldKing' },
-            { id: 48, nome: 'Propionato 200mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=PropKing' },
-            { id: 49, nome: 'Deca 300mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=DecaKing' },
-            { id: 50, nome: 'Primobolan 100mg 10ml', preco: 350, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=PrimoKing' },
-            { id: 51, nome: 'Testex 200mg 10ml(cipionato)', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Testex' },
-            { id: 52, nome: 'Nebido', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Nebido' },
-            { id: 53, nome: 'Stanozolol 30 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Stano30' },
-            { id: 54, nome: 'Stanozolol 15ml', preco: 100, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Stano15K' },
-            { id: 55, nome: 'Testoviron 250mg 10ml (enantato)', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Testov' },
-            { id: 56, nome: 'Sustan 250mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Sustan' },
-            { id: 57, nome: 'Masteron 100 mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=MastKing' },
-            { id: 58, nome: 'Npp 100 mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=NppKing' },
-            { id: 59, nome: 'Cutstack 150mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=CutKing' },
-            { id: 60, nome: 'Parabolan 100mg 10ml (Trembo acetato)', preco: 170, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaA' },
-            { id: 61, nome: 'Parabolin blend 200mg 10ml (Trembo blend)', preco: 250, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaBlend' },
-            { id: 62, nome: 'Finaplix 100mg 10 ml (Trembo enantato)', preco: 180, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Fina' },
-            { id: 63, nome: 'Parabolan hexa (Trembo Hexahydro)', preco: 200, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaHexa' },
-            { id: 64, nome: 'Masterom show', preco: 150, marca: 'KING PHARMA INJETÁVEL',
-                img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=MastShow' },
-            { id: 65, nome: 'Turinabol', preco: 170, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=TuriKing' },
-            { id: 66, nome: 'Proviron-RX 20caps/25mg', preco: 135, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=ProvRX' },
-            { id: 67, nome: 'Diana compr', preco: 125, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=DianaKC' },
-            { id: 68, nome: 'Stano compr', preco: 125, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=StanoKC' },
-            { id: 69, nome: 'Halotestin', preco: 300, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Halo' },
-            { id: 70, nome: 'Turinabol R$200', preco: 200, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Turi200' },
-            { id: 71, nome: 'Anavar Oxan 50cp 10mg', preco: 200, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Anavar' },
-            { id: 72, nome: 'Anadrol 50comp 50 mg (hemogenin)', preco: 175, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Anadrol' },
-            { id: 73, nome: 'Propionato oral', preco: 175, marca: 'KING PHARMA COMPRIMIDO',
-                img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=PropOral' },
-            { id: 74, nome: 'Dura Bujão', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DuraB' },
-            { id: 75, nome: 'Enantato Bujão', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=EnantB' },
-            { id: 76, nome: 'Deca Bujão', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DecaB' },
-            { id: 77, nome: 'Masterom Bujão', preco: 160, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=MastB' },
-            { id: 78, nome: 'Trembo ac Bujão', preco: 180, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TremB' },
-            { id: 79, nome: 'Stano injetável', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=StanoB' },
-            { id: 80, nome: 'Primobolan Bujão', preco: 300, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PrimoB' },
-            { id: 81, nome: 'Boldenona Bujão', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=BoldB' },
-            { id: 82, nome: 'Cipionato Bujão', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=CipB' },
-            { id: 83, nome: 'Propionato bujão', preco: 150, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PropB' },
-            { id: 84, nome: 'B-blend Bujão', preco: 180, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=BBlend' },
-            { id: 85, nome: 'Npp Bujão', preco: 160, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=NppB' },
-            { id: 86, nome: 'Primo ampola', preco: 350, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PrimoAmp' },
-            { id: 87, nome: 'Trembo ac ampola', preco: 240, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TremAmp' },
-            { id: 88, nome: 'Testo enantato ampola', preco: 200, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TestoEnant' },
-            { id: 89, nome: 'Testo Sales ampola', preco: 200, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TestoSales' },
-            { id: 90, nome: 'Deca ampola', preco: 200, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DecaAmp' },
-            { id: 91, nome: 'Masterom ampola', preco: 200, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=MastAmp' },
-            { id: 92, nome: 'Proviron 25caps/25mg', preco: 135, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=ProvB' },
-            { id: 93, nome: 'Stano oral', preco: 110, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=StanoBO' },
-            { id: 94, nome: 'Diana', preco: 110, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DianaB' },
-            { id: 95, nome: 'Oxandrolona', preco: 220, marca: 'BRATVA',
-                img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=OxanB' },
-            { id: 96, nome: 'LIPOSTABIL 5 ampolas de 5 ml', preco: 125, marca: 'QUEIMA DE GORDURA',
-                img: 'https://placehold.co/150x150/2a1e1e/d4af37?text=Lipo' },
-            { id: 97, nome: 'Anastrozol 1mg 30compr', preco: 125, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Anastr' },
-            { id: 98, nome: 'Deposteron de farmácia', preco: 120, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Depost' },
-            { id: 99, nome: 'Durateston aspen 1 ml', preco: 120, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=DuraAsp' },
-            { id: 100, nome: 'Venvanse 30 Mg', preco: 650, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven30' },
-            { id: 101, nome: 'Venvanse 50 Mg', preco: 700, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven50' },
-            { id: 102, nome: 'Venvanse 70 Mg', preco: 750, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven70' },
-            { id: 103, nome: 'Tamoxifeno 20 mg 30 compr', preco: 125, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Tamox' },
-            { id: 104, nome: 'Sibutramina legrand 15mg', preco: 75, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Sibut' },
-            { id: 105, nome: 'Rivotril compr Original', preco: 125, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivOri' },
-            { id: 106, nome: 'Rivotril gotas Original', preco: 125, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGotas' },
-            { id: 107, nome: 'Rivotril compr genérico', preco: 125, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGen' },
-            { id: 108, nome: 'Rivotril gotas genérico', preco: 125, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGenG' },
-            { id: 109, nome: 'Roacutan genérico', preco: 175, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RoacGen' },
-            { id: 110, nome: 'Roacutan original', preco: 380, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RoacOri' },
-            { id: 111, nome: 'Ritalina eas 30 compr', preco: 100, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalEAS' },
-            { id: 112, nome: 'Ritalina genérica 60 compr', preco: 150, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalGen' },
-            { id: 113, nome: 'Ritalina Novartis 30 compr 10 mg', preco: 150, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalNov30' },
-            { id: 114, nome: 'Ritalina Novartis 60 compr 10 mg', preco: 200, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalNov60' },
-            { id: 115, nome: 'Pramil 20 compr 50 Mg', preco: 50, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Pramil' },
-            { id: 116, nome: 'Erectalis tadalafil 20 Mg 20 compr', preco: 50, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Erect' },
-            { id: 117, nome: 'Dualid (anfepramona) original farmácia', preco: 110, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Dualid' },
-            { id: 118, nome: 'Deca aspen original', preco: 70, marca: 'PRODUTOS DE FARMÁCIA',
-                img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=DecaAsp' },
-            { id: 119, nome: 'Tb500 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS',
-                img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=TB500', obs: 'Peça a tabela' },
-            { id: 120, nome: 'Frag 176 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS',
-                img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Frag176', obs: 'Peça a tabela' },
-            { id: 121, nome: 'Ipamorelim (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS',
-                img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Ipa', obs: 'Peça a tabela' },
-            { id: 122, nome: 'Adipodite (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS',
-                img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Adipo', obs: 'Peça a tabela' },
-            { id: 123, nome: 'BPC 157 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS',
-                img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=BPC157', obs: 'Peça a tabela' },
-            { id: 124, nome: 'Igf1 Lr3 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS',
-                img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=IGF1', obs: 'Peça a tabela' },
-            { id: 125, nome: 'SARMs DRAGON elite', preco: 180, marca: 'SARMS',
-                img: 'https://placehold.co/150x150/1e1e2e/d4af37?text=SARMs' }
+            { id: 1, nome: 'Testenat 250 mg 4 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Testenat' },
+            { id: 2, nome: 'Deca 5 ml 200 mg', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Deca' },
+            { id: 3, nome: 'Depo Lander 3 x 2 ml 6 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Depo' },
+            { id: 4, nome: 'Dura Lander 1 ml 250 Mg', preco: 50, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Dura' },
+            { id: 5, nome: 'Stanozolol 30 ml aquoso 50 Mg', preco: 175, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Stano' },
+            { id: 6, nome: 'Stanozolol 15 ml aquoso 50 Mg', preco: 125, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Stano15' },
+            { id: 7, nome: 'Primobolan 100 mg 10 ml', preco: 410, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Primo' },
+            { id: 8, nome: 'Propionato 100 mg 10 ml', preco: 175, marca: 'LANDER LAN INJETÁVEL', img: 'https://placehold.co/150x150/1a1a2e/d4af37?text=Prop' },
+            { id: 9, nome: 'Oxandrolona 10 mg 50 compr', preco: 310, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan10' },
+            { id: 10, nome: 'Oxandrolona 5 mg 100 compr', preco: 300, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Oxan5' },
+            { id: 11, nome: 'Stanozolol 10 Mg 100 compr', preco: 135, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=StanoC' },
+            { id: 12, nome: 'Diana compr 10 Mg 100 compr', preco: 135, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Diana' },
+            { id: 13, nome: 'Hemog lander 50 mg 20 comp', preco: 135, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Hemog' },
+            { id: 14, nome: 'Clembuterol oral', preco: 150, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Clemb' },
+            { id: 15, nome: 'Masteron oral', preco: 250, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=MastOral' },
+            { id: 16, nome: 'Proviron 20comp/25mg', preco: 160, marca: 'LANDER LAN COMPRIMIDO', img: 'https://placehold.co/150x150/2a1a1e/d4af37?text=Prov' },
+            { id: 17, nome: 'Deca nandrolona 200 mg 10ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=DecaGold' },
+            { id: 18, nome: 'Boldenona 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=BoldGold' },
+            { id: 19, nome: 'Masteron 100 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=MastGold' },
+            { id: 20, nome: 'Npp 100 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=NppGold' },
+            { id: 21, nome: 'Enantato 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=EnantGold' },
+            { id: 22, nome: 'Durateston 250 mg 10 ml', preco: 210, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=DuraGold' },
+            { id: 23, nome: 'Trembo acetato 100 Mg 10 ml', preco: 240, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremA' },
+            { id: 24, nome: 'Trembo enantato 200 mg 10 ml', preco: 220, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremE' },
+            { id: 25, nome: 'Trembo hexahydro 51 mg 10 ml', preco: 300, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=TremH' },
+            { id: 26, nome: 'Sales de Trembo 200 mg 10 ml', preco: 330, marca: 'LANDERLAN GOLD', img: 'https://placehold.co/150x150/1e2a1e/d4af37?text=SalesTrem' },
+            { id: 27, nome: 'Deca nandrolona 200 mg 10ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DecaMP' },
+            { id: 28, nome: 'Boldenona 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=BoldMP' },
+            { id: 29, nome: 'Masteron 100 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=MastMP' },
+            { id: 30, nome: 'Npp 100 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=NppMP' },
+            { id: 31, nome: 'Enantato 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantMP' },
+            { id: 32, nome: 'Durateston 250 mg 10 ml', preco: 170, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DuraMP' },
+            { id: 33, nome: 'Trembo acetato 100 Mg 10 ml', preco: 180, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremAMP' },
+            { id: 34, nome: 'Trembo enantato 200 mg 10 ml', preco: 200, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremEMP' },
+            { id: 35, nome: 'Trembo hexahydro 51 mg 10 ml', preco: 300, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TremHMP' },
+            { id: 36, nome: 'Sales de Trembo 200 mg 10 ml', preco: 300, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=SalesTremMP' },
+            { id: 37, nome: 'Oxan 5,10mg', preco: 250, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=OxanMP' },
+            { id: 38, nome: 'Stano oral', preco: 140, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=StanoMP' },
+            { id: 39, nome: 'Hemogenin', preco: 140, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=HemoMP' },
+            { id: 40, nome: 'Diana', preco: 140, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=DianaMP' },
+            { id: 41, nome: 'Turinabol', preco: 190, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=TuriMP' },
+            { id: 42, nome: 'Proviron 40caps/25mg', preco: 150, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=ProvMP' },
+            { id: 43, nome: 'Cutstack', preco: 200, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=CutMP' },
+            { id: 44, nome: 'Primobolan', preco: 380, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoMP' },
+            { id: 45, nome: 'Primo muscle black 5ML', preco: 250, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=PrimoBlack' },
+            { id: 46, nome: 'Enantato muscle black 5ML', preco: 200, marca: 'MUSCLE PHARMA', img: 'https://placehold.co/150x150/1e1e2a/d4af37?text=EnantBlack' },
+            { id: 47, nome: 'Boldenona 300 mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=BoldKing' },
+            { id: 48, nome: 'Propionato 200mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=PropKing' },
+            { id: 49, nome: 'Deca 300mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=DecaKing' },
+            { id: 50, nome: 'Primobolan 100mg 10ml', preco: 350, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=PrimoKing' },
+            { id: 51, nome: 'Testex 200mg 10ml(cipionato)', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Testex' },
+            { id: 52, nome: 'Nebido', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Nebido' },
+            { id: 53, nome: 'Stanozolol 30 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Stano30' },
+            { id: 54, nome: 'Stanozolol 15ml', preco: 100, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Stano15K' },
+            { id: 55, nome: 'Testoviron 250mg 10ml (enantato)', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Testov' },
+            { id: 56, nome: 'Sustan 250mg 10ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Sustan' },
+            { id: 57, nome: 'Masteron 100 mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=MastKing' },
+            { id: 58, nome: 'Npp 100 mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=NppKing' },
+            { id: 59, nome: 'Cutstack 150mg 10 ml', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=CutKing' },
+            { id: 60, nome: 'Parabolan 100mg 10ml (Trembo acetato)', preco: 170, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaA' },
+            { id: 61, nome: 'Parabolin blend 200mg 10ml (Trembo blend)', preco: 250, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaBlend' },
+            { id: 62, nome: 'Finaplix 100mg 10 ml (Trembo enantato)', preco: 180, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=Fina' },
+            { id: 63, nome: 'Parabolan hexa (Trembo Hexahydro)', preco: 200, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=ParaHexa' },
+            { id: 64, nome: 'Masterom show', preco: 150, marca: 'KING PHARMA INJETÁVEL', img: 'https://placehold.co/150x150/2a1a1a/d4af37?text=MastShow' },
+            { id: 65, nome: 'Turinabol', preco: 170, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=TuriKing' },
+            { id: 66, nome: 'Proviron-RX 20caps/25mg', preco: 135, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=ProvRX' },
+            { id: 67, nome: 'Diana compr', preco: 125, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=DianaKC' },
+            { id: 68, nome: 'Stano compr', preco: 125, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=StanoKC' },
+            { id: 69, nome: 'Halotestin', preco: 300, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Halo' },
+            { id: 70, nome: 'Turinabol R$200', preco: 200, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Turi200' },
+            { id: 71, nome: 'Anavar Oxan 50cp 10mg', preco: 200, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Anavar' },
+            { id: 72, nome: 'Anadrol 50comp 50 mg (hemogenin)', preco: 175, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=Anadrol' },
+            { id: 73, nome: 'Propionato oral', preco: 175, marca: 'KING PHARMA COMPRIMIDO', img: 'https://placehold.co/150x150/2a2a1a/d4af37?text=PropOral' },
+            { id: 74, nome: 'Dura Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DuraB' },
+            { id: 75, nome: 'Enantato Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=EnantB' },
+            { id: 76, nome: 'Deca Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DecaB' },
+            { id: 77, nome: 'Masterom Bujão', preco: 160, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=MastB' },
+            { id: 78, nome: 'Trembo ac Bujão', preco: 180, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TremB' },
+            { id: 79, nome: 'Stano injetável', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=StanoB' },
+            { id: 80, nome: 'Primobolan Bujão', preco: 300, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PrimoB' },
+            { id: 81, nome: 'Boldenona Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=BoldB' },
+            { id: 82, nome: 'Cipionato Bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=CipB' },
+            { id: 83, nome: 'Propionato bujão', preco: 150, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PropB' },
+            { id: 84, nome: 'B-blend Bujão', preco: 180, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=BBlend' },
+            { id: 85, nome: 'Npp Bujão', preco: 160, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=NppB' },
+            { id: 86, nome: 'Primo ampola', preco: 350, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=PrimoAmp' },
+            { id: 87, nome: 'Trembo ac ampola', preco: 240, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TremAmp' },
+            { id: 88, nome: 'Testo enantato ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TestoEnant' },
+            { id: 89, nome: 'Testo Sales ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=TestoSales' },
+            { id: 90, nome: 'Deca ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DecaAmp' },
+            { id: 91, nome: 'Masterom ampola', preco: 200, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=MastAmp' },
+            { id: 92, nome: 'Proviron 25caps/25mg', preco: 135, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=ProvB' },
+            { id: 93, nome: 'Stano oral', preco: 110, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=StanoBO' },
+            { id: 94, nome: 'Diana', preco: 110, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=DianaB' },
+            { id: 95, nome: 'Oxandrolona', preco: 220, marca: 'BRATVA', img: 'https://placehold.co/150x150/1a1a1a/d4af37?text=OxanB' },
+            { id: 96, nome: 'LIPOSTABIL 5 ampolas de 5 ml', preco: 125, marca: 'QUEIMA DE GORDURA', img: 'https://placehold.co/150x150/2a1e1e/d4af37?text=Lipo' },
+            { id: 97, nome: 'Anastrozol 1mg 30compr', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Anastr' },
+            { id: 98, nome: 'Deposteron de farmácia', preco: 120, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Depost' },
+            { id: 99, nome: 'Durateston aspen 1 ml', preco: 120, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=DuraAsp' },
+            { id: 100, nome: 'Venvanse 30 Mg', preco: 650, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven30' },
+            { id: 101, nome: 'Venvanse 50 Mg', preco: 700, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven50' },
+            { id: 102, nome: 'Venvanse 70 Mg', preco: 750, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Ven70' },
+            { id: 103, nome: 'Tamoxifeno 20 mg 30 compr', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Tamox' },
+            { id: 104, nome: 'Sibutramina legrand 15mg', preco: 75, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Sibut' },
+            { id: 105, nome: 'Rivotril compr Original', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivOri' },
+            { id: 106, nome: 'Rivotril gotas Original', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGotas' },
+            { id: 107, nome: 'Rivotril compr genérico', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGen' },
+            { id: 108, nome: 'Rivotril gotas genérico', preco: 125, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RivGenG' },
+            { id: 109, nome: 'Roacutan genérico', preco: 175, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RoacGen' },
+            { id: 110, nome: 'Roacutan original', preco: 380, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RoacOri' },
+            { id: 111, nome: 'Ritalina eas 30 compr', preco: 100, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalEAS' },
+            { id: 112, nome: 'Ritalina genérica 60 compr', preco: 150, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalGen' },
+            { id: 113, nome: 'Ritalina Novartis 30 compr 10 mg', preco: 150, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalNov30' },
+            { id: 114, nome: 'Ritalina Novartis 60 compr 10 mg', preco: 200, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=RitalNov60' },
+            { id: 115, nome: 'Pramil 20 compr 50 Mg', preco: 50, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Pramil' },
+            { id: 116, nome: 'Erectalis tadalafil 20 Mg 20 compr', preco: 50, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Erect' },
+            { id: 117, nome: 'Dualid (anfepramona) original farmácia', preco: 110, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=Dualid' },
+            { id: 118, nome: 'Deca aspen original', preco: 70, marca: 'PRODUTOS DE FARMÁCIA', img: 'https://placehold.co/150x150/1e2a2a/d4af37?text=DecaAsp' },
+            { id: 119, nome: 'Tb500 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=TB500', obs: 'Peça a tabela' },
+            { id: 120, nome: 'Frag 176 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Frag176', obs: 'Peça a tabela' },
+            { id: 121, nome: 'Ipamorelim (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Ipa', obs: 'Peça a tabela' },
+            { id: 122, nome: 'Adipodite (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=Adipo', obs: 'Peça a tabela' },
+            { id: 123, nome: 'BPC 157 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=BPC157', obs: 'Peça a tabela' },
+            { id: 124, nome: 'Igf1 Lr3 (Peptídeo)', preco: 0, marca: 'PEPTÍDEOS', img: 'https://placehold.co/150x150/1e1e1e/d4af37?text=IGF1', obs: 'Peça a tabela' },
+            { id: 125, nome: 'SARMs DRAGON elite', preco: 180, marca: 'SARMS', img: 'https://placehold.co/150x150/1e1e2e/d4af37?text=SARMs' }
         ];
 
-        let produtos = [];
+        // ✅ CORREÇÃO: inicializa produtos imediatamente com a base, nunca vazio
+        let produtos = JSON.parse(JSON.stringify(produtosBase));
         let carrinho = [],
             usuarios = [],
             pedidos = [],
@@ -1253,7 +805,6 @@
             resize();
             window.addEventListener('resize', resize);
 
-            // Partículas de energia flutuantes
             const particles = [];
             const PARTICLE_COUNT = 35;
             for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -1269,7 +820,6 @@
                 });
             }
 
-            // Raios
             let lightningTimer = 0;
             let lightningPoints = [];
             let lightningAlpha = 0;
@@ -1290,10 +840,7 @@
                 for (let i = 1; i < segments; i++) {
                     const offsetX = (Math.random() - 0.5) * width * 0.15;
                     const offsetY = (Math.random() - 0.5) * dy * 1.5;
-                    points.push({
-                        x: startX + dx * i + offsetX,
-                        y: startY + dy * i + offsetY
-                    });
+                    points.push({ x: startX + dx * i + offsetX, y: startY + dy * i + offsetY });
                 }
                 points.push({ x: endX, y: endY });
                 return points;
@@ -1332,21 +879,16 @@
                 ctx.shadowBlur = lineWidth * 3;
                 ctx.beginPath();
                 ctx.moveTo(points[0].x, points[0].y);
-                for (let i = 1; i < points.length; i++) {
-                    ctx.lineTo(points[i].x, points[i].y);
-                }
+                for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
                 ctx.stroke();
 
-                // Linha interna mais fina (branca)
                 ctx.strokeStyle = '#fff';
                 ctx.lineWidth = lineWidth * 0.35;
                 ctx.shadowBlur = lineWidth * 5;
                 ctx.shadowColor = '#fff';
                 ctx.beginPath();
                 ctx.moveTo(points[0].x, points[0].y);
-                for (let i = 1; i < points.length; i++) {
-                    ctx.lineTo(points[i].x, points[i].y);
-                }
+                for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
                 ctx.stroke();
                 ctx.restore();
             }
@@ -1358,20 +900,17 @@
 
             function updateLightning(now) {
                 if (!mainBolt && now >= nextLightning) {
-                    // Criar novo raio
                     mainBolt = generateLightning();
                     branches = generateBranchedLightning(mainBolt);
                     lightningMaxAlpha = 0.35 + Math.random() * 0.45;
                     lightningAlpha = lightningMaxAlpha;
                     boltStartTime = now;
-                    nextLightning = now + LIGHTNING_INTERVAL_MIN + Math.random() * (LIGHTNING_INTERVAL_MAX -
-                        LIGHTNING_INTERVAL_MIN);
+                    nextLightning = now + LIGHTNING_INTERVAL_MIN + Math.random() * (LIGHTNING_INTERVAL_MAX - LIGHTNING_INTERVAL_MIN);
                 }
                 if (mainBolt) {
                     const elapsed = now - boltStartTime;
-                    if (elapsed < 60) {
-                        lightningAlpha = lightningMaxAlpha;
-                    } else if (elapsed < BOLT_DURATION) {
+                    if (elapsed < 60) lightningAlpha = lightningMaxAlpha;
+                    else if (elapsed < BOLT_DURATION) {
                         const decay = (elapsed - 60) / (BOLT_DURATION - 60);
                         lightningAlpha = lightningMaxAlpha * (1 - decay) * (0.5 + 0.5 * Math.random());
                     } else {
@@ -1384,8 +923,6 @@
 
             function draw(timestamp) {
                 ctx.clearRect(0, 0, width, height);
-
-                // Fundo com leve textura de grade
                 ctx.fillStyle = 'rgba(10,10,15,0.03)';
                 ctx.fillRect(0, 0, width, height);
                 const gridSize = 80;
@@ -1404,7 +941,6 @@
                     ctx.stroke();
                 }
 
-                // Partículas
                 particles.forEach(p => {
                     p.x += p.speedX;
                     p.y += p.speedY;
@@ -1418,17 +954,14 @@
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(240,200,80,${p.currentOpacity})`;
                     ctx.fill();
-                    // Glow
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius * 2.5, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(240,200,80,${p.currentOpacity * 0.25})`;
                     ctx.fill();
                 });
 
-                // Raios
                 updateLightning(timestamp);
                 if (mainBolt && lightningAlpha > 0.01) {
-                    // Glow do raio no ambiente
                     const glowGradient = ctx.createRadialGradient(
                         mainBolt[Math.floor(mainBolt.length / 2)].x,
                         mainBolt[Math.floor(mainBolt.length / 2)].y,
@@ -1443,17 +976,14 @@
                     ctx.fillStyle = glowGradient;
                     ctx.fillRect(0, 0, width, height);
 
-                    // Raio principal
                     drawLightningLine(mainBolt, lightningAlpha, 3.5, '#FFD700');
                     drawLightningLine(mainBolt, lightningAlpha * 0.7, 7, '#f0c040');
 
-                    // Ramos
                     branches.forEach(branch => {
                         drawLightningLine(branch, lightningAlpha * 0.55, 1.8, '#e0b030');
                         drawLightningLine(branch, lightningAlpha * 0.35, 4, '#d0a020');
                     });
                 }
-
                 requestAnimationFrame(draw);
             }
             requestAnimationFrame(draw);
@@ -1466,10 +996,18 @@
                 usuarios = uSnap.docs.map(d => { return { id: d.id, ...d.data() }; });
                 const pSnap = await db.collection('pedidos').orderBy('data', 'desc').get();
                 pedidos = pSnap.docs.map(d => { return { id: d.id, ...d.data() }; });
+
                 const prodSnap = await db.collection('produtos').get();
                 const firestoreProds = prodSnap.docs.map(d => d.data());
-                if (firestoreProds.length === 0) {
-                    produtos = JSON.parse(JSON.stringify(produtosBase));
+
+                if (firestoreProds.length > 0) {
+                    const mapBase = {};
+                    produtos.forEach(p => mapBase[p.id] = p);
+                    firestoreProds.forEach(fp => {
+                        mapBase[fp.id] = { ...mapBase[fp.id], ...fp, preco: parseFloat(fp.preco) || 0 };
+                    });
+                    produtos = Object.values(mapBase).sort((a, b) => a.id - b.id);
+                } else {
                     const batch = db.batch();
                     produtos.forEach(p => {
                         const ref = db.collection('produtos').doc(String(p.id));
@@ -1483,16 +1021,11 @@
                         });
                     });
                     await batch.commit();
-                } else {
-                    const mapBase = {};
-                    produtosBase.forEach(p => mapBase[p.id] = p);
-                    firestoreProds.forEach(fp => {
-                        mapBase[fp.id] = { ...mapBase[fp.id], ...fp, preco: parseFloat(fp.preco) || 0 };
-                    });
-                    produtos = Object.values(mapBase).sort((a, b) => a.id - b.id);
                 }
-            } catch (e) { console.error(e);
-                produtos = JSON.parse(JSON.stringify(produtosBase)); }
+            } catch (e) {
+                console.error('Erro ao carregar dados do Firestore:', e);
+                // mantém a base intacta
+            }
         }
 
         async function salvarProdutoFirestore(prod) {
@@ -1523,9 +1056,8 @@
             document.getElementById('cart-count').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
             const bf = document.getElementById('btnFinalizar');
             const ml = document.getElementById('msgLoginNeeded');
-            if (clienteLogado) { bf.disabled = false;
-                ml.style.display = 'none'; } else { bf.disabled = true;
-                ml.style.display = 'block'; }
+            if (clienteLogado) { bf.disabled = false; ml.style.display = 'none'; }
+            else { bf.disabled = true; ml.style.display = 'block'; }
             document.getElementById('nav-admin').style.display = adminLogado ? 'inline-block' : 'none';
             document.getElementById('nav-clientes').style.display = adminLogado ? 'inline-block' : 'none';
             document.getElementById('nav-gerenciar').style.display = adminLogado ? 'inline-block' : 'none';
@@ -1539,36 +1071,41 @@
             if (id === 'catalogo') renderCatalogo();
             if (id === 'carrinho') renderCarrinho();
             if (id === 'admin') renderAdmin();
-            if (id === 'gerenciarClientes') { if (!adminLogado) { alert('Acesso restrito.');
-                    showSection('login'); return; } renderGerenciarClientes(); }
-            if (id === 'gerenciarProdutos') { if (!adminLogado) { alert('Acesso restrito.');
-                    showSection('login'); return; } renderGerenciarProdutos(); }
+            if (id === 'gerenciarClientes') {
+                if (!adminLogado) { alert('Acesso restrito.'); showSection('login'); return; }
+                renderGerenciarClientes();
+            }
+            if (id === 'gerenciarProdutos') {
+                if (!adminLogado) { alert('Acesso restrito.'); showSection('login'); return; }
+                renderGerenciarProdutos();
+            }
             atualizarUI();
         }
 
-        function logout() { clienteLogado = null;
+        function logout() {
+            clienteLogado = null;
             adminLogado = false;
             salvarDadosLocais();
             showSection('catalogo');
-            atualizarUI(); }
+            atualizarUI();
+        }
 
         function renderBrandFilters() {
             const marcas = [...new Set(produtos.map(p => p.marca))];
-            document.getElementById('brandFilters').innerHTML = '<button class="toggle-brand ' + (filtroMarca === 'TODAS' ?
-                'active' : '') + '" onclick="setFiltroMarca(\'TODAS\')">TODAS</button>' + marcas.map(m =>
-                '<button class="toggle-brand ' + (filtroMarca === m ? 'active' : '') +
-                '" onclick="setFiltroMarca(\'' + m.replace(/'/g, "\\'") + '\')">' + m + '</button>').join('');
+            document.getElementById('brandFilters').innerHTML =
+                '<button class="toggle-brand ' + (filtroMarca === 'TODAS' ? 'active' : '') + '" onclick="setFiltroMarca(\'TODAS\')">TODAS</button>' +
+                marcas.map(m => '<button class="toggle-brand ' + (filtroMarca === m ? 'active' : '') + '" onclick="setFiltroMarca(\'' + m.replace(/'/g, "\\'") + '\')">' + m + '</button>').join('');
         }
 
-        function setFiltroMarca(m) { filtroMarca = m;
-            renderBrandFilters();
-            renderCatalogo(); }
+        function setFiltroMarca(m) { filtroMarca = m; renderBrandFilters(); renderCatalogo(); }
 
         function renderCatalogo() {
             const c = document.getElementById('catalogoContainer');
             const s = (document.getElementById('searchInput')?.value || '').toLowerCase();
-            let f = produtos.filter(p => (filtroMarca === 'TODAS' || p.marca === filtroMarca) && p.nome.toLowerCase()
-                .includes(s));
+            let f = produtos.filter(p =>
+                (filtroMarca === 'TODAS' || p.marca === filtroMarca) &&
+                p.nome.toLowerCase().includes(s)
+            );
             if (!f.length) { c.innerHTML = '<div class="empty-state">📦 Nenhum produto encontrado.</div>'; return; }
             c.innerHTML = f.map(p => {
                 const pr = p.preco > 0 ? 'R$ ' + p.preco.toFixed(2) : (p.obs || 'Consulte');
@@ -1588,15 +1125,12 @@
             alert(p.nome + ' adicionado!');
         }
 
-        function toggleSeguro() { seguroAtivo = document.getElementById('checkboxSeguro').checked;
-            salvarDadosLocais();
-            renderCarrinho(); }
+        function toggleSeguro() { seguroAtivo = document.getElementById('checkboxSeguro').checked; salvarDadosLocais(); renderCarrinho(); }
 
         function calcularTotaisCarrinho() {
             const sub = carrinho.reduce((s, i) => s + i.preco * i.qtd, 0);
             let frete = 0;
-            if (clienteLogado && clienteLogado.regiao && fretePorRegiao[clienteLogado.regiao]) frete = fretePorRegiao[
-                clienteLogado.regiao];
+            if (clienteLogado && clienteLogado.regiao && fretePorRegiao[clienteLogado.regiao]) frete = fretePorRegiao[clienteLogado.regiao];
             const seg = seguroAtivo ? sub * 0.3 : 0;
             return { subtotal: sub, frete: frete, seguro: seg, total: sub + frete + seg };
         }
@@ -1604,66 +1138,45 @@
         function renderCarrinho() {
             const c = document.getElementById('carrinhoContainer');
             const r = document.getElementById('carrinhoResumo');
-            if (!carrinho.length) { c.innerHTML =
-                '<div class="empty-state"><p>🛒 Carrinho vazio.</p></div>';
+            if (!carrinho.length) {
+                c.innerHTML = '<div class="empty-state"><p>🛒 Carrinho vazio.</p></div>';
                 r.classList.add('hidden');
                 document.getElementById('checkboxSeguro').checked = false;
-                seguroAtivo = false; return; }
+                seguroAtivo = false;
+                return;
+            }
             r.classList.remove('hidden');
             document.getElementById('checkboxSeguro').checked = seguroAtivo;
             c.innerHTML = carrinho.map((item, i) => {
                 const sub = item.preco * item.qtd;
                 const mt = item.marca ? ' (' + item.marca + ')' : '';
-                return '<div class="card flex-row flex-between"><div><strong>' + item.nome + '</strong>' + mt +
-                    '<br>R$ ' + item.preco.toFixed(2) + ' x ' + item.qtd + ' = R$ ' + sub.toFixed(2) +
-                    '</div><div><input type="number" min="1" value="' + item.qtd +
-                    '" class="qty-input" onchange="alterarQtdCarrinho(' + i +
-                    ', this.value)"><button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(' + i +
-                    ')">🗑️</button></div></div>';
+                return '<div class="card flex-row flex-between"><div><strong>' + item.nome + '</strong>' + mt + '<br>R$ ' + item.preco.toFixed(2) + ' x ' + item.qtd + ' = R$ ' + sub.toFixed(2) + '</div><div><input type="number" min="1" value="' + item.qtd + '" class="qty-input" onchange="alterarQtdCarrinho(' + i + ', this.value)"><button class="btn btn-danger btn-sm" onclick="removerDoCarrinho(' + i + ')">🗑️</button></div></div>';
             }).join('');
             const t = calcularTotaisCarrinho();
             document.getElementById('resumoItens').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
             document.getElementById('resumoSubtotal').textContent = 'R$ ' + t.subtotal.toFixed(2);
-            document.getElementById('resumoFrete').textContent = t.frete > 0 ? 'R$ ' + t.frete.toFixed(2) : (clienteLogado ?
-                'R$ 0,00' : 'Faça login');
+            document.getElementById('resumoFrete').textContent = t.frete > 0 ? 'R$ ' + t.frete.toFixed(2) : (clienteLogado ? 'R$ 0,00' : 'Faça login');
             document.getElementById('resumoSeguro').textContent = 'R$ ' + t.seguro.toFixed(2);
             document.getElementById('pSeguro').classList.toggle('hidden', !seguroAtivo);
             document.getElementById('resumoTotal').textContent = 'R$ ' + t.total.toFixed(2);
         }
 
-        function alterarQtdCarrinho(i, v) { carrinho[i].qtd = Math.max(1, parseInt(v) || 1);
-            salvarDadosLocais();
-            renderCarrinho();
-            atualizarUI(); }
-
-        function removerDoCarrinho(i) { carrinho.splice(i, 1);
-            salvarDadosLocais();
-            renderCarrinho();
-            atualizarUI(); }
+        function alterarQtdCarrinho(i, v) { carrinho[i].qtd = Math.max(1, parseInt(v) || 1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
+        function removerDoCarrinho(i) { carrinho.splice(i, 1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
 
         function finalizarPedido() {
             if (!clienteLogado) return alert('Faça login.');
             if (!carrinho.length) return alert('Carrinho vazio.');
             const t = calcularTotaisCarrinho();
             const num = Date.now().toString().slice(-8);
-            const enderecoCompleto =
-                `${clienteLogado.rua || ''}, ${clienteLogado.numero || ''} - ${clienteLogado.bairro || ''}, ${clienteLogado.cidade || ''} - ${clienteLogado.regiao || ''}, CEP: ${clienteLogado.cep || ''}${clienteLogado.complemento ? ' (' + clienteLogado.complemento + ')' : ''}`;
+            const enderecoCompleto = `${clienteLogado.rua || ''}, ${clienteLogado.numero || ''} - ${clienteLogado.bairro || ''}, ${clienteLogado.cidade || ''} - ${clienteLogado.regiao || ''}, CEP: ${clienteLogado.cep || ''}${clienteLogado.complemento ? ' (' + clienteLogado.complemento + ')' : ''}`;
             let itensMsg = '';
-            carrinho.forEach(item => { itensMsg +=
-                    `➡️ ${item.qtd}x ${item.nome}${item.marca ? ` (${item.marca})` : ''} - R$ ${(item.preco*item.qtd).toFixed(2)}\n`; });
+            carrinho.forEach(item => { itensMsg += `➡️ ${item.qtd}x ${item.nome}${item.marca ? ` (${item.marca})` : ''} - R$ ${(item.preco*item.qtd).toFixed(2)}\n`; });
             let detalhesMsg = `Subtotal: R$ ${t.subtotal.toFixed(2)}\n`;
             if (t.frete > 0) detalhesMsg += `Frete: R$ ${t.frete.toFixed(2)}\n`;
             if (t.seguro > 0) detalhesMsg += `Seguro (30%): R$ ${t.seguro.toFixed(2)}\n`;
             detalhesMsg += `💰 TOTAL: R$ ${t.total.toFixed(2)}`;
-            const mensagem = `🛒 *NOVO PEDIDO #${num}*\n\n` +
-                `👤 *Cliente:* ${clienteLogado.nome}\n` +
-                `📄 *CPF:* ${clienteLogado.cpf}\n` +
-                `📍 *Endereço:* ${enderecoCompleto}\n` +
-                `📞 *Contato:* ${clienteLogado.contato}\n\n` +
-                `📋 *ITENS DO PEDIDO:*\n${itensMsg}\n` +
-                `${detalhesMsg}\n\n` +
-                `💳 *PIX:* Fortpharma137@gmail.com\n` +
-                `✅ *Confirmar pagamento para envio.*`;
+            const mensagem = `🛒 *NOVO PEDIDO #${num}*\n\n👤 *Cliente:* ${clienteLogado.nome}\n📄 *CPF:* ${clienteLogado.cpf}\n📍 *Endereço:* ${enderecoCompleto}\n📞 *Contato:* ${clienteLogado.contato}\n\n📋 *ITENS DO PEDIDO:*\n${itensMsg}\n${detalhesMsg}\n\n💳 *PIX:* Fortpharma137@gmail.com\n✅ *Confirmar pagamento para envio.*`;
             if (confirm('Confirma o pedido?\n\nTotal: R$ ' + t.total.toFixed(2))) {
                 const novoPedido = {
                     id: Date.now(),
@@ -1692,17 +1205,14 @@
             }
         }
 
-        async function salvarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).set(u); } catch (e) {
-                console.error(e); } }
+        async function salvarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).set(u); } catch (e) { console.error(e); } }
+        async function atualizarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).update(u); } catch (e) { console.error(e); } }
+        async function deletarUsuario(id) { try { await db.collection('usuarios').doc(String(id)).delete(); } catch (e) { console.error(e); } }
 
-        async function atualizarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).update(u); } catch (
-            e) { console.error(e); } }
-
-        async function deletarUsuario(id) { try { await db.collection('usuarios').doc(String(id)).delete(); } catch (e) {
-                console.error(e); } }
-
-        function toggleCadastro() { document.getElementById('loginForm').classList.toggle('hidden');
-            document.getElementById('cadastroForm').classList.toggle('hidden'); }
+        function toggleCadastro() {
+            document.getElementById('loginForm').classList.toggle('hidden');
+            document.getElementById('cadastroForm').classList.toggle('hidden');
+        }
 
         function loginCliente() {
             const cpf = document.getElementById('loginCpf').value.replace(/\D/g, '');
@@ -1726,8 +1236,7 @@
             const regiao = document.getElementById('cadRegiao').value;
             const cep = document.getElementById('cadCep').value.trim();
             const t = document.getElementById('cadContato').value.trim();
-            if (!n || !c || !rua || !num || !bairro || !cidade || !regiao || !t) return alert(
-                'Preencha todos os campos obrigatórios (Nome, CPF, Endereço, Número, Bairro, Cidade, Estado e WhatsApp).');
+            if (!n || !c || !rua || !num || !bairro || !cidade || !regiao || !t) return alert('Preencha todos os campos obrigatórios.');
             if (usuarios.find(u => u.cpf === c)) return alert('CPF já cadastrado.');
             const novo = {
                 id: Date.now(),
@@ -1756,8 +1265,7 @@
         function showAdminLogin() { showSection('admin'); }
 
         function loginAdmin() {
-            if (document.getElementById('adminUser').value.trim() === 'Fortbomba' && document.getElementById('adminPass')
-                .value.trim() === '20362881') {
+            if (document.getElementById('adminUser').value.trim() === 'Fortbomba' && document.getElementById('adminPass').value.trim() === '20362881') {
                 adminLogado = true;
                 clienteLogado = null;
                 salvarDadosLocais();
@@ -1768,13 +1276,14 @@
             } else alert('Credenciais inválidas.');
         }
 
-        function renderAdmin() { if (!adminLogado) return;
+        function renderAdmin() {
+            if (!adminLogado) return;
             document.getElementById('adminLoginForm').style.display = 'none';
             document.getElementById('adminContent').classList.remove('hidden');
-            renderAdminPedidos(); }
+            renderAdminPedidos();
+        }
 
-        function filtrarPedidos(s) { filtroAdminStatus = s;
-            renderAdminPedidos(); }
+        function filtrarPedidos(s) { filtroAdminStatus = s; renderAdminPedidos(); }
 
         function renderAdminPedidos() {
             const c = document.getElementById('adminPedidosContainer');
@@ -1783,33 +1292,31 @@
             if (filtroAdminStatus === 'finalizado') f = pedidos.filter(p => p.status === 'finalizado');
             if (!f.length) { c.innerHTML = '<div class="empty-state">📭 Nenhum pedido.</div>'; return; }
             c.innerHTML = f.map(p => {
-                const itens = p.itens.map(i => i.qtd + 'x ' + i.nome + (i.marca ? ' (' + i.marca + ')' : ''))
-                    .join(', ');
+                const itens = p.itens.map(i => i.qtd + 'x ' + i.nome + (i.marca ? ' (' + i.marca + ')' : '')).join(', ');
                 const det = [];
                 if (p.subtotal) det.push('Subtotal: R$ ' + p.subtotal.toFixed(2));
                 if (p.frete > 0) det.push('Frete: R$ ' + p.frete.toFixed(2));
                 if (p.seguro > 0) det.push('Seguro: R$ ' + p.seguro.toFixed(2));
-                return '<div class="card"><div class="flex-row flex-between"><div><strong>#' + p.numero +
-                    '</strong> <span class="status-badge ' + (p.status === 'pendente' ? 'status-pendente' :
-                        'status-finalizado') + '">' + p.status + '</span></div><div>' + (p.status === 'pendente' ?
-                        '<button class="btn btn-success btn-sm" onclick="marcarFinalizado(' + p.id +
-                        ')">✔️ Finalizar</button>' : '') +
-                    ' <button class="btn btn-danger btn-sm" onclick="apagarPedido(' + p.id +
-                    ')">🗑️</button></div></div><p>👤 ' + p.clienteNome + ' | 📞 <a class="whatsapp-link" href="https://wa.me/55' +
-                    p.clienteContato.replace(/\D/g, '') + '" target="_blank">' + p.clienteContato +
-                    '</a></p><p>📍 ' + p.clienteEndereco + '</p><p>🛍️ ' + itens + '</p>' + (det.length ? '<p>📋 ' + det.join(
-                        ' | ') + '</p>' : '') + '<p>💰 <strong>Total: R$ ' + p.total.toFixed(2) +
-                    '</strong></p></div>';
+                return `<div class="card"><div class="flex-row flex-between"><div><strong>#${p.numero}</strong> <span class="status-badge ${p.status==='pendente'?'status-pendente':'status-finalizado'}">${p.status}</span></div><div>${p.status==='pendente'?`<button class="btn btn-success btn-sm" onclick="marcarFinalizado(${p.id})">✔️ Finalizar</button>`:''} <button class="btn btn-danger btn-sm" onclick="apagarPedido(${p.id})">🗑️</button></div></div><p>👤 ${p.clienteNome} | 📞 <a class="whatsapp-link" href="https://wa.me/55${p.clienteContato.replace(/\D/g,'')}" target="_blank">${p.clienteContato}</a></p><p>📍 ${p.clienteEndereco}</p><p>🛍️ ${itens}</p>${det.length?`<p>📋 ${det.join(' | ')}</p>`:''}<p>💰 <strong>Total: R$ ${p.total.toFixed(2)}</strong></p></div>`;
             }).join('');
         }
 
-        function marcarFinalizado(id) { const p = pedidos.find(x => x.id === id); if (p) { p.status = 'finalizado';
+        function marcarFinalizado(id) {
+            const p = pedidos.find(x => x.id === id);
+            if (p) {
+                p.status = 'finalizado';
                 db.collection('pedidos').doc(String(id)).update({ status: 'finalizado' }).catch(e => console.error(e));
-                renderAdminPedidos(); } }
+                renderAdminPedidos();
+            }
+        }
 
-        async function apagarPedido(id) { if (confirm('Apagar pedido?')) { pedidos = pedidos.filter(x => x.id !== id);
+        async function apagarPedido(id) {
+            if (confirm('Apagar pedido?')) {
+                pedidos = pedidos.filter(x => x.id !== id);
                 await db.collection('pedidos').doc(String(id)).delete().catch(e => console.error(e));
-                renderAdminPedidos(); } }
+                renderAdminPedidos();
+            }
+        }
 
         function renderGerenciarClientes() {
             if (!adminLogado) return;
@@ -1820,11 +1327,9 @@
                 const s = searchVal.toLowerCase();
                 return u.nome.toLowerCase().includes(s) || u.cpf.includes(s) || u.contato.includes(s);
             });
-            c.innerHTML = '<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="' +
-                searchVal + '"></div>' +
+            c.innerHTML = `<div class="mb-2"><input type="text" class="search-box" placeholder="🔍 Buscar cliente..." oninput="renderGerenciarClientes()" id="searchClientes" value="${searchVal}"></div>` +
                 filtrados.map(u => {
-                    const end = u.endereco ||
-                        `${u.rua||''}, ${u.numero||''} - ${u.bairro||''}, ${u.cidade||''} - ${u.regiao||''}, CEP: ${u.cep||''}${u.complemento?' ('+u.complemento+')':''}`;
+                    const end = u.endereco || `${u.rua||''}, ${u.numero||''} - ${u.bairro||''}, ${u.cidade||''} - ${u.regiao||''}, CEP: ${u.cep||''}${u.complemento?' ('+u.complemento+')':''}`;
                     return `<div class="client-card flex-row flex-between"><div><strong>${u.nome}</strong><br><small>CPF: ${u.cpf} | 📞 ${u.contato}</small><br><small>📍 ${end}</small></div><div class="flex-row"><button class="btn btn-info btn-sm" onclick="abrirModalEditarCliente(${u.id})">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="excluirCliente(${u.id})">🗑️ Excluir</button></div></div>`;
                 }).join('');
         }
@@ -1832,10 +1337,13 @@
         async function excluirCliente(id) {
             if (!confirm('Excluir cliente?')) return;
             const i = usuarios.findIndex(u => u.id === id);
-            if (i !== -1) { usuarios.splice(i, 1);
-                await deletarUsuario(id); if (clienteLogado && clienteLogado.id === id) logout();
+            if (i !== -1) {
+                usuarios.splice(i, 1);
+                await deletarUsuario(id);
+                if (clienteLogado && clienteLogado.id === id) logout();
                 renderGerenciarClientes();
-                alert('Cliente excluído!'); }
+                alert('Cliente excluído!');
+            }
         }
 
         function abrirModalEditarCliente(id) {
@@ -1856,8 +1364,7 @@
             document.getElementById('modalEditarCliente').classList.remove('hidden');
         }
 
-        function fecharModal() { document.getElementById('modalEditarCliente').classList.add('hidden');
-            clienteEditandoId = null; }
+        function fecharModal() { document.getElementById('modalEditarCliente').classList.add('hidden'); clienteEditandoId = null; }
 
         async function salvarEdicaoCliente() {
             const id = parseInt(document.getElementById('editClienteId').value);
@@ -1872,11 +1379,9 @@
             u.regiao = document.getElementById('editRegiao').value;
             u.cep = document.getElementById('editCep').value.trim();
             u.contato = document.getElementById('editContato').value.trim();
-            u.endereco =
-                `${u.rua}, ${u.numero} - ${u.bairro}, ${u.cidade} - ${u.regiao}, CEP: ${u.cep}${u.complemento?' ('+u.complemento+')':''}`;
+            u.endereco = `${u.rua}, ${u.numero} - ${u.bairro}, ${u.cidade} - ${u.regiao}, CEP: ${u.cep}${u.complemento?' ('+u.complemento+')':''}`;
             await atualizarUsuario(u);
-            if (clienteLogado && clienteLogado.id === id) { clienteLogado = u;
-                salvarDadosLocais(); }
+            if (clienteLogado && clienteLogado.id === id) { clienteLogado = u; salvarDadosLocais(); }
             fecharModal();
             renderGerenciarClientes();
             alert('Dados atualizados!');
@@ -1886,19 +1391,19 @@
             if (!adminLogado) return;
             const container = document.getElementById('gerenciarContainer');
             container.innerHTML = produtos.map(p => `
-            <div class="produto-editar-item">
-              <img src="${p.img}" class="image-preview" onerror="this.src='https://placehold.co/100x100/1a1a25/d4af37?text=Sem'">
-              <input type="text" class="nome-prod" value="${p.nome.replace(/"/g,'&quot;')}" id="nome-${p.id}" placeholder="Nome">
-              <input type="number" class="preco-prod" value="${p.preco}" step="0.01" min="0" id="preco-${p.id}" placeholder="Preço">
-              <input type="text" class="marca-prod" value="${p.marca.replace(/"/g,'&quot;')}" id="marca-${p.id}" placeholder="Marca">
-              <div class="upload-group">
-                <input type="file" id="file-${p.id}" class="file-input" accept="image/*">
-                <button class="btn btn-info btn-sm" id="btnUpload-${p.id}" onclick="uploadImagemProduto(${p.id}, document.getElementById('file-${p.id}'), this)">📤 Imagem</button>
-              </div>
-              <button class="btn btn-success btn-sm" onclick="salvarEdicaoProduto(${p.id})">💾 Salvar</button>
-              <button class="btn btn-danger btn-sm" onclick="excluirProduto(${p.id})">🗑️ Excluir</button>
-            </div>
-          `).join('');
+                <div class="produto-editar-item">
+                  <img src="${p.img}" class="image-preview" onerror="this.src='https://placehold.co/100x100/1a1a25/d4af37?text=Sem'">
+                  <input type="text" class="nome-prod" value="${p.nome.replace(/"/g,'&quot;')}" id="nome-${p.id}" placeholder="Nome">
+                  <input type="number" class="preco-prod" value="${p.preco}" step="0.01" min="0" id="preco-${p.id}" placeholder="Preço">
+                  <input type="text" class="marca-prod" value="${p.marca.replace(/"/g,'&quot;')}" id="marca-${p.id}" placeholder="Marca">
+                  <div class="upload-group">
+                    <input type="file" id="file-${p.id}" class="file-input" accept="image/*">
+                    <button class="btn btn-info btn-sm" id="btnUpload-${p.id}" onclick="uploadImagemProduto(${p.id}, document.getElementById('file-${p.id}'), this)">📤 Imagem</button>
+                  </div>
+                  <button class="btn btn-success btn-sm" onclick="salvarEdicaoProduto(${p.id})">💾 Salvar</button>
+                  <button class="btn btn-danger btn-sm" onclick="excluirProduto(${p.id})">🗑️ Excluir</button>
+                </div>
+            `).join('');
         }
 
         async function salvarEdicaoProduto(id) {
@@ -1990,12 +1495,9 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        let width = img.width,
-                            height = img.height;
-                        if (width > height) { if (width > maxWidth) { height *= maxWidth / width;
-                                width = maxWidth; } } else { if (height > maxHeight) { width *= maxHeight /
-                                height;
-                                height = maxHeight; } }
+                        let width = img.width, height = img.height;
+                        if (width > height) { if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; } }
+                        else { if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; } }
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
@@ -2020,13 +1522,10 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxWidth = 500,
-                        maxHeight = 500;
-                    let width = img.width,
-                        height = img.height;
-                    if (width > height) { if (width > maxWidth) { height *= maxWidth / width;
-                            width = maxWidth; } } else { if (height > maxHeight) { width *= maxHeight / height;
-                            height = maxHeight; } }
+                    const maxWidth = 500, maxHeight = 500;
+                    let width = img.width, height = img.height;
+                    if (width > height) { if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; } }
+                    else { if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; } }
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
@@ -2046,14 +1545,10 @@
                         fileInput.value = '';
                     });
                 };
-                img.onerror = function() { alert('❌ Erro ao carregar imagem.');
-                    btn.disabled = false;
-                    btn.textContent = '📤 Imagem'; };
+                img.onerror = function() { alert('❌ Erro ao carregar imagem.'); btn.disabled = false; btn.textContent = '📤 Imagem'; };
                 img.src = e.target.result;
             };
-            reader.onerror = function() { alert('❌ Erro ao ler o arquivo.');
-                btn.disabled = false;
-                btn.textContent = '📤 Imagem'; };
+            reader.onerror = function() { alert('❌ Erro ao ler o arquivo.'); btn.disabled = false; btn.textContent = '📤 Imagem'; };
             reader.readAsDataURL(file);
         }
 
@@ -2062,10 +1557,19 @@
             seguroAtivo = JSON.parse(localStorage.getItem('seguroAtivo')) || false;
             clienteLogado = JSON.parse(sessionStorage.getItem('clienteLogado')) || null;
             adminLogado = JSON.parse(sessionStorage.getItem('adminLogado')) || false;
-            await carregarDados();
+
+            // ✅ Renderiza imediatamente com a base (agora produtos nunca vazio)
             renderBrandFilters();
             renderCatalogo();
             atualizarUI();
+
+            await carregarDados(); // atualiza com Firebase, se disponível
+
+            // Re-renderiza para refletir dados do Firestore (pedidos, clientes, etc.)
+            renderBrandFilters();
+            renderCatalogo();
+            atualizarUI();
+
             if (adminLogado) {
                 document.getElementById('nav-admin').style.display = 'inline-block';
                 document.getElementById('nav-clientes').style.display = 'inline-block';
