@@ -42,6 +42,8 @@
             line-height: 1.6;
             overflow-x: hidden;
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         /* TELA DE LOADING */
@@ -941,38 +943,164 @@
             color: #2ecc71;
             border: 1px solid #1a4a2a;
         }
-        .toggle-brand {
+
+        /* ========== NOVO SLIDER DE MARCAS DESLIZANTE ========== */
+        .brand-slider-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .brand-slider-arrow {
             background: var(--surface2);
             border: 1px solid var(--border);
-            color: var(--text2);
-            padding: 0.55rem 1.3rem;
-            border-radius: 25px;
+            color: var(--accent);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            margin: 0.2rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            flex-shrink: 0;
+            z-index: 5;
+            font-weight: bold;
         }
-        .toggle-brand.active {
+        .brand-slider-arrow:hover {
+            background: #222230;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(240, 192, 64, 0.3);
+            color: #FFD700;
+        }
+        .brand-slider-arrow:active {
+            transform: scale(0.9);
+        }
+        .brand-slider-container {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            cursor: grab;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 0.5rem 0.2rem;
+            scroll-snap-type: x mandatory;
+            -webkit-scroll-snap-type: x mandatory;
+            mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+        }
+        .brand-slider-container::-webkit-scrollbar {
+            display: none;
+        }
+        .brand-slider-container:active {
+            cursor: grabbing;
+        }
+        .brand-slider-container.dragging {
+            scroll-behavior: auto;
+            cursor: grabbing;
+        }
+        .brand-slider-track {
+            display: inline-flex;
+            gap: 0.5rem;
+            padding: 0 1.5rem;
+        }
+        .toggle-brand-slide {
+            background: var(--surface2);
+            border: 2px solid var(--border);
+            color: var(--text2);
+            padding: 0.6rem 1.4rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.82rem;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            scroll-snap-align: center;
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .toggle-brand-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.08), transparent);
+            transition: left 0.5s;
+        }
+        .toggle-brand-slide:hover::before {
+            left: 100%;
+        }
+        .toggle-brand-slide:hover {
+            border-color: #5a5a40;
+            color: #d4a020;
+            box-shadow: 0 0 18px rgba(200, 160, 40, 0.25);
+            transform: translateY(-2px);
+        }
+        .toggle-brand-slide.active {
             background: linear-gradient(135deg, #d4a020, #b8860b);
             color: #000;
             border-color: var(--accent);
-            box-shadow: var(--glow);
-            font-weight: 700;
+            box-shadow: 0 0 25px rgba(240, 192, 64, 0.6), 0 0 50px rgba(240, 180, 40, 0.3);
+            font-weight: 800;
+            transform: scale(1.05);
+            z-index: 2;
+            letter-spacing: 1.5px;
         }
-        .toggle-brand:hover:not(.active) {
-            border-color: #5a5a40;
-            color: #d4a020;
-            box-shadow: 0 0 15px rgba(200, 160, 40, 0.2);
+        .toggle-brand-slide.active::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 33px;
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            animation: activePulseBorder 1.8s ease-in-out infinite;
+            pointer-events: none;
         }
-        .brand-filters {
+        @keyframes activePulseBorder {
+            0%,
+            100% {
+                border-color: rgba(255, 215, 0, 0.6);
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+            50% {
+                border-color: rgba(255, 240, 80, 0.9);
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            }
+        }
+        .brand-indicator-dots {
             display: flex;
-            flex-wrap: wrap;
+            justify-content: center;
             gap: 0.4rem;
-            margin-bottom: 1.8rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
         }
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .brand-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            width: 24px;
+            border-radius: 10px;
+        }
+
         .image-preview {
             width: 100px;
             height: 100px;
@@ -1150,6 +1278,19 @@
             .loading-bar-container {
                 width: 200px;
             }
+            .brand-slider-arrow {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            .toggle-brand-slide {
+                padding: 0.5rem 1rem;
+                font-size: 0.7rem;
+            }
+            .brand-slider-track {
+                gap: 0.3rem;
+                padding: 0 1rem;
+            }
         }
     </style>
 </head>
@@ -1216,7 +1357,15 @@
         <section id="catalogo" class="section active">
             <h2>🏪 Catálogo de Produtos</h2>
             <input type="text" class="search-box" placeholder="🔍 Buscar por nome..." id="searchInput" oninput="renderCatalogo()">
-            <div class="brand-filters" id="brandFilters"></div>
+            <!-- SLIDER DE MARCAS DESLIZANTE -->
+            <div class="brand-slider-wrapper">
+                <button class="brand-slider-arrow" onclick="slideBrands(-1)" title="Marca anterior">◀</button>
+                <div class="brand-slider-container" id="brandSliderContainer">
+                    <div class="brand-slider-track" id="brandSliderTrack"></div>
+                </div>
+                <button class="brand-slider-arrow" onclick="slideBrands(1)" title="Próxima marca">▶</button>
+            </div>
+            <div class="brand-indicator-dots" id="brandIndicatorDots"></div>
             <div id="catalogoContainer" class="product-grid"></div>
         </section>
 
@@ -1238,7 +1387,6 @@
             </div>
         </section>
 
-        <!-- NOVA SEÇÃO: MEUS PEDIDOS -->
         <section id="meusPedidos" class="section">
             <h2>📋 Meus Pedidos</h2>
             <div id="meusPedidosContainer"></div>
@@ -1345,7 +1493,6 @@
     </main>
 
     <script>
-        // Configuração Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAMXzy9rvOg_OiosG-j83nxGdEEcBwMfeo",
             authDomain: "fort-laboratory.firebaseapp.com",
@@ -1520,16 +1667,20 @@
             seguroAtivo = false,
             clienteEditandoId = null;
 
-        // Placeholder SVG
+        // Controle de drag do slider
+        let isDragging = false,
+            startX = 0,
+            scrollLeftStart = 0;
+        let sliderDragged = false; // para evitar clique durante drag
+
         function gerarPlaceholderSVG(nome) {
             const seguro = String(nome || 'PRODUTO').substring(0, 25).replace(/&/g, '&amp;').replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-            const svg =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect fill="#1a1a25" width="150" height="150" rx="8"/><text x="75" y="75" fill="#d4af37" font-size="14" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif" font-weight="bold">${seguro}</text></svg>`;
-            return 'data:image/svg+xml,' + encodeURIComponent(svg);
+            return 'data:image/svg+xml,' + encodeURIComponent(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><rect fill="#1a1a25" width="150" height="150" rx="8"/><text x="75" y="75" fill="#d4af37" font-size="14" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif" font-weight="bold">${seguro}</text></svg>`
+                );
         }
 
-        // Partículas loading
         function criarParticulasLoading() {
             const container = document.getElementById('loadingParticles');
             if (!container) return;
@@ -1546,7 +1697,6 @@
             }
         }
 
-        // Canvas de raios
         (function() {
             const canvas = document.getElementById('lightningCanvas');
             const ctx = canvas.getContext('2d');
@@ -1650,7 +1800,6 @@
             requestAnimationFrame(draw);
         })();
 
-        // Cache imagens
         function getCacheImagens() {
             try { return JSON.parse(localStorage.getItem('cacheImagens') || '{}'); } catch (e) { return {}; }
         }
@@ -1666,7 +1815,6 @@
             }
         }
 
-        // Empacotamento
         function mostrarAnimacaoEmpacotamento(callback) {
             const overlay = document.getElementById('empacotamentoOverlay');
             if (!overlay) return callback();
@@ -1761,7 +1909,8 @@
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if (id === 'catalogo') renderCatalogo();
+            if (id === 'catalogo') { renderBrandSlider();
+                renderCatalogo(); }
             if (id === 'carrinho') renderCarrinho();
             if (id === 'meusPedidos') renderMeusPedidos();
             if (id === 'admin') renderAdmin();
@@ -1784,18 +1933,226 @@
             showSection('catalogo');
             atualizarUI(); }
 
-        function renderBrandFilters() {
-            const marcas = [...new Set(produtos.map(p => p.marca))];
-            document.getElementById('brandFilters').innerHTML =
-                `<button class="toggle-brand ${filtroMarca==='TODAS'?'active':''}" onclick="setFiltroMarca('TODAS')">TODAS</button>` +
-                marcas.map(m =>
-                    `<button class="toggle-brand ${filtroMarca===m?'active':''}" onclick="setFiltroMarca('${m.replace(/'/g, "\\'")}')">${m}</button>`
-                    ).join('');
+        // ========== SLIDER DE MARCAS ==========
+        function getMarcasUnicas() {
+            return ['TODAS', ...new Set(produtos.map(p => p.marca))];
         }
 
-        function setFiltroMarca(m) { filtroMarca = m;
-            renderBrandFilters();
-            renderCatalogo(); }
+        function renderBrandSlider() {
+            const marcas = getMarcasUnicas();
+            const track = document.getElementById('brandSliderTrack');
+            const dotsContainer = document.getElementById('brandIndicatorDots');
+            if (!track || !dotsContainer) return;
+
+            track.innerHTML = marcas.map(m =>
+                `<button class="toggle-brand-slide ${filtroMarca === m ? 'active' : ''}" data-marca="${m.replace(/"/g, '&quot;')}" onclick="handleBrandClick(event, '${m.replace(/'/g, "\\'")}')">${m}</button>`
+            ).join('');
+
+            dotsContainer.innerHTML = marcas.map((m, i) =>
+                `<span class="brand-dot ${filtroMarca === m ? 'active' : ''}" data-index="${i}" onclick="scrollToBrand(${i})"></span>`
+            ).join('');
+
+            // Centralizar a marca ativa após renderizar
+            setTimeout(() => {
+                scrollToActiveBrand(false);
+            }, 100);
+
+            // Configurar eventos de drag
+            setupSliderDrag();
+        }
+
+        function setupSliderDrag() {
+            const slider = document.getElementById('brandSliderContainer');
+            if (!slider) return;
+
+            // Remove listeners anteriores (para evitar duplicação)
+            const newSlider = slider.cloneNode(true);
+            slider.parentNode.replaceChild(newSlider, slider);
+
+            const container = document.getElementById('brandSliderContainer');
+
+            container.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                sliderDragged = false;
+                startX = e.pageX - container.offsetLeft;
+                scrollLeftStart = container.scrollLeft;
+                container.classList.add('dragging');
+                container.style.cursor = 'grabbing';
+            });
+
+            container.addEventListener('mouseleave', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    container.classList.remove('dragging');
+                    container.style.cursor = 'grab';
+                }
+            });
+
+            container.addEventListener('mouseup', (e) => {
+                if (isDragging) {
+                    const dx = e.pageX - container.offsetLeft - startX;
+                    if (Math.abs(dx) > 8) {
+                        sliderDragged = true;
+                    }
+                    isDragging = false;
+                    container.classList.remove('dragging');
+                    container.style.cursor = 'grab';
+                    // Snap ao soltar
+                    setTimeout(() => snapToNearestBrand(), 150);
+                }
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                container.scrollLeft = scrollLeftStart - walk;
+            });
+
+            // Touch events
+            container.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                sliderDragged = false;
+                startX = e.touches[0].pageX - container.offsetLeft;
+                scrollLeftStart = container.scrollLeft;
+                container.classList.add('dragging');
+            }, { passive: true });
+
+            container.addEventListener('touchend', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    container.classList.remove('dragging');
+                    setTimeout(() => snapToNearestBrand(), 150);
+                }
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const x = e.touches[0].pageX - container.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                container.scrollLeft = scrollLeftStart - walk;
+            }, { passive: true });
+
+            // Scroll snap ao parar
+            container.addEventListener('scroll', () => {
+                updateActiveDotFromScroll();
+            });
+        }
+
+        function handleBrandClick(event, marca) {
+            if (sliderDragged) {
+                sliderDragged = false;
+                return;
+            }
+            setFiltroMarca(marca);
+            // Scroll até a marca selecionada
+            scrollToActiveBrand(true);
+        }
+
+        function setFiltroMarca(m) {
+            filtroMarca = m;
+            renderBrandSlider();
+            renderCatalogo();
+        }
+
+        function scrollToActiveBrand(animate = true) {
+            const slider = document.getElementById('brandSliderContainer');
+            const activeBtn = slider?.querySelector('.toggle-brand-slide.active');
+            if (slider && activeBtn) {
+                const sliderRect = slider.getBoundingClientRect();
+                const btnRect = activeBtn.getBoundingClientRect();
+                const offset = btnRect.left - sliderRect.left + slider.scrollLeft - (sliderRect.width / 2) + (btnRect
+                    .width / 2);
+                slider.scrollTo({
+                    left: offset,
+                    behavior: animate ? 'smooth' : 'instant'
+                });
+            }
+            updateActiveDot();
+        }
+
+        function scrollToBrand(index) {
+            const slider = document.getElementById('brandSliderContainer');
+            const buttons = slider?.querySelectorAll('.toggle-brand-slide');
+            if (buttons && buttons[index]) {
+                const btn = buttons[index];
+                const marca = btn.getAttribute('data-marca');
+                if (marca && filtroMarca !== marca) {
+                    setFiltroMarca(marca);
+                }
+                scrollToActiveBrand(true);
+            }
+        }
+
+        function snapToNearestBrand() {
+            const slider = document.getElementById('brandSliderContainer');
+            if (!slider) return;
+            const buttons = slider.querySelectorAll('.toggle-brand-slide');
+            if (!buttons.length) return;
+            const sliderCenter = slider.getBoundingClientRect().left + slider.getBoundingClientRect().width / 2;
+            let closestBtn = null;
+            let closestDist = Infinity;
+            buttons.forEach(btn => {
+                const btnCenter = btn.getBoundingClientRect().left + btn.getBoundingClientRect().width / 2;
+                const dist = Math.abs(btnCenter - sliderCenter);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestBtn = btn;
+                }
+            });
+            if (closestBtn) {
+                const marca = closestBtn.getAttribute('data-marca');
+                if (marca && filtroMarca !== marca) {
+                    setFiltroMarca(marca);
+                }
+                scrollToActiveBrand(true);
+            }
+        }
+
+        function updateActiveDotFromScroll() {
+            const slider = document.getElementById('brandSliderContainer');
+            if (!slider || isDragging) return;
+            const buttons = slider.querySelectorAll('.toggle-brand-slide');
+            if (!buttons.length) return;
+            const sliderCenter = slider.getBoundingClientRect().left + slider.getBoundingClientRect().width / 2;
+            let closestIndex = 0;
+            let closestDist = Infinity;
+            buttons.forEach((btn, i) => {
+                const btnCenter = btn.getBoundingClientRect().left + btn.getBoundingClientRect().width / 2;
+                const dist = Math.abs(btnCenter - sliderCenter);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestIndex = i;
+                }
+            });
+            const dots = document.querySelectorAll('#brandIndicatorDots .brand-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === closestIndex);
+            });
+        }
+
+        function updateActiveDot() {
+            const marcas = getMarcasUnicas();
+            const activeIndex = marcas.indexOf(filtroMarca);
+            const dots = document.querySelectorAll('#brandIndicatorDots .brand-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === activeIndex);
+            });
+        }
+
+        function slideBrands(direction) {
+            const slider = document.getElementById('brandSliderContainer');
+            if (!slider) return;
+            const scrollAmount = 220;
+            slider.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+            setTimeout(() => snapToNearestBrand(), 400);
+        }
+
+        // ========== FIM SLIDER ==========
 
         function renderCatalogo() {
             const c = document.getElementById('catalogoContainer');
@@ -1948,7 +2305,6 @@
             }
         }
 
-        // ============ MEUS PEDIDOS (NOVA FUNCIONALIDADE) ============
         function renderMeusPedidos() {
             if (!clienteLogado) {
                 document.getElementById('meusPedidosContainer').innerHTML =
@@ -1991,8 +2347,6 @@
                 p.status = 'finalizado';
                 db.collection('pedidos').doc(String(pedidoId)).update({ status: 'finalizado' }).catch(e => console.error(
                     e));
-
-                // Montar mensagem completa para o dono
                 let itensMsg = '';
                 p.itens.forEach(item => {
                     itensMsg +=
@@ -2002,12 +2356,9 @@
                 if (p.frete > 0) detalhesMsg += `Frete: R$ ${p.frete.toFixed(2)}\n`;
                 if (p.seguro > 0) detalhesMsg += `Seguro: R$ ${p.seguro.toFixed(2)}\n`;
                 detalhesMsg += `💰 TOTAL: R$ ${p.total.toFixed(2)}`;
-
                 const mensagem =
                     `✅ *PEDIDO ENTREGUE - CONFIRMADO PELO CLIENTE*\n\n🛒 *Pedido #${p.numero}*\n👤 *Cliente:* ${p.clienteNome}\n📄 *CPF:* ${p.clienteCpf}\n📍 *Endereço:* ${p.clienteEndereco}\n📞 *Contato:* ${p.clienteContato}\n\n📋 *ITENS DO PEDIDO:*\n${itensMsg}\n${detalhesMsg}\n\n✅ O cliente confirmou que recebeu o pedido.`;
-
                 window.open(`https://wa.me/5593991381813?text=${encodeURIComponent(mensagem)}`, '_blank');
-
                 renderMeusPedidos();
                 if (adminLogado) renderAdminPedidos();
                 alert('Recebimento confirmado! Uma mensagem foi enviada ao vendedor.');
@@ -2111,7 +2462,7 @@
             if (!f.length) { c.innerHTML = '<div class="empty-state">📭 Nenhum pedido.</div>'; return; }
             c.innerHTML = f.map(p => {
                 const itens = p.itens.map(i => i.qtd + 'x ' + i.nome + (i.marca ? ' (' + i.marca + ')' : '')).join(
-                ', ');
+                    ', ');
                 const det = [];
                 if (p.subtotal) det.push('Subtotal: R$ ' + p.subtotal.toFixed(2));
                 if (p.frete > 0) det.push('Frete: R$ ' + p.frete.toFixed(2));
@@ -2232,7 +2583,6 @@
             alert('Dados atualizados!');
         }
 
-        // ============ FUNÇÕES DE IMAGEM E PRODUTOS (IMPLEMENTADAS COMPLETAS) ============
         function fileToBase64Resized(file, maxW, maxH) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2297,7 +2647,7 @@
                 alert('Produto atualizado!');
                 renderGerenciarProdutos();
                 renderCatalogo();
-                renderBrandFilters();
+                renderBrandSlider();
             }
         }
 
@@ -2310,7 +2660,7 @@
                 alert('Excluído!');
                 renderGerenciarProdutos();
                 renderCatalogo();
-                renderBrandFilters();
+                renderBrandSlider();
             }
         }
 
@@ -2338,7 +2688,7 @@
             document.getElementById('novoProdImg').value = '';
             renderGerenciarProdutos();
             renderCatalogo();
-            renderBrandFilters();
+            renderBrandSlider();
         }
 
         function renderGerenciarProdutos() {
@@ -2370,7 +2720,7 @@
             const timeoutSeguranca = setTimeout(() => {
                 console.warn('Timeout segurança loading');
                 esconderLoading();
-                renderBrandFilters();
+                renderBrandSlider();
                 renderCatalogo();
                 atualizarUI();
             }, 6000);
@@ -2378,7 +2728,7 @@
             try { await carregarDados(); } catch (e) { console.error('Erro ao carregar:', e); }
             clearTimeout(timeoutSeguranca);
 
-            renderBrandFilters();
+            renderBrandSlider();
             renderCatalogo();
             atualizarUI();
             if (adminLogado) {
