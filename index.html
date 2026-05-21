@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FORT LABORATORY ⚡</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
+    </script>
     <style>
         :root {
             --bg: #0a0a0f;
@@ -19,7 +21,6 @@
             --danger: #e04050;
             --success: #2ecc71;
             --info: #3b8beb;
-            --warning: #f0a020;
             --radius: 12px;
             --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -27,7 +28,11 @@
             --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: var(--font);
@@ -39,119 +44,509 @@
             position: relative;
         }
 
+        /* ============ TELA DE LOADING PROFISSIONAL ============ */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #0d0d1a 0%, #050510 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            overflow: hidden;
+        }
+        #loadingScreen.oculto {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Partículas de fundo no loading */
+        .loading-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .loading-particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.8), rgba(240, 192, 64, 0.2));
+            border-radius: 50%;
+            animation: floatUp 3s ease-in-out infinite;
+            opacity: 0;
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Container do DNA */
+        .dna-wrapper {
+            position: relative;
+            width: 160px;
+            height: 260px;
+            margin-bottom: 2.5rem;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.4));
+        }
+
+        /* Estrutura do DNA em 3D */
+        .dna-scene {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateDNA 4s linear infinite;
+        }
+        @keyframes rotateDNA {
+            0% {
+                transform: rotateY(0deg) rotateX(5deg);
+            }
+            50% {
+                transform: rotateY(180deg) rotateX(-5deg);
+            }
+            100% {
+                transform: rotateY(360deg) rotateX(5deg);
+            }
+        }
+
+        /* Fita 1 do DNA */
+        .dna-ribbon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+        .dna-ribbon::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    #FFD700 0%, #f0c040 10%, #FFD700 20%, #f0c040 30%,
+                    #FFD700 40%, #f0c040 50%, #FFD700 60%, #f0c040 70%,
+                    #FFD700 80%, #f0c040 90%, #FFD700 100%);
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            animation: ribbonGlow 2s ease-in-out infinite;
+        }
+        .dna-ribbon::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    #f0c040 0%, #FFD700 10%, #f0c040 20%, #FFD700 30%,
+                    #f0c040 40%, #FFD700 50%, #f0c040 60%, #FFD700 70%,
+                    #f0c040 80%, #FFD700 90%, #f0c040 100%);
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            animation: ribbonGlow 2s ease-in-out 0.5s infinite;
+        }
+        @keyframes ribbonGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 200, 50, 0.4);
+            }
+        }
+
+        /* Degraus do DNA */
+        .dna-rung {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            height: 4px;
+            background: linear-gradient(90deg,
+                    rgba(255, 215, 0, 0.9), rgba(240, 192, 64, 0.9), rgba(255, 215, 0, 0.9));
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+            animation: rungPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes rungPulse {
+            0%,
+            100% {
+                opacity: 0.7;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+            }
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        /* Nós do DNA */
+        .dna-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+            animation: nodeGlow 1.8s ease-in-out infinite;
+        }
+        .dna-node.left {
+            left: 7px;
+            transform: translateY(-50%);
+        }
+        .dna-node.right {
+            right: 7px;
+            transform: translateY(-50%);
+        }
+        @keyframes nodeGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+                background: #FFD700;
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 40px rgba(255, 180, 30, 0.6);
+                background: #ffe44d;
+            }
+        }
+
+        /* Texto de loading */
+        .loading-text-container {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .loading-title {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 200, 50, 0.4), 0 0 80px rgba(255, 180, 30, 0.2);
+            animation: titlePulse 2s ease-in-out infinite;
+            margin-bottom: 0.5rem;
+        }
+        @keyframes titlePulse {
+            0%,
+            100% {
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 200, 50, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                text-shadow: 0 0 35px rgba(255, 230, 80, 1), 0 0 70px rgba(255, 200, 50, 0.7), 0 0 100px rgba(255, 160, 20, 0.3);
+                transform: scale(1.02);
+            }
+        }
+        .loading-subtitle {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: #d4a020;
+            text-shadow: 0 0 10px rgba(200, 160, 40, 0.5);
+            animation: subtitleFade 1.5s ease-in-out infinite;
+            text-transform: uppercase;
+        }
+        @keyframes subtitleFade {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Barra de progresso */
+        .loading-bar-container {
+            width: 250px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+        .loading-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f0c040, #FFD700, #f0c040);
+            border-radius: 2px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            animation: progressBar 2.5s ease-in-out infinite;
+            width: 30%;
+        }
+        @keyframes progressBar {
+            0% {
+                width: 20%;
+                margin-left: 0;
+            }
+            50% {
+                width: 60%;
+                margin-left: 20%;
+            }
+            100% {
+                width: 20%;
+                margin-left: 80%;
+            }
+        }
+
         #lightningCanvas {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none; opacity: 0.45;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.35;
         }
 
         header {
             background: linear-gradient(180deg, rgba(20, 20, 30, 0.95) 0%, rgba(10, 10, 18, 0.9) 100%);
             border-bottom: 1px solid #2a2a38;
             padding: 0.9rem 2rem;
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-            position: sticky; top: 0; z-index: 100;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 2px 30px rgba(0, 0, 0, 0.6);
         }
         header::after {
             content: '';
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
             background: linear-gradient(90deg,
-                transparent 0%, rgba(240,192,64,0.1) 10%, rgba(240,192,64,0.6) 25%,
-                #f0c040 40%, rgba(255,220,80,0.8) 50%, #f0c040 60%,
-                rgba(240,192,64,0.6) 75%, rgba(240,192,64,0.1) 90%, transparent 100%);
+                    transparent 0%, rgba(240, 192, 64, 0.1) 10%, rgba(240, 192, 64, 0.6) 25%,
+                    #f0c040 40%, rgba(255, 220, 80, 0.8) 50%, #f0c040 60%,
+                    rgba(240, 192, 64, 0.6) 75%, rgba(240, 192, 64, 0.1) 90%, transparent 100%);
             animation: energyLine 3s ease-in-out infinite;
             z-index: 101;
         }
         @keyframes energyLine {
-            0%, 100% { opacity: 0.5; transform: scaleX(0.8); }
-            50% { opacity: 1; transform: scaleX(1); }
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scaleX(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
         }
 
         .logo {
-            font-size: 2rem; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 3px;
+            font-size: 2rem;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
             color: #FFD700;
-            text-shadow: 0 0 15px rgba(255,215,0,0.7), 0 0 40px rgba(255,200,50,0.4), 0 0 80px rgba(255,180,30,0.2);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 200, 50, 0.4);
             animation: logoPulse 2s ease-in-out infinite;
-            position: relative; z-index: 102; transition: all 0.3s;
+            position: relative;
+            z-index: 102;
+            transition: all 0.3s;
         }
         .logo:hover {
-            text-shadow: 0 0 25px rgba(255,220,60,0.9), 0 0 60px rgba(255,200,50,0.6), 0 0 100px rgba(255,180,30,0.35);
+            text-shadow: 0 0 25px rgba(255, 220, 60, 0.9), 0 0 60px rgba(255, 200, 50, 0.6);
             transform: scale(1.03);
         }
         @keyframes logoPulse {
-            0%,100%{ text-shadow:0 0 15px rgba(255,215,0,0.7),0 0 40px rgba(255,200,50,0.4); }
-            30%{ text-shadow:0 0 35px rgba(255,230,80,1),0 0 70px rgba(255,200,50,0.7),0 0 120px rgba(255,160,20,0.3); }
-            60%{ text-shadow:0 0 8px rgba(255,200,40,0.5),0 0 25px rgba(255,180,30,0.3); }
+            0%,
+            100% {
+                text-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 200, 50, 0.4);
+            }
+            30% {
+                text-shadow: 0 0 35px rgba(255, 230, 80, 1), 0 0 70px rgba(255, 200, 50, 0.7);
+            }
+            60% {
+                text-shadow: 0 0 8px rgba(255, 200, 40, 0.5), 0 0 25px rgba(255, 180, 30, 0.3);
+            }
+        }
+        .logo::before,
+        .logo::after {
+            content: '⚡';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+            animation: boltFlicker 0.8s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px #FFD700);
         }
         .logo::before {
-            content:'⚡'; position:absolute; left:-28px; top:50%; transform:translateY(-50%);
-            font-size:1.3rem; animation:boltFlicker 0.8s ease-in-out infinite;
-            filter:drop-shadow(0 0 8px #FFD700);
+            left: -28px;
         }
         .logo::after {
-            content:'⚡'; position:absolute; right:-28px; top:50%; transform:translateY(-50%) scaleX(-1);
-            font-size:1.3rem; animation:boltFlicker2 0.8s ease-in-out 0.4s infinite;
-            filter:drop-shadow(0 0 8px #FFD700);
+            right: -28px;
+            transform: translateY(-50%) scaleX(-1);
+            animation-name: boltFlicker2;
         }
         @keyframes boltFlicker {
-            0%,100%{ opacity:0.4; transform:translateY(-50%) scale(0.8); }
-            50%{ opacity:1; transform:translateY(-50%) scale(1.3); }
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: translateY(-50%) scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1.3);
+            }
         }
         @keyframes boltFlicker2 {
-            0%,100%{ opacity:0.4; transform:translateY(-50%) scaleX(-1) scale(0.8); }
-            50%{ opacity:1; transform:translateY(-50%) scaleX(-1) scale(1.3); }
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: translateY(-50%) scaleX(-1) scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50%) scaleX(-1) scale(1.3);
+            }
         }
 
-        nav { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
+        nav {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
         nav button {
-            background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-            padding: 0.55rem 1.2rem; border-radius: 25px; cursor: pointer; font-size: 0.85rem;
-            transition: var(--transition); font-weight: 600; white-space: nowrap;
-            letter-spacing: 0.5px; position: relative; overflow: hidden;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.55rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            font-weight: 600;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
         }
         nav button:hover {
-            background: #222230; border-color: var(--accent); color: #FFD700;
-            box-shadow: 0 0 18px rgba(240,192,64,0.25); transform: translateY(-2px);
+            background: #222230;
+            border-color: var(--accent);
+            color: #FFD700;
+            box-shadow: 0 0 18px rgba(240, 192, 64, 0.25);
+            transform: translateY(-2px);
         }
         .cart-badge {
-            background: var(--accent); color: #000; border-radius: 50%; padding: 0.18rem 0.5rem;
-            font-size: 0.7rem; font-weight: 800; margin-left: 5px;
-            box-shadow: 0 0 10px rgba(240,192,64,0.6);
-            transition: transform 0.2s ease; display: inline-block;
+            background: var(--accent);
+            color: #000;
+            border-radius: 50%;
+            padding: 0.18rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-left: 5px;
+            box-shadow: 0 0 10px rgba(240, 192, 64, 0.6);
+            transition: transform 0.2s ease;
+            display: inline-block;
         }
-        .cart-badge.pulse { animation: badgePop 0.4s ease-out; }
+        .cart-badge.pulse {
+            animation: badgePop 0.4s ease-out;
+        }
         @keyframes badgePop {
-            0%{ transform:scale(1); } 50%{ transform:scale(1.6); } 100%{ transform:scale(1); }
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.6);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .gold-particle {
-            position: fixed; pointer-events: none;
+            position: fixed;
+            pointer-events: none;
             background: radial-gradient(circle, #FFD700, #f0c040);
-            border-radius: 50%; z-index: 9999;
+            border-radius: 50%;
+            z-index: 9999;
             animation: particleFly 0.7s ease-out forwards;
         }
         @keyframes particleFly {
-            0%{ opacity:1; transform: translate(0,0) scale(1); }
-            100%{ opacity:0; transform: translate(var(--dx), var(--dy)) scale(0); }
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(0);
+            }
         }
 
-        main { max-width: 1320px; margin: 2rem auto; padding: 0 1.5rem; position: relative; z-index: 1; }
+        main {
+            max-width: 1320px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
 
-        .section { display: none; animation: sectionIn 0.35s ease-out forwards; }
-        .section.active { display: block; }
+        .section {
+            display: none;
+            animation: sectionIn 0.35s ease-out forwards;
+        }
+        .section.active {
+            display: block;
+        }
         @keyframes sectionIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h2 {
-            font-size: 1.8rem; margin-bottom: 1.6rem; color: #FFD700;
-            border-bottom: 2px solid #2a2a38; padding-bottom: 0.6rem;
-            text-shadow: 0 0 12px rgba(255,215,0,0.3); letter-spacing: 1px;
+            font-size: 1.8rem;
+            margin-bottom: 1.6rem;
+            color: #FFD700;
+            border-bottom: 2px solid #2a2a38;
+            padding-bottom: 0.6rem;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+            letter-spacing: 1px;
         }
-        h3 { color: var(--text); margin-bottom: 1rem; font-size: 1.2rem; letter-spacing: 0.5px; }
+        h3 {
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
 
         .product-grid {
             display: grid;
@@ -159,163 +554,594 @@
             gap: 1.5rem;
         }
 
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
         .product-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-            padding: 1.6rem; text-align: center; transition: var(--transition);
-            box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 0.7rem;
-            color: var(--text); position: relative; overflow: hidden;
-            /* sem animação de entrada para performance */
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.6rem;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            color: var(--text);
+            position: relative;
+            overflow: hidden;
+            animation: cardEntrance 0.5s ease-out backwards;
         }
 
         .product-card::after {
             content: '';
-            position: absolute; top: -50%; left: -75%; width: 50%; height: 200%;
+            position: absolute;
+            top: -50%;
+            left: -75%;
+            width: 50%;
+            height: 200%;
             background: linear-gradient(105deg,
-                transparent 30%, rgba(255,215,0,0.15) 45%, rgba(255,240,100,0.4) 50%,
-                rgba(255,215,0,0.15) 55%, transparent 70%);
-            transform: skewX(-25deg); transition: left 0.5s ease; z-index: 2; pointer-events: none;
+                    transparent 30%, rgba(255, 215, 0, 0.15) 45%, rgba(255, 240, 100, 0.4) 50%,
+                    rgba(255, 215, 0, 0.15) 55%, transparent 70%);
+            transform: skewX(-25deg);
+            transition: left 0.5s ease;
+            z-index: 2;
+            pointer-events: none;
         }
-        .product-card:hover::after { left: 125%; }
+        .product-card:hover::after {
+            left: 125%;
+        }
 
         .product-card::before {
             content: '';
-            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at center, rgba(240,192,64,0.06) 0%, transparent 70%);
-            opacity: 0; transition: opacity 0.4s; z-index: 1; pointer-events: none;
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(240, 192, 64, 0.06) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: 1;
+            pointer-events: none;
         }
-        .product-card:hover::before { opacity: 1; }
+        .product-card:hover::before {
+            opacity: 1;
+        }
 
         .product-card:hover {
-            transform: translateY(-6px); border-color: var(--accent);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7), var(--glow);
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), var(--glow);
         }
-        .product-card img, .product-card .card-img {
-            width: 100%; height: 130px; object-fit: contain; border-radius: 8px;
-            background: #1a1a25; padding: 0.6rem; border: 1px solid #222;
-            transition: var(--transition); position: relative; z-index: 3;
+        .product-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #1a1a25;
+            padding: 0.6rem;
+            border: 1px solid #222;
+            transition: var(--transition);
+            position: relative;
+            z-index: 3;
         }
-        .card-img { display: flex; align-items: center; justify-content: center; }
-        .product-card:hover img, .product-card:hover .card-img {
-            border-color: #3a3a4a; box-shadow: 0 0 20px rgba(240,192,64,0.15);
+        .product-card:hover img {
+            border-color: #3a3a4a;
+            box-shadow: 0 0 20px rgba(240, 192, 64, 0.15);
         }
         .product-card .name {
-            font-weight: 700; font-size: 0.95rem; min-height: 2.5rem; color: #e0e0ec;
-            letter-spacing: 0.3px; position: relative; z-index: 3;
+            font-weight: 700;
+            font-size: 0.95rem;
+            min-height: 2.5rem;
+            color: #e0e0ec;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 3;
         }
         .product-card .price {
-            font-size: 1.5rem; font-weight: 900; color: #FFD700;
-            text-shadow: 0 0 10px rgba(255,215,0,0.3); position: relative; z-index: 3;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            position: relative;
+            z-index: 3;
         }
         .product-card .brand-tag {
-            font-size: 0.65rem; background: #1a1a10; border: 1px solid #3a3a18;
-            padding: 0.25rem 0.7rem; border-radius: 15px; display: inline-block;
-            color: #d4a020; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;
-            animation: tagPulse 2s ease-in-out infinite; position: relative; z-index: 3;
+            font-size: 0.65rem;
+            background: #1a1a10;
+            border: 1px solid #3a3a18;
+            padding: 0.25rem 0.7rem;
+            border-radius: 15px;
+            display: inline-block;
+            color: #d4a020;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            animation: tagPulse 2s ease-in-out infinite;
+            position: relative;
+            z-index: 3;
         }
         @keyframes tagPulse {
-            0%,100%{ border-color:#3a3a18; }
-            50%{ border-color:#6a6a28; box-shadow:0 0 12px rgba(200,160,40,0.3); }
+            0%,
+            100% {
+                border-color: #3a3a18;
+            }
+            50% {
+                border-color: #6a6a28;
+                box-shadow: 0 0 12px rgba(200, 160, 40, 0.3);
+            }
         }
 
         .qty-input {
-            width: 58px; padding: 0.5rem; background: #1a1a25; border: 1px solid var(--border);
-            color: var(--text); border-radius: 8px; text-align: center; font-weight: 600;
-            transition: var(--transition); position: relative; z-index: 3;
+            width: 58px;
+            padding: 0.5rem;
+            background: #1a1a25;
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            z-index: 3;
         }
-        .qty-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(240,192,64,0.2); }
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(240, 192, 64, 0.2);
+        }
 
-        .btn, .toggle-brand, nav button, .btn-outline, .btn-success, .btn-danger, .btn-info {
-            position: relative; overflow: hidden;
-        }
         .btn {
-            background: linear-gradient(135deg, #d4a020, #b8860b); color: #000; border: none;
-            padding: 0.55rem 1.3rem; border-radius: 25px; cursor: pointer; font-weight: 700;
-            font-size: 0.85rem; transition: var(--transition); letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(180,130,20,0.3); z-index: 3;
+            background: linear-gradient(135deg, #d4a020, #b8860b);
+            color: #000;
+            border: none;
+            padding: 0.55rem 1.3rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(180, 130, 20, 0.3);
+            z-index: 3;
         }
         .btn:hover {
             background: linear-gradient(135deg, #e8b830, #c89818);
-            box-shadow: 0 6px 25px rgba(200,150,30,0.5), var(--glow); transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(200, 150, 30, 0.5), var(--glow);
+            transform: translateY(-2px);
         }
-        .btn:active { transform: scale(0.95); }
-        .btn-danger { background: linear-gradient(135deg, #c0392b, #8b0000); box-shadow: 0 4px 15px rgba(180,40,40,0.3); }
-        .btn-danger:hover { background: linear-gradient(135deg, #e04040, #a01010); box-shadow: 0 6px 25px rgba(200,50,50,0.5); }
-        .btn-success { background: linear-gradient(135deg, #27ae60, #1a7a40); box-shadow: 0 4px 15px rgba(30,150,60,0.3); }
-        .btn-success:hover { background: linear-gradient(135deg, #2ecc71, #1f8f4a); box-shadow: 0 6px 25px rgba(40,180,70,0.5); }
-        .btn-info { background: linear-gradient(135deg, #2980b9, #1a5080); color: #fff; box-shadow: 0 4px 15px rgba(30,100,180,0.3); }
-        .btn-info:hover { background: linear-gradient(135deg, #3498db, #206090); box-shadow: 0 6px 25px rgba(40,120,200,0.5); }
-        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); font-weight: 700; box-shadow: none; }
-        .btn-outline:hover { background: rgba(240,192,64,0.1); color: #FFD700; box-shadow: var(--glow); }
-        .btn-sm { padding: 0.35rem 0.9rem; font-size: 0.75rem; }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #c0392b, #8b0000);
+            box-shadow: 0 4px 15px rgba(180, 40, 40, 0.3);
+        }
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #e04040, #a01010);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #1a7a40);
+            box-shadow: 0 4px 15px rgba(30, 150, 60, 0.3);
+        }
+        .btn-success:hover {
+            background: linear-gradient(135deg, #2ecc71, #1f8f4a);
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #2980b9, #1a5080);
+            color: #fff;
+        }
+        .btn-info:hover {
+            background: linear-gradient(135deg, #3498db, #206090);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: rgba(240, 192, 64, 0.1);
+            color: #FFD700;
+            box-shadow: var(--glow);
+        }
+        .btn-sm {
+            padding: 0.35rem 0.9rem;
+            font-size: 0.75rem;
+        }
 
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.35rem; font-weight: 700; color: #c0c0d0; font-size: 0.8rem; letter-spacing: 0.5px; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 0.7rem 1.1rem; background: #1a1a25; border: 1px solid var(--border);
-            border-radius: 8px; color: var(--text); font-size: 1rem; transition: var(--transition); font-family: var(--font);
+        .form-group {
+            margin-bottom: 1rem;
         }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(240,192,64,0.12), 0 0 20px rgba(240,192,64,0.08);
+        .form-group label {
+            display: block;
+            margin-bottom: 0.35rem;
+            font-weight: 700;
+            color: #c0c0d0;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.7rem 1.1rem;
+            background: #1a1a25;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(240, 192, 64, 0.12);
         }
 
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.6rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); color: var(--text); transition: var(--transition); }
-        .card:hover { border-color: #3a3a4a; }
-        .whatsapp-link { color: #25d366; text-decoration: none; font-weight: 700; transition: var(--transition); }
-        .whatsapp-link:hover { text-decoration: underline; text-shadow: 0 0 10px rgba(37,211,102,0.5); }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.6rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            color: var(--text);
+            transition: var(--transition);
+        }
+        .card:hover {
+            border-color: #3a3a4a;
+        }
+        .whatsapp-link {
+            color: #25d366;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+        .whatsapp-link:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
+        }
         .search-box {
-            width: 100%; padding: 0.8rem 1.3rem; background: #1a1a25; border: 1px solid var(--border);
-            border-radius: 30px; color: var(--text); font-size: 1rem; margin-bottom: 1.5rem;
-            transition: var(--transition); font-family: var(--font);
+            width: 100%;
+            padding: 0.8rem 1.3rem;
+            background: #1a1a25;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            font-family: var(--font);
         }
-        .search-box:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,192,64,0.12), 0 0 25px rgba(240,192,64,0.08); }
-        .status-badge { padding: 0.25rem 0.8rem; border-radius: 20px; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.6px; }
-        .status-pendente { background: #2a1a08; color: #f0a020; border: 1px solid #5a3a10; }
-        .status-finalizado { background: #0a1a10; color: #2ecc71; border: 1px solid #1a4a2a; }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(240, 192, 64, 0.12);
+        }
+        .status-badge {
+            padding: 0.25rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .status-pendente {
+            background: #2a1a08;
+            color: #f0a020;
+            border: 1px solid #5a3a10;
+        }
+        .status-finalizado {
+            background: #0a1a10;
+            color: #2ecc71;
+            border: 1px solid #1a4a2a;
+        }
         .toggle-brand {
-            background: var(--surface2); border: 1px solid var(--border); color: var(--text2);
-            padding: 0.55rem 1.3rem; border-radius: 25px; cursor: pointer; font-weight: 600;
-            font-size: 0.8rem; margin: 0.2rem; transition: var(--transition); text-transform: uppercase;
-            letter-spacing: 1px; position: relative; overflow: hidden;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 0.55rem 1.3rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .toggle-brand.active { background: linear-gradient(135deg, #d4a020, #b8860b); color: #000; border-color: var(--accent); box-shadow: var(--glow); font-weight: 700; }
-        .toggle-brand:hover:not(.active) { border-color: #5a5a40; color: #d4a020; box-shadow: 0 0 15px rgba(200,160,40,0.2); }
-        .brand-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.8rem; }
-        .image-preview { width: 100px; height: 100px; object-fit: contain; border: 1px solid var(--border); border-radius: 8px; background: #1a1a25; }
-        .client-card { background: #151520; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.3rem; margin-bottom: 1rem; transition: var(--transition); color: var(--text); }
-        .client-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
+        .toggle-brand.active {
+            background: linear-gradient(135deg, #d4a020, #b8860b);
+            color: #000;
+            border-color: var(--accent);
+            box-shadow: var(--glow);
+            font-weight: 700;
+        }
+        .toggle-brand:hover:not(.active) {
+            border-color: #5a5a40;
+            color: #d4a020;
+            box-shadow: 0 0 15px rgba(200, 160, 40, 0.2);
+        }
+        .brand-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1.8rem;
+        }
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #1a1a25;
+        }
+        .client-card {
+            background: #151520;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.3rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+            color: var(--text);
+        }
+        .client-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--glow);
+        }
         .modal-overlay {
-            position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center; z-index: 200;
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(6px);
         }
-        .modal { background: #1a1a28; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 30px 70px rgba(0,0,0,0.8); }
-        .empty-state { text-align: center; padding: 3.5rem; color: var(--text2); font-size: 1.1rem; }
-        .hidden { display: none !important; }
-        .flex-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
-        .flex-between { justify-content: space-between; }
-        .mt-2 { margin-top: 1rem; } .mb-2 { margin-bottom: 1rem; }
-        .seguro-checkbox { display: flex; align-items: center; gap: 0.5rem; margin: 0.8rem 0; color: var(--text2); font-weight: 600; }
-        .seguro-checkbox input { accent-color: var(--accent); width: 18px; height: 18px; }
-        .upload-group { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-        .file-input { padding: 0.45rem; background: #1a1a25; border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.8rem; width: 180px; }
-        .alert-box { background: #1a1a08; border: 1px solid #4a4a18; border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1.5rem; color: #d4a020; font-size: 0.9rem; white-space: pre-line; line-height: 1.6; }
-        .produto-editar-item { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; padding: 1.1rem; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 0.8rem; background: #151520; transition: var(--transition); }
-        .produto-editar-item:hover { border-color: #4a4a4a; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
-        .produto-editar-item input { padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: #1a1a25; color: var(--text); }
-        .produto-editar-item input.nome-prod { width: 200px; } .produto-editar-item input.preco-prod { width: 90px; } .produto-editar-item input.marca-prod { width: 160px; }
+        .modal {
+            background: #1a1a28;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3.5rem;
+            color: var(--text2);
+            font-size: 1.1rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .flex-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .flex-between {
+            justify-content: space-between;
+        }
+        .mt-2 {
+            margin-top: 1rem;
+        }
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+        .seguro-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.8rem 0;
+            color: var(--text2);
+            font-weight: 600;
+        }
+        .upload-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .file-input {
+            padding: 0.45rem;
+            background: #1a1a25;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.8rem;
+            width: 180px;
+        }
+        .alert-box {
+            background: #1a1a08;
+            border: 1px solid #4a4a18;
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #d4a020;
+            font-size: 0.9rem;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        .produto-editar-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: center;
+            padding: 1.1rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            background: #151520;
+        }
+        .produto-editar-item:hover {
+            border-color: #4a4a4a;
+        }
+        .produto-editar-item input {
+            padding: 0.5rem 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: #1a1a25;
+            color: var(--text);
+        }
+        .produto-editar-item input.nome-prod {
+            width: 200px;
+        }
+        .produto-editar-item input.preco-prod {
+            width: 90px;
+        }
+        .produto-editar-item input.marca-prod {
+            width: 160px;
+        }
 
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0a0a0f; } ::-webkit-scrollbar-thumb { background: #2a2a38; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #3a3a48; }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a38;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3a48;
+        }
 
         @media (max-width:768px) {
-            header { padding: 1rem; flex-direction: column; text-align: center; }
-            .logo { font-size: 1.5rem; } .logo::before, .logo::after { font-size: 1rem; left: -20px; } .logo::after { right: -20px; }
-            nav { justify-content: center; } .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } .modal { padding: 1.5rem; }
-            .produto-editar-item { flex-direction: column; align-items: stretch; } .produto-editar-item input.nome-prod, .produto-editar-item input.preco-prod, .produto-editar-item input.marca-prod { width: 100%; }
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            .produto-editar-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .produto-editar-item input.nome-prod,
+            .produto-editar-item input.preco-prod,
+            .produto-editar-item input.marca-prod {
+                width: 100%;
+            }
+            .dna-wrapper {
+                width: 120px;
+                height: 200px;
+            }
+            .loading-title {
+                font-size: 1.5rem;
+            }
+            .loading-bar-container {
+                width: 200px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- ============ TELA DE LOADING SUPER PROFISSIONAL ============ -->
+    <div id="loadingScreen">
+        <!-- Partículas de fundo -->
+        <div class="loading-particles" id="loadingParticles"></div>
+
+        <!-- DNA 3D -->
+        <div class="dna-wrapper">
+            <div class="dna-scene">
+                <div class="dna-ribbon"></div>
+                <!-- 14 degraus do DNA com nós -->
+                <div class="dna-rung" style="top: 3%;"></div>
+                <div class="dna-node left" style="top: 3%;"></div>
+                <div class="dna-node right" style="top: 3%;"></div>
+
+                <div class="dna-rung" style="top: 10%;"></div>
+                <div class="dna-node left" style="top: 10%;"></div>
+                <div class="dna-node right" style="top: 10%;"></div>
+
+                <div class="dna-rung" style="top: 17%;"></div>
+                <div class="dna-node left" style="top: 17%;"></div>
+                <div class="dna-node right" style="top: 17%;"></div>
+
+                <div class="dna-rung" style="top: 24%;"></div>
+                <div class="dna-node left" style="top: 24%;"></div>
+                <div class="dna-node right" style="top: 24%;"></div>
+
+                <div class="dna-rung" style="top: 31%;"></div>
+                <div class="dna-node left" style="top: 31%;"></div>
+                <div class="dna-node right" style="top: 31%;"></div>
+
+                <div class="dna-rung" style="top: 38%;"></div>
+                <div class="dna-node left" style="top: 38%;"></div>
+                <div class="dna-node right" style="top: 38%;"></div>
+
+                <div class="dna-rung" style="top: 45%;"></div>
+                <div class="dna-node left" style="top: 45%;"></div>
+                <div class="dna-node right" style="top: 45%;"></div>
+
+                <div class="dna-rung" style="top: 52%;"></div>
+                <div class="dna-node left" style="top: 52%;"></div>
+                <div class="dna-node right" style="top: 52%;"></div>
+
+                <div class="dna-rung" style="top: 59%;"></div>
+                <div class="dna-node left" style="top: 59%;"></div>
+                <div class="dna-node right" style="top: 59%;"></div>
+
+                <div class="dna-rung" style="top: 66%;"></div>
+                <div class="dna-node left" style="top: 66%;"></div>
+                <div class="dna-node right" style="top: 66%;"></div>
+
+                <div class="dna-rung" style="top: 73%;"></div>
+                <div class="dna-node left" style="top: 73%;"></div>
+                <div class="dna-node right" style="top: 73%;"></div>
+
+                <div class="dna-rung" style="top: 80%;"></div>
+                <div class="dna-node left" style="top: 80%;"></div>
+                <div class="dna-node right" style="top: 80%;"></div>
+
+                <div class="dna-rung" style="top: 87%;"></div>
+                <div class="dna-node left" style="top: 87%;"></div>
+                <div class="dna-node right" style="top: 87%;"></div>
+
+                <div class="dna-rung" style="top: 94%;"></div>
+                <div class="dna-node left" style="top: 94%;"></div>
+                <div class="dna-node right" style="top: 94%;"></div>
+            </div>
+        </div>
+
+        <!-- Textos -->
+        <div class="loading-text-container">
+            <div class="loading-title">LOADING</div>
+            <div class="loading-subtitle">Preparando Produtos</div>
+        </div>
+
+        <!-- Barra de progresso -->
+        <div class="loading-bar-container">
+            <div class="loading-bar-fill"></div>
+        </div>
+    </div>
+
     <canvas id="lightningCanvas"></canvas>
 
     <header>
@@ -350,7 +1176,7 @@
                     <p><strong>Frete:</strong> <span id="resumoFrete">R$ 0,00</span></p>
                     <div class="seguro-checkbox"><input type="checkbox" id="checkboxSeguro" onchange="toggleSeguro()"><label>Contratar Seguro (30%)</label></div>
                     <p id="pSeguro" class="hidden"><strong>Seguro (30%):</strong> <span id="resumoSeguro">R$ 0,00</span></p>
-                    <p><strong>Valor Total:</strong> <span id="resumoTotal" style="font-size:1.6rem;color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,0.3);">R$ 0,00</span></p>
+                    <p><strong>Valor Total:</strong> <span id="resumoTotal" style="font-size:1.6rem;color:#FFD700;">R$ 0,00</span></p>
                     <button class="btn" onclick="finalizarPedido()" id="btnFinalizar" disabled>✅ Finalizar Compra</button>
                     <p id="msgLoginNeeded" style="color:#e04050;margin-top:0.5rem;">⚠️ Faça login para finalizar.</p>
                 </div>
@@ -471,12 +1297,29 @@
         const db = firebase.firestore();
 
         const fretePorRegiao = {
-            'SP': 50, 'DF': 70, 'RJ': 70, 'MG': 80, 'GO': 80, 'ES': 80, 'RS': 80,
-            'MT': 90, 'MS': 90, 'BA': 90, 'CE': 90, 'PR': 90, 'SC': 90, 'MA': 90,
-            'PA': 90, 'AC': 90, 'AM': 90, 'TO': 90, 'RO': 95, 'RR': 95, 'AP': 95
+            'SP': 50,
+            'DF': 70,
+            'RJ': 70,
+            'MG': 80,
+            'GO': 80,
+            'ES': 80,
+            'RS': 80,
+            'MT': 90,
+            'MS': 90,
+            'BA': 90,
+            'CE': 90,
+            'PR': 90,
+            'SC': 90,
+            'MA': 90,
+            'PA': 90,
+            'AC': 90,
+            'AM': 90,
+            'TO': 90,
+            'RO': 95,
+            'RR': 95,
+            'AP': 95
         };
 
-        // Produtos base (agora sem imagens externas; serão gerados placeholders SVG)
         const produtosBase = [
             { id: 1, nome: 'Testenat 250 mg 4 ml', preco: 125, marca: 'LANDER LAN INJETÁVEL' },
             { id: 2, nome: 'Deca 5 ml 200 mg', preco: 125, marca: 'LANDER LAN INJETÁVEL' },
@@ -605,28 +1448,52 @@
             { id: 125, nome: 'SARMs DRAGON elite', preco: 180, marca: 'SARMS' }
         ];
 
-        // Inicializa produtos com a base + placeholder vazio
         let produtos = JSON.parse(JSON.stringify(produtosBase)).map(p => ({ ...p, img: '' }));
-        let carrinho = [], usuarios = [], pedidos = [],
-            clienteLogado = null, adminLogado = false,
-            filtroMarca = 'TODAS', filtroAdminStatus = 'todos',
-            seguroAtivo = false, clienteEditandoId = null;
+        let carrinho = [],
+            usuarios = [],
+            pedidos = [],
+            clienteLogado = null,
+            adminLogado = false,
+            filtroMarca = 'TODAS',
+            filtroAdminStatus = 'todos',
+            seguroAtivo = false,
+            clienteEditandoId = null;
 
-        // ============ PLACEHOLDER SVG (instantâneo, sem rede) ============
+        // ============ GERADOR DE PLACEHOLDER SVG INSTANTÂNEO ============
         function gerarPlaceholderSVG(nome) {
-            const texto = (nome || 'PRODUTO').substring(0, 25);
+            const seguro = String(nome || 'PRODUTO').substring(0, 25)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150">
                 <rect fill="#1a1a25" width="150" height="150" rx="8"/>
-                <text x="75" y="75" fill="#d4af37" font-size="16" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif">${texto}</text>
+                <text x="75" y="75" fill="#d4af37" font-size="14" text-anchor="middle" dy=".3em" font-family="Arial, sans-serif" font-weight="bold">${seguro}</text>
             </svg>`;
             return 'data:image/svg+xml,' + encodeURIComponent(svg);
         }
 
-        // ============ CANVAS DE RAIOS (otimizado) ============
+        // ============ PARTÍCULAS DO LOADING ============
+        function criarParticulasLoading() {
+            const container = document.getElementById('loadingParticles');
+            if (!container) return;
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'loading-particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // ============ CANVAS DE FUNDO (PARTÍCULAS SUAVES) ============
         (function() {
             const canvas = document.getElementById('lightningCanvas');
             const ctx = canvas.getContext('2d');
             let width, height;
+
             function resize() {
                 width = window.innerWidth;
                 height = window.innerHeight;
@@ -637,70 +1504,53 @@
             window.addEventListener('resize', resize);
 
             const particles = [];
-            const PARTICLE_COUNT = 15;  // reduzido para performance
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
+            for (let i = 0; i < 20; i++) {
                 particles.push({
-                    x: Math.random() * width, y: Math.random() * height,
+                    x: Math.random() * width,
+                    y: Math.random() * height,
                     radius: Math.random() * 1.2 + 0.4,
-                    speedX: (Math.random() - 0.5) * 0.3, speedY: (Math.random() - 0.5) * 0.3,
-                    opacity: Math.random() * 0.4 + 0.1,
+                    speedX: (Math.random() - 0.5) * 0.25,
+                    speedY: (Math.random() - 0.5) * 0.25,
+                    opacity: Math.random() * 0.3 + 0.1,
                     pulseSpeed: Math.random() * 0.02 + 0.005,
                     pulseOffset: Math.random() * Math.PI * 2
                 });
             }
 
-            let lightningAlpha = 0, lightningMaxAlpha = 0;
-            let nextLightning = 4000 + Math.random() * 6000;  // mais espaçado
-            let mainBolt = null, branches = [], boltStartTime = 0;
-            const BOLT_DURATION = 300;
+            let boltPoints = null,
+                boltAlpha = 0,
+                boltStart = 0;
+            const BOLT_DURATION = 400;
 
-            function generateLightning() {
-                const startX = Math.random() * width, startY = 0;
-                const endX = startX + (Math.random() - 0.5) * width * 0.6, endY = height;
-                const segments = 6 + Math.floor(Math.random() * 8);
-                const points = [{ x: startX, y: startY }];
-                const dx = (endX - startX) / segments, dy = (endY - startY) / segments;
-                for (let i = 1; i < segments; i++) {
+            function generateBolt() {
+                const startX = Math.random() * width;
+                const endX = startX + (Math.random() - 0.5) * width * 0.5;
+                const points = [];
+                const steps = 8;
+                for (let i = 0; i <= steps; i++) {
+                    const t = i / steps;
                     points.push({
-                        x: startX + dx * i + (Math.random() - 0.5) * width * 0.12,
-                        y: startY + dy * i + (Math.random() - 0.5) * dy * 1.3
+                        x: startX + (endX - startX) * t + (Math.random() - 0.5) * 60,
+                        y: height * t
                     });
                 }
-                points.push({ x: endX, y: endY });
                 return points;
             }
 
-            function generateBranchedLightning(mainPoints) {
-                const branches = [];
-                const numBranches = Math.floor(Math.random() * 2) + 1;
-                for (let b = 0; b < numBranches; b++) {
-                    const parentIndex = Math.floor(Math.random() * (mainPoints.length - 2)) + 1;
-                    const parent = mainPoints[parentIndex];
-                    const branchLength = 2 + Math.floor(Math.random() * 4);
-                    const angle = (Math.random() - 0.5) * Math.PI * 0.7;
-                    const branchPoints = [{ x: parent.x, y: parent.y }];
-                    const dirX = Math.cos(angle) * width * 0.06;
-                    const dirY = Math.sin(angle) * height * 0.12 + Math.abs(Math.random() * height * 0.03);
-                    for (let i = 1; i <= branchLength; i++) {
-                        const t = i / branchLength;
-                        branchPoints.push({
-                            x: parent.x + dirX * t + (Math.random() - 0.5) * 20,
-                            y: parent.y + dirY * t + (Math.random() - 0.5) * 15
-                        });
-                    }
-                    branches.push(branchPoints);
-                }
-                return branches;
-            }
+            window.triggerLightning = function() {
+                boltPoints = generateBolt();
+                boltAlpha = 0.9;
+                boltStart = performance.now();
+            };
 
-            function drawLightningLine(points, alpha, lineWidth, glowColor) {
-                if (points.length < 2) return;
+            function drawLightningLine(points, alpha) {
+                if (!points || alpha <= 0) return;
                 ctx.save();
                 ctx.globalAlpha = alpha;
-                ctx.strokeStyle = glowColor;
-                ctx.lineWidth = lineWidth;
-                ctx.shadowColor = glowColor;
-                ctx.shadowBlur = lineWidth * 2.5;
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = '#FFD700';
+                ctx.shadowBlur = 15;
                 ctx.beginPath();
                 ctx.moveTo(points[0].x, points[0].y);
                 for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
@@ -708,55 +1558,79 @@
                 ctx.restore();
             }
 
-            function updateLightning(now) {
-                if (!mainBolt && now >= nextLightning) {
-                    mainBolt = generateLightning();
-                    branches = generateBranchedLightning(mainBolt);
-                    lightningMaxAlpha = 0.25 + Math.random() * 0.35;
-                    lightningAlpha = lightningMaxAlpha;
-                    boltStartTime = now;
-                    nextLightning = now + 4000 + Math.random() * 6000;
-                }
-                if (mainBolt) {
-                    const elapsed = now - boltStartTime;
-                    if (elapsed < 50) lightningAlpha = lightningMaxAlpha;
-                    else if (elapsed < BOLT_DURATION) {
-                        const decay = (elapsed - 50) / (BOLT_DURATION - 50);
-                        lightningAlpha = lightningMaxAlpha * (1 - decay) * (0.5 + 0.5 * Math.random());
-                    } else {
-                        mainBolt = null; branches = []; lightningAlpha = 0;
-                    }
-                }
-            }
-
             function draw(timestamp) {
                 ctx.clearRect(0, 0, width, height);
-                // partículas leves
                 particles.forEach(p => {
-                    p.x += p.speedX; p.y += p.speedY;
-                    if (p.x < 0) p.x = width; if (p.x > width) p.x = 0;
-                    if (p.y < 0) p.y = height; if (p.y > height) p.y = 0;
-                    p.currentOpacity = p.opacity + Math.sin(timestamp * p.pulseSpeed + p.pulseOffset) * 0.15;
-                    p.currentOpacity = Math.max(0.03, Math.min(0.6, p.currentOpacity));
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    if (p.x < 0) p.x = width;
+                    if (p.x > width) p.x = 0;
+                    if (p.y < 0) p.y = height;
+                    if (p.y > height) p.y = 0;
+                    p.currentOpacity = p.opacity + Math.sin(timestamp * p.pulseSpeed + p.pulseOffset) *
+                        0.1;
+                    p.currentOpacity = Math.max(0.03, Math.min(0.5, p.currentOpacity));
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = `rgba(240,200,80,${p.currentOpacity})`;
                     ctx.fill();
                 });
 
-                updateLightning(timestamp);
-                if (mainBolt && lightningAlpha > 0.01) {
-                    drawLightningLine(mainBolt, lightningAlpha, 2.8, '#FFD700');
-                    branches.forEach(branch => drawLightningLine(branch, lightningAlpha * 0.45, 1.5, '#e0b030'));
+                if (boltPoints) {
+                    const elapsed = timestamp - boltStart;
+                    if (elapsed < 50) boltAlpha = 0.9;
+                    else if (elapsed < BOLT_DURATION) boltAlpha = 0.9 * (1 - (elapsed - 50) / (BOLT_DURATION -
+                        50));
+                    else {
+                        boltPoints = null;
+                        boltAlpha = 0;
+                    }
+                    if (boltPoints && boltAlpha > 0.01) {
+                        drawLightningLine(boltPoints, boltAlpha);
+                        for (let i = 1; i < boltPoints.length - 1; i++) {
+                            const branch = [
+                                boltPoints[i],
+                                {
+                                    x: boltPoints[i].x + (Math.random() - 0.5) * 50,
+                                    y: boltPoints[i].y + (Math.random() - 0.5) * 40
+                                }
+                            ];
+                            drawLightningLine(branch, boltAlpha * 0.3);
+                        }
+                    }
                 }
+
                 requestAnimationFrame(draw);
             }
             requestAnimationFrame(draw);
         })();
 
+        // ============ CACHE LOCAL DE IMAGENS ============
+        function getCacheImagens() {
+            try { return JSON.parse(localStorage.getItem('cacheImagens') || '{}'); } catch (e) { return {}; }
+        }
+
+        function setCacheImagens(cache) {
+            localStorage.setItem('cacheImagens', JSON.stringify(cache));
+        }
+
+        // ============ FUNÇÃO PARA ESCONDER O LOADING ============
+        function esconderLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('oculto');
+                setTimeout(() => {
+                    if (loadingScreen.parentNode) {
+                        loadingScreen.parentNode.removeChild(loadingScreen);
+                    }
+                }, 900);
+            }
+        }
+
         // ============ FUNÇÕES DE DADOS ============
         async function carregarDados() {
             try {
+                const cacheImg = getCacheImagens();
                 const uSnap = await db.collection('usuarios').get();
                 usuarios = uSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 const pSnap = await db.collection('pedidos').orderBy('data', 'desc').get();
@@ -767,28 +1641,41 @@
                     const mapBase = {};
                     produtos.forEach(p => mapBase[p.id] = p);
                     firestoreProds.forEach(fp => {
+                        if (cacheImg[fp.id] && !fp.img) fp.img = cacheImg[fp.id];
                         mapBase[fp.id] = { ...mapBase[fp.id], ...fp, preco: parseFloat(fp.preco) || 0 };
+                        if (fp.img && fp.img.startsWith('data:image')) cacheImg[fp.id] = fp.img;
                     });
                     produtos = Object.values(mapBase).sort((a, b) => a.id - b.id);
+                    setCacheImagens(cacheImg);
                 } else {
                     const batch = db.batch();
                     produtos.forEach(p => {
                         const ref = db.collection('produtos').doc(String(p.id));
                         batch.set(ref, {
-                            id: p.id, nome: p.nome, preco: p.preco, marca: p.marca,
-                            img: p.img || '', obs: p.obs || ''
+                            id: p.id,
+                            nome: p.nome,
+                            preco: p.preco,
+                            marca: p.marca,
+                            img: p.img || '',
+                            obs: p.obs || ''
                         });
                     });
                     await batch.commit();
                 }
-            } catch (e) { console.error('Erro Firestore:', e); }
+            } catch (e) {
+                console.error('Erro Firestore:', e);
+            }
         }
 
         async function salvarProdutoFirestore(prod) {
             try {
                 await db.collection('produtos').doc(String(prod.id)).set({
-                    id: prod.id, nome: prod.nome, preco: prod.preco, marca: prod.marca,
-                    img: prod.img || '', obs: prod.obs || ''
+                    id: prod.id,
+                    nome: prod.nome,
+                    preco: prod.preco,
+                    marca: prod.marca,
+                    img: prod.img || '',
+                    obs: prod.obs || ''
                 }, { merge: true });
             } catch (e) { console.error(e); }
         }
@@ -805,13 +1692,16 @@
 
         function atualizarUI() {
             document.getElementById('cart-count').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
-            const bf = document.getElementById('btnFinalizar'), ml = document.getElementById('msgLoginNeeded');
-            if (clienteLogado) { bf.disabled = false; ml.style.display = 'none'; }
-            else { bf.disabled = true; ml.style.display = 'block'; }
+            const bf = document.getElementById('btnFinalizar'),
+                ml = document.getElementById('msgLoginNeeded');
+            if (clienteLogado) { bf.disabled = false;
+                ml.style.display = 'none'; } else { bf.disabled = true;
+                ml.style.display = 'block'; }
             document.getElementById('nav-admin').style.display = adminLogado ? 'inline-block' : 'none';
             document.getElementById('nav-clientes').style.display = adminLogado ? 'inline-block' : 'none';
             document.getElementById('nav-gerenciar').style.display = adminLogado ? 'inline-block' : 'none';
-            document.getElementById('nav-logout').style.display = (clienteLogado || adminLogado) ? 'inline-block' : 'none';
+            document.getElementById('nav-logout').style.display = (clienteLogado || adminLogado) ? 'inline-block' :
+                'none';
             document.getElementById('nav-login').style.display = (clienteLogado || adminLogado) ? 'none' : 'inline-block';
         }
 
@@ -819,36 +1709,42 @@
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             const section = document.getElementById(id);
             section.classList.add('active');
-            section.style.animation = 'none';
-            section.offsetHeight;
-            section.style.animation = '';
             if (id === 'catalogo') renderCatalogo();
             if (id === 'carrinho') renderCarrinho();
             if (id === 'admin') renderAdmin();
             if (id === 'gerenciarClientes') {
-                if (!adminLogado) { alert('Acesso restrito.'); showSection('login'); return; }
+                if (!adminLogado) { alert('Acesso restrito.');
+                    showSection('login'); return; }
                 renderGerenciarClientes();
             }
             if (id === 'gerenciarProdutos') {
-                if (!adminLogado) { alert('Acesso restrito.'); showSection('login'); return; }
+                if (!adminLogado) { alert('Acesso restrito.');
+                    showSection('login'); return; }
                 renderGerenciarProdutos();
             }
             atualizarUI();
         }
 
         function logout() {
-            clienteLogado = null; adminLogado = false;
-            salvarDadosLocais(); showSection('catalogo'); atualizarUI();
+            clienteLogado = null;
+            adminLogado = false;
+            salvarDadosLocais();
+            showSection('catalogo');
+            atualizarUI();
         }
 
         function renderBrandFilters() {
             const marcas = [...new Set(produtos.map(p => p.marca))];
             document.getElementById('brandFilters').innerHTML =
                 `<button class="toggle-brand ${filtroMarca === 'TODAS' ? 'active' : ''}" onclick="setFiltroMarca('TODAS')">TODAS</button>` +
-                marcas.map(m => `<button class="toggle-brand ${filtroMarca === m ? 'active' : ''}" onclick="setFiltroMarca('${m.replace(/'/g, "\\'")}')">${m}</button>`).join('');
+                marcas.map(m =>
+                    `<button class="toggle-brand ${filtroMarca === m ? 'active' : ''}" onclick="setFiltroMarca('${m.replace(/'/g, "\\'")}')">${m}</button>`
+                ).join('');
         }
 
-        function setFiltroMarca(m) { filtroMarca = m; renderBrandFilters(); renderCatalogo(); }
+        function setFiltroMarca(m) { filtroMarca = m;
+            renderBrandFilters();
+            renderCatalogo(); }
 
         function renderCatalogo() {
             const c = document.getElementById('catalogoContainer');
@@ -857,12 +1753,16 @@
                 (filtroMarca === 'TODAS' || p.marca === filtroMarca) &&
                 p.nome.toLowerCase().includes(s)
             );
-            if (!f.length) { c.innerHTML = '<div class="empty-state">📦 Nenhum produto encontrado.</div>'; return; }
+            if (!f.length) {
+                c.innerHTML = '<div class="empty-state">📦 Nenhum produto encontrado.</div>';
+                return;
+            }
             c.innerHTML = f.map((p, i) => {
                 const imgSrc = p.img || gerarPlaceholderSVG(p.nome);
                 const pr = p.preco > 0 ? 'R$ ' + p.preco.toFixed(2) : (p.obs || 'Consulte');
-                return `<div class="product-card">
-                    <img src="${imgSrc}" alt="${p.nome}" style="object-fit:contain;">
+                const delay = (i * 0.04).toFixed(2) + 's';
+                return `<div class="product-card" style="animation-delay:${delay};">
+                    <img src="${imgSrc}" alt="${p.nome.replace(/"/g, '&quot;')}" style="object-fit:contain;" width="150" height="150" loading="lazy">
                     <span class="brand-tag">${p.marca}</span>
                     <span class="name">${p.nome}</span>
                     <span class="price">${pr}</span>
@@ -883,21 +1783,22 @@
             else carrinho.push({ prodId: pid, qtd: q, preco: p.preco, nome: p.nome, marca: p.marca });
             salvarDadosLocais();
             atualizarUI();
+            if (window.triggerLightning) window.triggerLightning();
             const badge = document.getElementById('cart-count');
             badge.classList.add('pulse');
             badge.addEventListener('animationend', () => badge.classList.remove('pulse'), { once: true });
             if (btnElement) {
                 const rect = btnElement.getBoundingClientRect();
-                for (let i = 0; i < 6; i++) {
+                for (let i = 0; i < 8; i++) {
                     const particle = document.createElement('div');
                     particle.className = 'gold-particle';
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 30 + Math.random() * 50;
+                    const distance = 30 + Math.random() * 60;
                     particle.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
                     particle.style.setProperty('--dy', Math.sin(angle) * distance + 'px');
                     particle.style.left = (rect.left + rect.width / 2) + 'px';
                     particle.style.top = (rect.top + rect.height / 2) + 'px';
-                    particle.style.width = particle.style.height = (4 + Math.random() * 5) + 'px';
+                    particle.style.width = particle.style.height = (4 + Math.random() * 6) + 'px';
                     document.body.appendChild(particle);
                     particle.addEventListener('animationend', () => particle.remove());
                 }
@@ -905,7 +1806,9 @@
             alert(p.nome + ' adicionado!');
         }
 
-        function toggleSeguro() { seguroAtivo = document.getElementById('checkboxSeguro').checked; salvarDadosLocais(); renderCarrinho(); }
+        function toggleSeguro() { seguroAtivo = document.getElementById('checkboxSeguro').checked;
+            salvarDadosLocais();
+            renderCarrinho(); }
 
         function calcularTotaisCarrinho() {
             const sub = carrinho.reduce((s, i) => s + i.preco * i.qtd, 0);
@@ -917,7 +1820,8 @@
         }
 
         function renderCarrinho() {
-            const c = document.getElementById('carrinhoContainer'), r = document.getElementById('carrinhoResumo');
+            const c = document.getElementById('carrinhoContainer'),
+                r = document.getElementById('carrinhoResumo');
             if (!carrinho.length) {
                 c.innerHTML = '<div class="empty-state"><p>🛒 Carrinho vazio.</p></div>';
                 r.classList.add('hidden');
@@ -941,14 +1845,22 @@
             const t = calcularTotaisCarrinho();
             document.getElementById('resumoItens').textContent = carrinho.reduce((s, i) => s + i.qtd, 0);
             document.getElementById('resumoSubtotal').textContent = 'R$ ' + t.subtotal.toFixed(2);
-            document.getElementById('resumoFrete').textContent = t.frete > 0 ? 'R$ ' + t.frete.toFixed(2) : (clienteLogado ? 'R$ 0,00' : 'Faça login');
+            document.getElementById('resumoFrete').textContent = t.frete > 0 ? 'R$ ' + t.frete.toFixed(2) : (clienteLogado ?
+                'R$ 0,00' : 'Faça login');
             document.getElementById('resumoSeguro').textContent = 'R$ ' + t.seguro.toFixed(2);
             document.getElementById('pSeguro').classList.toggle('hidden', !seguroAtivo);
             document.getElementById('resumoTotal').textContent = 'R$ ' + t.total.toFixed(2);
         }
 
-        function alterarQtdCarrinho(i, v) { carrinho[i].qtd = Math.max(1, parseInt(v) || 1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
-        function removerDoCarrinho(i) { carrinho.splice(i, 1); salvarDadosLocais(); renderCarrinho(); atualizarUI(); }
+        function alterarQtdCarrinho(i, v) { carrinho[i].qtd = Math.max(1, parseInt(v) || 1);
+            salvarDadosLocais();
+            renderCarrinho();
+            atualizarUI(); }
+
+        function removerDoCarrinho(i) { carrinho.splice(i, 1);
+            salvarDadosLocais();
+            renderCarrinho();
+            atualizarUI(); }
 
         function finalizarPedido() {
             if (!clienteLogado) return alert('Faça login.');
@@ -962,7 +1874,8 @@
                 (clienteLogado.complemento ? ' (' + clienteLogado.complemento + ')' : '');
             let itensMsg = '';
             carrinho.forEach(item => {
-                itensMsg += `➡️ ${item.qtd}x ${item.nome}${item.marca ? ` (${item.marca})` : ''} - R$ ${(item.preco * item.qtd).toFixed(2)}\n`;
+                itensMsg +=
+                    `➡️ ${item.qtd}x ${item.nome}${item.marca ? ` (${item.marca})` : ''} - R$ ${(item.preco * item.qtd).toFixed(2)}\n`;
             });
             let detalhesMsg = `Subtotal: R$ ${t.subtotal.toFixed(2)}\n`;
             if (t.frete > 0) detalhesMsg += `Frete: R$ ${t.frete.toFixed(2)}\n`;
@@ -978,27 +1891,35 @@
 
             if (confirm('Confirma o pedido?\n\nTotal: R$ ' + t.total.toFixed(2))) {
                 const novoPedido = {
-                    id: Date.now(), numero: num,
+                    id: Date.now(),
+                    numero: num,
                     clienteId: clienteLogado.id,
                     clienteNome: clienteLogado.nome,
                     clienteContato: clienteLogado.contato,
                     clienteEndereco: enderecoCompleto,
                     clienteCpf: clienteLogado.cpf,
                     itens: carrinho.map(i => ({ ...i })),
-                    subtotal: t.subtotal, frete: t.frete, seguro: t.seguro, total: t.total,
-                    status: 'pendente', data: new Date().toISOString()
+                    subtotal: t.subtotal,
+                    frete: t.frete,
+                    seguro: t.seguro,
+                    total: t.total,
+                    status: 'pendente',
+                    data: new Date().toISOString()
                 };
                 pedidos.unshift(novoPedido);
                 db.collection('pedidos').doc(String(novoPedido.id)).set(novoPedido).catch(e => console.error(e));
-                carrinho = []; seguroAtivo = false;
-                salvarDadosLocais(); atualizarUI(); renderCarrinho();
+                carrinho = [];
+                seguroAtivo = false;
+                salvarDadosLocais();
+                atualizarUI();
+                renderCarrinho();
                 window.open(`https://wa.me/5593991381813?text=${encodeURIComponent(mensagem)}`, '_blank');
             }
         }
 
-        async function salvarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).set(u); } catch(e){} }
-        async function atualizarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).update(u); } catch(e){} }
-        async function deletarUsuario(id) { try { await db.collection('usuarios').doc(String(id)).delete(); } catch(e){} }
+        async function salvarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).set(u); } catch (e) {} }
+        async function atualizarUsuario(u) { try { await db.collection('usuarios').doc(String(u.id)).update(u); } catch (e) {} }
+        async function deletarUsuario(id) { try { await db.collection('usuarios').doc(String(id)).delete(); } catch (e) {} }
 
         function toggleCadastro() {
             document.getElementById('loginForm').classList.toggle('hidden');
@@ -1009,8 +1930,11 @@
             const cpf = document.getElementById('loginCpf').value.replace(/\D/g, '');
             const u = usuarios.find(u => u.cpf === cpf);
             if (!u) return alert('CPF não cadastrado.');
-            clienteLogado = u; adminLogado = false;
-            salvarDadosLocais(); atualizarUI(); showSection('catalogo');
+            clienteLogado = u;
+            adminLogado = false;
+            salvarDadosLocais();
+            atualizarUI();
+            showSection('catalogo');
         }
 
         function cadastrarCliente() {
@@ -1028,14 +1952,26 @@
                 return alert('Preencha todos os campos obrigatórios.');
             if (usuarios.find(u => u.cpf === c)) return alert('CPF já cadastrado.');
             const novo = {
-                id: Date.now(), nome: n, cpf: c, rua, numero: num, bairro, complemento,
-                cidade, regiao, cep, contato: t,
+                id: Date.now(),
+                nome: n,
+                cpf: c,
+                rua,
+                numero: num,
+                bairro,
+                complemento,
+                cidade,
+                regiao,
+                cep,
+                contato: t,
                 endereco: `${rua}, ${num} - ${bairro}, ${cidade} - ${regiao}, CEP: ${cep}${complemento ? ' (' + complemento + ')' : ''}`
             };
             usuarios.push(novo);
             salvarUsuario(novo);
-            clienteLogado = novo; adminLogado = false;
-            salvarDadosLocais(); atualizarUI(); showSection('catalogo');
+            clienteLogado = novo;
+            adminLogado = false;
+            salvarDadosLocais();
+            atualizarUI();
+            showSection('catalogo');
             alert('Cadastro realizado!');
         }
 
@@ -1044,8 +1980,10 @@
         function loginAdmin() {
             if (document.getElementById('adminUser').value.trim() === 'Fortbomba' &&
                 document.getElementById('adminPass').value.trim() === '20362881') {
-                adminLogado = true; clienteLogado = null;
-                salvarDadosLocais(); atualizarUI();
+                adminLogado = true;
+                clienteLogado = null;
+                salvarDadosLocais();
+                atualizarUI();
                 document.getElementById('adminLoginForm').style.display = 'none';
                 document.getElementById('adminContent').classList.remove('hidden');
                 renderAdmin();
@@ -1059,7 +1997,8 @@
             renderAdminPedidos();
         }
 
-        function filtrarPedidos(s) { filtroAdminStatus = s; renderAdminPedidos(); }
+        function filtrarPedidos(s) { filtroAdminStatus = s;
+            renderAdminPedidos(); }
 
         function renderAdminPedidos() {
             const c = document.getElementById('adminPedidosContainer');
@@ -1178,7 +2117,8 @@
             u.contato = document.getElementById('editContato').value.trim();
             u.endereco = `${u.rua}, ${u.numero} - ${u.bairro}, ${u.cidade} - ${u.regiao}, CEP: ${u.cep}${u.complemento ? ' (' + u.complemento + ')' : ''}`;
             await atualizarUsuario(u);
-            if (clienteLogado && clienteLogado.id === id) { clienteLogado = u; salvarDadosLocais(); }
+            if (clienteLogado && clienteLogado.id === id) { clienteLogado = u;
+                salvarDadosLocais(); }
             fecharModal();
             renderGerenciarClientes();
             alert('Dados atualizados!');
@@ -1186,9 +2126,10 @@
 
         function renderGerenciarProdutos() {
             if (!adminLogado) return;
-            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p => `
-                <div class="produto-editar-item">
-                    <img src="${p.img || gerarPlaceholderSVG(p.nome)}" class="image-preview" onerror="this.src='${gerarPlaceholderSVG(p.nome)}'">
+            document.getElementById('gerenciarContainer').innerHTML = produtos.map(p => {
+                const imgPreview = p.img || gerarPlaceholderSVG(p.nome);
+                return `<div class="produto-editar-item">
+                    <img src="${imgPreview}" class="image-preview" onerror="this.src='${gerarPlaceholderSVG(p.nome)}'" alt="${p.nome.replace(/"/g, '&quot;')}">
                     <input type="text" class="nome-prod" value="${p.nome.replace(/"/g, '&quot;')}" id="nome-${p.id}" placeholder="Nome">
                     <input type="number" class="preco-prod" value="${p.preco}" step="0.01" min="0" id="preco-${p.id}" placeholder="Preço">
                     <input type="text" class="marca-prod" value="${p.marca.replace(/"/g, '&quot;')}" id="marca-${p.id}" placeholder="Marca">
@@ -1198,8 +2139,8 @@
                     </div>
                     <button class="btn btn-success btn-sm" onclick="salvarEdicaoProduto(${p.id})">💾 Salvar</button>
                     <button class="btn btn-danger btn-sm" onclick="excluirProduto(${p.id})">🗑️ Excluir</button>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         async function salvarEdicaoProduto(id) {
@@ -1257,16 +2198,25 @@
             const marca = marcaEl.value.trim();
             if (!nome) { alert('Informe o nome.'); return; }
             const novoProduto = {
-                id: Date.now(), nome, preco, marca: marca || 'GERAL', img: '', obs: ''
+                id: Date.now(),
+                nome,
+                preco,
+                marca: marca || 'GERAL',
+                img: '',
+                obs: ''
             };
             if (imgEl.files && imgEl.files[0]) {
-                try { novoProduto.img = await fileToBase64Resized(imgEl.files[0], 500, 500); }
-                catch (e) { console.error(e); }
+                try { novoProduto.img = await fileToBase64Resized(imgEl.files[0], 500, 500); } catch (e) { console.error(e); }
             }
             produtos.push(novoProduto);
             await salvarProdutoFirestore(novoProduto);
-            nomeEl.value = ''; precoEl.value = ''; marcaEl.value = ''; imgEl.value = '';
-            renderGerenciarProdutos(); renderCatalogo(); renderBrandFilters();
+            nomeEl.value = '';
+            precoEl.value = '';
+            marcaEl.value = '';
+            imgEl.value = '';
+            renderGerenciarProdutos();
+            renderCatalogo();
+            renderBrandFilters();
             alert('Produto adicionado!');
         }
 
@@ -1277,10 +2227,13 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        let w = img.width, h = img.height;
-                        if (w > h) { if (w > maxW) { h *= maxW / w; w = maxW; } }
-                        else { if (h > maxH) { w *= maxH / h; h = maxH; } }
-                        canvas.width = w; canvas.height = h;
+                        let w = img.width,
+                            h = img.height;
+                        if (w > h) { if (w > maxW) { h *= maxW / w;
+                                w = maxW; } } else { if (h > maxH) { w *= maxH / h;
+                                h = maxH; } }
+                        canvas.width = w;
+                        canvas.height = h;
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         resolve(canvas.toDataURL('image/jpeg', 0.8));
                     };
@@ -1295,49 +2248,74 @@
         function uploadImagemProduto(produtoId, fileInput, btn) {
             const file = fileInput.files[0];
             if (!file) { alert('Selecione uma imagem.'); return; }
-            btn.disabled = true; btn.textContent = '⏳...';
+            btn.disabled = true;
+            btn.textContent = '⏳...';
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxW = 500, maxH = 500;
-                    let w = img.width, h = img.height;
-                    if (w > h) { if (w > maxW) { h *= maxW / w; w = maxW; } }
-                    else { if (h > maxH) { w *= maxH / h; h = maxH; } }
-                    canvas.width = w; canvas.height = h;
+                    const maxW = 500,
+                        maxH = 500;
+                    let w = img.width,
+                        h = img.height;
+                    if (w > h) { if (w > maxW) { h *= maxW / w;
+                            w = maxW; } } else { if (h > maxH) { w *= maxH / h;
+                            h = maxH; } }
+                    canvas.width = w;
+                    canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     const base64 = canvas.toDataURL('image/jpeg', 0.8);
                     const produto = produtos.find(p => p.id === produtoId);
-                    if (produto) produto.img = base64;
-                    salvarProdutoFirestore(produto).then(() => {
-                        renderGerenciarProdutos(); renderCatalogo();
-                        alert('✅ Imagem atualizada!');
-                    }).catch(error => {
-                        alert('❌ Falha ao salvar: ' + error.message);
-                    }).finally(() => {
-                        btn.disabled = false; btn.textContent = '📤 Imagem';
-                        fileInput.value = '';
-                    });
+                    if (produto) {
+                        produto.img = base64;
+                        salvarProdutoFirestore(produto).then(() => {
+                            renderGerenciarProdutos();
+                            renderCatalogo();
+                            alert('✅ Imagem atualizada!');
+                        }).catch(error => {
+                            alert('❌ Falha ao salvar: ' + error.message);
+                        }).finally(() => {
+                            btn.disabled = false;
+                            btn.textContent = '📤 Imagem';
+                            fileInput.value = '';
+                        });
+                    } else {
+                        alert('❌ Produto não encontrado.');
+                        btn.disabled = false;
+                        btn.textContent = '📤 Imagem';
+                    }
                 };
-                img.onerror = () => { alert('❌ Erro ao carregar imagem.'); btn.disabled = false; btn.textContent = '📤 Imagem'; };
+                img.onerror = () => {
+                    alert('❌ Erro ao carregar imagem.');
+                    btn.disabled = false;
+                    btn.textContent = '📤 Imagem';
+                };
                 img.src = e.target.result;
             };
-            reader.onerror = () => { alert('❌ Erro ao ler arquivo.'); btn.disabled = false; btn.textContent = '📤 Imagem'; };
+            reader.onerror = () => {
+                alert('❌ Erro ao ler arquivo.');
+                btn.disabled = false;
+                btn.textContent = '📤 Imagem';
+            };
             reader.readAsDataURL(file);
         }
 
+        // ============ INICIALIZAÇÃO ============
         async function init() {
+            // Cria partículas do loading
+            criarParticulasLoading();
+
+            // Restaura dados locais
             carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
             seguroAtivo = JSON.parse(localStorage.getItem('seguroAtivo')) || false;
             clienteLogado = JSON.parse(sessionStorage.getItem('clienteLogado')) || null;
             adminLogado = JSON.parse(sessionStorage.getItem('adminLogado')) || false;
 
-            renderBrandFilters();
-            renderCatalogo();
-            atualizarUI();
-
+            // Carrega dados do Firestore
             await carregarDados();
+
+            // Renderiza interface
             renderBrandFilters();
             renderCatalogo();
             atualizarUI();
@@ -1347,7 +2325,11 @@
                 document.getElementById('nav-clientes').style.display = 'inline-block';
                 document.getElementById('nav-gerenciar').style.display = 'inline-block';
             }
+
+            // Esconde loading com fade out
+            esconderLoading();
         }
+
         init();
     </script>
 </body>
