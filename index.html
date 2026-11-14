@@ -291,6 +291,9 @@
   .btn-whats{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 8px 20px rgba(37,211,102,.4)}
   .btn-whats:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(37,211,102,.52)}
 
+  .big-caixa.receber{background:linear-gradient(135deg,#B7791F,#C08552)}
+  .big-caixa.receber .v{color:#FFF3D6}
+
 </style>
 </head>
 <body>
@@ -327,6 +330,7 @@
   <button data-tab="vendas" role="tab" aria-selected="false">🛒 Vendas</button>
   <button data-tab="caixa" role="tab" aria-selected="false">💰 Caixa</button>
   <button data-tab="receber" role="tab" aria-selected="false">📅 A Receber</button>
+  <button data-tab="pix" role="tab" aria-selected="false">💠 Pix</button>
 </nav>
 
 <main>
@@ -367,7 +371,12 @@
       <div class="section-title"><span class="dot"></span>Relatório</div>
       <h3 class="sub-head">🔔 Quem está me devendo</h3>
       <div id="reportDebt"></div>
-      <h3 class="sub-head">🛍️ Últimas vendas</h3>
+      <h3 class="sub-head">🛍️ Vendas</h3>
+      <div class="filtros" style="margin-bottom:10px">
+        <input type="text" id="fRelNome" placeholder="Nome do cliente" style="flex:1;min-width:130px">
+        <input type="date" id="fRelDia" style="flex:1;min-width:130px" aria-label="Filtrar por dia">
+        <input type="month" id="fRelMes" style="flex:1;min-width:130px" aria-label="Filtrar por mês">
+      </div>
       <div id="reportSales"></div>
     </div>
   </section>
@@ -455,24 +464,9 @@
       <span class="v" id="bigCaixa">R$ 0,00</span>
     </div>
 
-    <div class="card">
-      <div class="section-title"><span class="dot"></span>Retirar dinheiro do caixa</div>
-      <div class="row">
-        <div class="field">
-          <label class="fld" for="inRetValor">Valor (R$)</label>
-          <input type="number" id="inRetValor" min="0" step="0.01" placeholder="0,00">
-        </div>
-        <div class="field">
-          <label class="fld" for="inRetMotivo">Motivo (opcional)</label>
-          <input type="text" id="inRetMotivo" placeholder="Ex.: compra de ingredientes">
-        </div>
-      </div>
-      <button class="btn btn-danger" id="btnRetirar" style="width:100%">💸 Registrar retirada</button>
-    </div>
-
-    <div class="card">
-      <div class="section-title"><span class="dot"></span>Histórico de movimentações</div>
-      <div id="histList"></div>
+    <div class="big-caixa receber">
+      <span class="l">Saldo a receber (pendente)</span>
+      <span class="v" id="bigReceber">R$ 0,00</span>
     </div>
   </section>
 
@@ -488,6 +482,15 @@
     <div class="card">
       <div class="section-title"><span class="dot"></span>Quem está me devendo</div>
       <div id="receberList"></div>
+    </div>
+  </section>
+
+  <!-- ============ PIX ============ -->
+  <section class="view" id="pix" role="tabpanel">
+    <div class="card" style="text-align:center">
+      <div class="section-title" style="justify-content:center"><span class="dot"></span>Pagamento via Pix</div>
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:18px">Mostre este QR Code para o cliente pagar.</p>
+      <img src="pix.png" alt="QR Code Pix" style="max-width:280px;width:100%;border-radius:18px;box-shadow:var(--shadow)">
     </div>
   </section>
 
@@ -612,8 +615,16 @@
   function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
   // ===== DERIVADOS =====
+  function recebidoDe(s){
+    if(s.pago !== false) return (s.total||0);
+    return (s.recebido||0);
+  }
+  function saldoDe(s){
+    if(s.pago !== false) return 0;
+    return Math.max(0, (s.total||0) - (s.recebido||0));
+  }
   function caixaTotal(){
-    const v = state.sales.filter(x=>x.pago!==false).reduce((s,x)=>s+(x.total||0),0);
+    const v = state.sales.reduce((s,x)=> s + recebidoDe(x), 0);
     const r = state.withdrawals.reduce((s,x)=>s+(x.valor||0),0);
     return v - r;
   }
@@ -639,6 +650,7 @@
     $("kpiCaixa").textContent = din(caixaTotal());
     $("caixaBadge").textContent = din(caixaTotal());
     $("bigCaixa").textContent = din(caixaTotal());
+    $("bigReceber").textContent = din(totalAReceber());
     $("kpiUnidades").textContent = unidadesEmEstoque();
     $("kpiVendidos").textContent = itensVendidos();
     $("kpiHoje").textContent = din(vendasHoje());
@@ -940,7 +952,8 @@
     state.sales.push({
       id: uid(), ts: Date.now(), items, qtde, total,
       forma: forma, cliente: cliente,
-      pago: !depois, vencimento: depois ? vencimento : ""
+      pago: !depois, vencimento: depois ? vencimento : "",
+      recebido: 0
     });
     saveState();
     cart = [];
@@ -964,14 +977,18 @@
   function renderHist(){
     const list = $("histList");
     const movs = [];
-    state.sales.forEach(s=> movs.push({
-      ts: s.ts,
-      tipo: s.pago===false ? "fiado" : "venda",
-      label: s.pago===false ? ("Fiado — " + nomeCliente(s)) : (`Venda de ${s.qtde} ${s.qtde===1?"item":"itens"}`),
-      valor: s.total, pend: s.pago===false, in: s.pago!==false,
-      venc: s.pago===false ? s.vencimento : "",
-      detalhes: descreverVenda(s)
-    }));
+    state.sales.forEach(s=>{
+      const deve = s.pago===false && saldoDe(s)>0;
+      movs.push({
+        ts: s.ts,
+        tipo: deve ? "fiado" : "venda",
+        label: deve ? ("Fiado — " + nomeCliente(s)) : (`Venda de ${s.qtde} ${s.qtde===1?"item":"itens"}`),
+        valor: deve ? saldoDe(s) : s.total,
+        pend: deve, in: !deve,
+        venc: deve ? s.vencimento : "",
+        detalhes: descreverVenda(s) + (deve && (s.recebido||0)>0 ? ` · já pagou ${din(s.recebido||0)}` : "")
+      });
+    });
     state.withdrawals.forEach(w=> movs.push({ ts:w.ts, tipo:"retirada", label: w.motivo ? `Retirada — ${w.motivo}` : "Retirada", valor:w.valor, in:false, pend:false }));
     movs.sort((a,b)=>b.ts-a.ts);
     if(!movs.length){
@@ -1007,12 +1024,12 @@
     const d = new Date();
     return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
   }
-  function dividas(){ return state.sales.filter(x=>x.pago===false); }
+  function dividas(){ return state.sales.filter(x=>x.pago===false && saldoDe(x)>0); }
   function dividasVencidas(){
     const h = hojeStr();
     return dividas().filter(x=>x.vencimento && x.vencimento <= h);
   }
-  function totalAReceber(){ return dividas().reduce((s,x)=>s+(x.total||0),0); }
+  function totalAReceber(){ return dividas().reduce((s,x)=>s+saldoDe(x),0); }
   function nomeCliente(x){ return (x.cliente && x.cliente.trim()) ? x.cliente.trim() : "Cliente"; }
   function calcDias(v){ const a=new Date(v+"T00:00:00"); const b=new Date(); b.setHours(0,0,0,0); return Math.floor((b-a)/86400000); }
   function formatDataBr(v){ if(!v) return "—"; const p=v.split("-"); return `${p[2]}/${p[1]}/${p[0]}`; }
@@ -1028,7 +1045,8 @@
     });
     return Array.from(map.values()).map(g=>{
       const vendas = g.vendas;
-      const total = vendas.reduce((s,x)=>s+(x.total||0),0);
+      const recebido = vendas.reduce((s,x)=>s+(x.recebido||0),0);
+      const saldo = vendas.reduce((s,x)=>s+saldoDe(x),0);
       let vencimento = null;
       vendas.forEach(x=>{ if(x.vencimento && (!vencimento || x.vencimento < vencimento)) vencimento = x.vencimento; });
       const agg = new Map();
@@ -1042,24 +1060,40 @@
         const sabor = a.sabor ? " "+a.sabor : "";
         return `${a.qty}x ${nome}${sabor}`;
       }).join(" · ");
-      return { nome: g.nome, total, vencimento, descricao, qtd: vendas.length };
+      return { nome: g.nome, saldo, recebido, vencimento, descricao, qtd: vendas.length };
     });
   }
 
-  function marcarPagoPorNome(nome){
+  function registrarRecebimento(nome, valor){
     const key = nome.toLowerCase();
-    const vendas = state.sales.filter(x=>x.pago===false && nomeCliente(x).toLowerCase()===key);
-    if(!vendas.length) return;
-    const total = vendas.reduce((s,x)=>s+(x.total||0),0);
-    if(!confirm(`Confirmar recebimento de ${din(total)} de "${nome}"?`)) return;
-    vendas.forEach(x=>x.pago=true);
+    let restante = valor;
+    const alvo = state.sales
+      .filter(x=>x.pago===false && nomeCliente(x).toLowerCase()===key && saldoDe(x)>0)
+      .sort((a,b)=>a.ts-b.ts);
+    for(const s of alvo){
+      if(restante <= 0) break;
+      const aplicar = Math.min(restante, saldoDe(s));
+      s.recebido = (s.recebido||0) + aplicar;
+      restante -= aplicar;
+      if(saldoDe(s) <= 0) s.pago = true;
+    }
     saveState();
     renderAll();
   }
 
+  function pedirReceber(nome, saldo){
+    const padrao = saldo.toFixed(2).replace(".", ",");
+    const resp = prompt(`Quanto ${nome} pagou? (Saldo: ${din(saldo)})`, padrao);
+    if(resp === null) return;
+    const valor = parseFloat(String(resp).trim().replace(",", "."));
+    if(isNaN(valor) || valor <= 0){ alert("Valor inválido."); return; }
+    if(valor > saldo + 0.004){ alert("O valor informado é maior que a dívida."); return; }
+    registrarRecebimento(nome, valor);
+  }
+
   function renderReceber(){
     $("recTotal").textContent = din(totalAReceber());
-    $("recVencidas").textContent = dividasVencidas().length;
+    $("recVencidas").textContent = dividasPorNome().filter(g=>g.vencimento && g.vencimento<=hojeStr()).length;
     const list = $("receberList");
     const grupos = dividasPorNome();
     if(!grupos.length){
@@ -1076,11 +1110,11 @@
         `<div class="ava">🧑</div>
          <div class="info">
            <div class="nm">${escapeHtml(g.nome)}</div>
-           <div class="dl">${escapeHtml(g.descricao)}${g.vencimento?' · vence '+formatDataBr(g.vencimento):''}${vencida?' <span class="over">('+labelVencida(calcDias(g.vencimento))+')</span>':''}${g.qtd>1?' · '+g.qtd+' compras':''}</div>
+           <div class="dl">${escapeHtml(g.descricao)}${g.vencimento?' · vence '+formatDataBr(g.vencimento):''}${vencida?' <span class="over">('+labelVencida(calcDias(g.vencimento))+')</span>':''}${g.qtd>1?' · '+g.qtd+' compras':''}${g.recebido>0?' · já pagou '+din(g.recebido):''}</div>
          </div>
-         <div class="val">${din(g.total)}</div>
-         <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">✅ Pago</button>`;
-      div.querySelector("[data-nome]").addEventListener("click", ()=>marcarPagoPorNome(g.nome));
+         <div class="val">${din(g.saldo)}</div>
+         <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">💵 Receber</button>`;
+      div.querySelector("[data-nome]").addEventListener("click", ()=>pedirReceber(g.nome, g.saldo));
       list.appendChild(div);
     });
   }
@@ -1103,7 +1137,7 @@
              <div class="dl">${escapeHtml(g.descricao)}</div>
            </div>
            <div style="text-align:right">
-             <div class="v">${din(g.total)}</div>
+             <div class="v">${din(g.saldo)}</div>
              <div class="dl" style="${vencida?'color:var(--red);font-weight:700':''}">${g.vencimento?"vence "+formatDataBr(g.vencimento):""}</div>
            </div>`;
         debtBox.appendChild(row);
@@ -1111,9 +1145,26 @@
     }
 
     const salesBox = $("reportSales");
-    const recentes = state.sales.slice().sort((a,b)=>b.ts-a.ts).slice(0,6);
+    const fNome = ($("fRelNome").value || "").trim().toLowerCase();
+    const fDia = $("fRelDia").value;
+    const fMes = $("fRelMes").value;
+
+    let recentes = state.sales.slice().sort((a,b)=>b.ts-a.ts);
+    if(fNome || fDia || fMes){
+      recentes = recentes.filter(s=>{
+        const d = new Date(s.ts);
+        const dia = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+        if(fNome && !((s.cliente||"").toLowerCase().includes(fNome))) return false;
+        if(fDia && dia !== fDia) return false;
+        if(fMes && dia.slice(0,7) !== fMes) return false;
+        return true;
+      });
+    } else {
+      recentes = recentes.slice(0,6);
+    }
+
     if(!recentes.length){
-      salesBox.innerHTML = '<div class="empty" style="padding:12px">Nenhuma venda ainda.</div>';
+      salesBox.innerHTML = '<div class="empty" style="padding:12px">Nenhuma venda encontrada.</div>';
       return;
     }
     salesBox.innerHTML = "";
@@ -1134,10 +1185,11 @@
 
   function renderAlerta(){
     const al = $("alerta");
-    const deb = dividasVencidas();
-    if(!deb.length){ al.classList.add("hidden"); return; }
-    const total = deb.reduce((s,x)=>s+(x.total||0),0);
-    $("alertaTitulo").textContent = deb.length===1 ? `${nomeCliente(deb[0])} está te devendo!` : `Você tem ${deb.length} cobranças vencidas!`;
+    const h = hojeStr();
+    const grupos = dividasPorNome().filter(g=>g.vencimento && g.vencimento<=h);
+    if(!grupos.length){ al.classList.add("hidden"); return; }
+    const total = grupos.reduce((s,x)=>s+x.saldo,0);
+    $("alertaTitulo").textContent = grupos.length===1 ? `${grupos[0].nome} está te devendo!` : `Você tem ${grupos.length} cobranças vencidas!`;
     $("alertaSub").textContent = `Total: ${din(total)} · clique para ver quem deve`;
     al.classList.remove("hidden");
   }
@@ -1154,8 +1206,8 @@
           <div class="nm">${escapeHtml(g.nome)}</div>
           <div class="dl">${escapeHtml(g.descricao)}<br>Vence ${formatDataBr(g.vencimento)}${vencida?' <span class="over">· '+labelVencida(calcDias(g.vencimento))+'</span>':''}</div>
         </div>
-        <div class="val">${din(g.total)}</div>
-        <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">✅ Pago</button>
+        <div class="val">${din(g.saldo)}</div>
+        <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">💵 Receber</button>
       </div>`;
     }).join("");
     m.innerHTML = `<div class="sheet">
@@ -1169,7 +1221,9 @@
     m.removeAttribute("hidden");
     $("modalClose").addEventListener("click", closeModal);
     m.querySelectorAll("[data-nome]").forEach(b=> b.addEventListener("click", ()=>{
-      marcarPagoPorNome(b.dataset.nome); openModal();
+      const nome = b.dataset.nome;
+      const g = dividasPorNome().find(x=>x.nome.toLowerCase()===nome.toLowerCase());
+      if(g){ pedirReceber(g.nome, g.saldo); openModal(); }
     }));
   }
   function closeModal(){
@@ -1198,7 +1252,6 @@
     renderStock();
     renderSellList();
     renderCart();
-    renderHist();
     renderReceber();
     renderRelatorio();
     renderAlerta();
@@ -1222,12 +1275,14 @@
     $("fTipo").addEventListener("change", renderStock);
     $("fBusca").addEventListener("input", renderStock);
     $("btnFinalizar").addEventListener("click", finalizarVenda);
-    $("btnRetirar").addEventListener("click", retirarCaixa);
     $("formaGrid").addEventListener("change", toggleVenc);
     $("alerta").addEventListener("click", openModal);
     $("alerta").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openModal(); } });
     $("modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeModal(); });
     $("btnEnviarVendas").addEventListener("click", enviarVendasDoDia);
+    $("fRelNome").addEventListener("input", renderRelatorio);
+    $("fRelDia").addEventListener("change", renderRelatorio);
+    $("fRelMes").addEventListener("change", renderRelatorio);
   }
 
   // ===== PWA (instalação no celular) =====
