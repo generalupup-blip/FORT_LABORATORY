@@ -176,6 +176,8 @@
   .qty-ctl .q{min-width:30px;text-align:center;font-weight:700}
   .stock-item .price{font-size:.88rem;font-weight:800;color:var(--green);flex:0 0 auto;text-align:right;white-space:nowrap}
   .stock-item .price small{display:block;font-weight:500;color:var(--muted);font-size:.68rem}
+  .stock-item.zero{opacity:.6}
+  .stock-item.zero .info .nm{color:var(--red)}
   .delete-x{border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:18px;padding:4px;border-radius:8px}
   .delete-x:hover{color:var(--red);background:#FBE5DD}
   .empty{padding:36px 16px;text-align:center;color:var(--muted);font-size:.92rem}
@@ -830,7 +832,7 @@
     itens.forEach(it=>{
       const p = PRODUTOS[it.tipo] || {};
       const div = document.createElement("div");
-      div.className = "stock-item";
+      div.className = "stock-item" + (it.quantidade <= 0 ? " zero":"");
       div.innerHTML =
         `<div class="em">${p.emoji||"🍬"}</div>
          <div class="info">
@@ -842,7 +844,7 @@
            <span class="q">${it.quantidade}</span>
            <button class="plus-s" title="Aumentar">+</button>
          </div>
-         <div class="price">${din(it.preco)}<small>por unidade</small></div>
+         <div class="price">${din(it.preco)}<small>${it.quantidade <= 0 ? "esgotado" : "por unidade"}</small></div>
          <button class="delete-x" title="Remover do estoque" aria-label="Remover ${escapeHtml(it.sabor)}">🗑️</button>`;
       div.querySelector(".minus").addEventListener("click", ()=>adjustQty(it.id,-1));
       div.querySelector(".plus-s").addEventListener("click", ()=>adjustQty(it.id,1));
@@ -854,11 +856,7 @@
   function adjustQty(id, delta){
     const it = state.stock.find(x=>x.id===id);
     if(!it) return;
-    it.quantidade += delta;
-    if(it.quantidade <= 0){
-      if(!confirm(`Remover "${it.sabor}" do estoque?`)){ it.quantidade = 1; return; }
-      state.stock = state.stock.filter(x=>x.id!==id);
-    }
+    it.quantidade = Math.max(0, it.quantidade + delta);
     saveState(); renderAll();
   }
   function removeStock(id){
@@ -983,7 +981,6 @@
       const it = state.stock.find(x=>x.id===c.id);
       it.quantidade -= c.qty;
     }
-    state.stock = state.stock.filter(x=>x.quantidade > 0);
     state.sales.push({
       id: uid(), ts: Date.now(), items, qtde, total,
       forma: forma, cliente: cliente,
