@@ -1,8 +1,10 @@
-const CACHE = "docaria-v1";
+const CACHE = "docaria-v2";
 const ASSETS = [
   "./",
+  "./index.html",
   "./manifest.json",
-  "./logo.png"
+  "./logo.png",
+  "./pix.png"
 ];
 
 self.addEventListener("install", (e) => {
@@ -20,11 +22,27 @@ self.addEventListener("activate", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.match(e.request).then((r) =>
-      r || fetch(e.request).then((res) => {
+  const req = e.request;
+
+  // Navegação (a página HTML): sempre busca a versão mais nova na rede,
+  // para que atualizações entrem sem precisar limpar cache.
+  if (req.mode === "navigate") {
+    e.respondWith(
+      fetch(req).then((res) => {
         const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        caches.open(CACHE).then((c) => c.put("./index.html", copy));
+        return res;
+      }).catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
+  // Demais arquivos: cache primeiro, rede como fallback.
+  e.respondWith(
+    caches.match(req).then((r) =>
+      r || fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
         return res;
       }).catch(() => caches.match("./"))
     )
