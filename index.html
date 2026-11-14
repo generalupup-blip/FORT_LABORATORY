@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Doçaria — Estoque & Caixa</title>
+<title>Cá Doces Mel — Estoque & Caixa</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo.png">
 <meta name="theme-color" content="#4E342E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Doçaria">
+<meta name="apple-mobile-web-app-title" content="Cá Doces Mel">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:wght@700;800&display=swap" rel="stylesheet">
@@ -276,6 +276,21 @@
   #btnEntrar{background:transparent;border:none;color:rgba(255,255,255,.82);font-family:inherit;font-size:.85rem;cursor:pointer;margin-top:14px;text-decoration:underline}
   #iosHint{margin-top:16px;font-size:.8rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:10px 14px;border-radius:12px}
 
+  .sub-head{font-size:.78rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+  .sub-head:first-child{margin-top:0}
+  .rep-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+  .rep-row:last-child{border-bottom:none}
+  .rep-row .g{flex:1;min-width:0}
+  .rep-row .g .nm{font-weight:700}
+  .rep-row .g .dl{font-size:.74rem;color:var(--muted)}
+  .rep-row .v{font-weight:800;white-space:nowrap}
+
+  .brand-name{background:linear-gradient(90deg,#ffe3b3 0%,#fff 28%,#ffe3b3 50%,#fff 72%,#ffe3b3 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite, glow 2.2s ease-in-out infinite}
+  @keyframes shine{to{background-position:200% center}}
+  @keyframes glow{0%,100%{filter:drop-shadow(0 0 3px rgba(255,227,179,.35))}50%{filter:drop-shadow(0 0 13px rgba(255,214,165,.95))}}
+  .btn-whats{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 8px 20px rgba(37,211,102,.4)}
+  .btn-whats:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(37,211,102,.52)}
+
 </style>
 </head>
 <body>
@@ -284,7 +299,7 @@
   <div class="splash-bg"></div>
   <div class="splash-card">
     <img src="logo.png" alt="Logo do app">
-    <h1>Doçaria Mel &amp; Cia</h1>
+    <h1 class="brand-name">Cá Doces Mel</h1>
     <p>Instale o app para vender mais rápido e ter tudo salvo na nuvem.</p>
     <button id="btnInstalar">📲 Instalar app</button>
     <button id="btnEntrar">Agora não</button>
@@ -296,7 +311,7 @@
   <div class="brand">
     <div class="logo">🍯</div>
     <div>
-      <h1>Doçaria Mel &amp; Cia</h1>
+      <h1 class="brand-name">Cá Doces Mel</h1>
       <p>Pão de Mel · Bolo Bom Bom · Trufa</p>
     </div>
   </div>
@@ -344,7 +359,16 @@
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-primary" id="goEstoque">➕ Adicionar ao estoque</button>
         <button class="btn btn-dark" id="goVendas">🛒 Fazer uma venda</button>
+        <button class="btn btn-whats" id="btnEnviarVendas">📤 Enviar vendas do dia</button>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><span class="dot"></span>Relatório</div>
+      <h3 class="sub-head">🔔 Quem está me devendo</h3>
+      <div id="reportDebt"></div>
+      <h3 class="sub-head">🛍️ Últimas vendas</h3>
+      <div id="reportSales"></div>
     </div>
   </section>
 
@@ -403,7 +427,9 @@
       <hr class="divider">
       <div class="field">
         <label class="fld" for="inCliente">Cliente (nome)</label>
-        <input type="text" id="inCliente" placeholder="Ex.: Maria Silva">
+        <input type="text" id="inCliente" list="dlClientes" placeholder="Ex.: Maria Silva" autocomplete="off">
+        <datalist id="dlClientes"></datalist>
+        <div class="chips" id="clienteChips"></div>
       </div>
       <div class="field">
         <label class="fld">Forma de pagamento</label>
@@ -492,7 +518,6 @@
   const PAGAMENTOS = {
     dinheiro: { nome: "Dinheiro", emoji: "💵", depois: false },
     pix:      { nome: "Pix",      emoji: "⚡",  depois: false },
-    cartao:   { nome: "Cartão",   emoji: "💳",  depois: false },
     depois:   { nome: "Depois / Fiado", emoji: "📅", depois: true }
   };
 
@@ -683,6 +708,32 @@
       b.className = "chip";
       b.textContent = s;
       b.addEventListener("click", ()=> $("inSabor").value = s);
+      chips.appendChild(b);
+    });
+  }
+
+  function clientesExistentes(){
+    const s = new Set();
+    state.sales.forEach(x => { if(x.cliente && x.cliente.trim()) s.add(x.cliente.trim()); });
+    return Array.from(s).sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  }
+
+  function mountClienteChips(){
+    const dl = $("dlClientes");
+    const chips = $("clienteChips");
+    const nomes = clientesExistentes();
+    dl.innerHTML = nomes.map(n=>`<option value="${escapeHtml(n)}"></option>`).join("");
+    chips.innerHTML = "";
+    if(!nomes.length){
+      chips.innerHTML = '<span style="font-size:.72rem;color:var(--muted)">Nenhum cliente salvo ainda.</span>';
+      return;
+    }
+    nomes.slice(0,12).forEach(n=>{
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = n;
+      b.addEventListener("click", ()=> $("inCliente").value = n);
       chips.appendChild(b);
     });
   }
@@ -967,41 +1018,118 @@
   function formatDataBr(v){ if(!v) return "—"; const p=v.split("-"); return `${p[2]}/${p[1]}/${p[0]}`; }
   function labelVencida(dias){ if(dias===0) return "vence hoje!"; if(dias===1) return "1 dia atrasada"; return `${dias} dias atrasada`; }
 
+  function dividasPorNome(){
+    const map = new Map();
+    dividas().forEach(s=>{
+      const nome = nomeCliente(s);
+      const key = nome.toLowerCase();
+      if(!map.has(key)) map.set(key, { nome, vendas: [] });
+      map.get(key).vendas.push(s);
+    });
+    return Array.from(map.values()).map(g=>{
+      const vendas = g.vendas;
+      const total = vendas.reduce((s,x)=>s+(x.total||0),0);
+      let vencimento = null;
+      vendas.forEach(x=>{ if(x.vencimento && (!vencimento || x.vencimento < vencimento)) vencimento = x.vencimento; });
+      const agg = new Map();
+      vendas.forEach(s=> (s.items||[]).forEach(i=>{
+        const k = (i.tipo||"")+"|"+(i.sabor||"");
+        if(!agg.has(k)) agg.set(k, { tipo:i.tipo, sabor:i.sabor, qty:0 });
+        agg.get(k).qty += (i.qty||0);
+      }));
+      const descricao = Array.from(agg.values()).map(a=>{
+        const nome = PRODUTOS[a.tipo]?.nome || a.tipo;
+        const sabor = a.sabor ? " "+a.sabor : "";
+        return `${a.qty}x ${nome}${sabor}`;
+      }).join(" · ");
+      return { nome: g.nome, total, vencimento, descricao, qtd: vendas.length };
+    });
+  }
+
+  function marcarPagoPorNome(nome){
+    const key = nome.toLowerCase();
+    const vendas = state.sales.filter(x=>x.pago===false && nomeCliente(x).toLowerCase()===key);
+    if(!vendas.length) return;
+    const total = vendas.reduce((s,x)=>s+(x.total||0),0);
+    if(!confirm(`Confirmar recebimento de ${din(total)} de "${nome}"?`)) return;
+    vendas.forEach(x=>x.pago=true);
+    saveState();
+    renderAll();
+  }
+
   function renderReceber(){
     $("recTotal").textContent = din(totalAReceber());
     $("recVencidas").textContent = dividasVencidas().length;
     const list = $("receberList");
-    const deb = dividas().slice().sort((a,b)=>(a.vencimento||"").localeCompare(b.vencimento||""));
-    if(!deb.length){
+    const grupos = dividasPorNome();
+    if(!grupos.length){
       list.innerHTML = '<div class="empty"><span class="big">😊</span>Ninguém está te devendo.<br>Tudo em dia!</div>';
       return;
     }
     const h = hojeStr();
     list.innerHTML = "";
-    deb.forEach(s=>{
-      const vencida = s.vencimento && s.vencimento <= h;
+    grupos.forEach(g=>{
+      const vencida = g.vencimento && g.vencimento <= h;
       const div = document.createElement("div");
       div.className = "debt-row";
       div.innerHTML =
         `<div class="ava">🧑</div>
          <div class="info">
-           <div class="nm">${escapeHtml(nomeCliente(s))}</div>
-           <div class="dl">${escapeHtml(s.items?descreverVenda(s):"")} · vence ${formatDataBr(s.vencimento)}${vencida?' <span class="over">('+labelVencida(calcDias(s.vencimento))+')</span>':''}</div>
+           <div class="nm">${escapeHtml(g.nome)}</div>
+           <div class="dl">${escapeHtml(g.descricao)}${g.vencimento?' · vence '+formatDataBr(g.vencimento):''}${vencida?' <span class="over">('+labelVencida(calcDias(g.vencimento))+')</span>':''}${g.qtd>1?' · '+g.qtd+' compras':''}</div>
          </div>
-         <div class="val">${din(s.total)}</div>
-         <button class="btn btn-primary btn-sm" data-pago="${s.id}">✅ Pago</button>`;
-      div.querySelector("[data-pago]").addEventListener("click", ()=>marcarPago(s.id));
+         <div class="val">${din(g.total)}</div>
+         <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">✅ Pago</button>`;
+      div.querySelector("[data-nome]").addEventListener("click", ()=>marcarPagoPorNome(g.nome));
       list.appendChild(div);
     });
   }
 
-  function marcarPago(id){
-    const s = state.sales.find(x=>x.id===id);
-    if(!s) return;
-    if(!confirm(`Confirmar recebimento de ${din(s.total)} de "${nomeCliente(s)}"?`)) return;
-    s.pago = true;
-    saveState();
-    renderAll();
+  function renderRelatorio(){
+    const debtBox = $("reportDebt");
+    const grupos = dividasPorNome();
+    const h = hojeStr();
+    if(!grupos.length){
+      debtBox.innerHTML = '<div class="empty" style="padding:12px">Ninguém te deve no momento 😊</div>';
+    } else {
+      debtBox.innerHTML = "";
+      grupos.forEach(g=>{
+        const vencida = g.vencimento && g.vencimento <= h;
+        const row = document.createElement("div");
+        row.className = "rep-row";
+        row.innerHTML =
+          `<div class="g">
+             <div class="nm">${escapeHtml(g.nome)}</div>
+             <div class="dl">${escapeHtml(g.descricao)}</div>
+           </div>
+           <div style="text-align:right">
+             <div class="v">${din(g.total)}</div>
+             <div class="dl" style="${vencida?'color:var(--red);font-weight:700':''}">${g.vencimento?"vence "+formatDataBr(g.vencimento):""}</div>
+           </div>`;
+        debtBox.appendChild(row);
+      });
+    }
+
+    const salesBox = $("reportSales");
+    const recentes = state.sales.slice().sort((a,b)=>b.ts-a.ts).slice(0,6);
+    if(!recentes.length){
+      salesBox.innerHTML = '<div class="empty" style="padding:12px">Nenhuma venda ainda.</div>';
+      return;
+    }
+    salesBox.innerHTML = "";
+    recentes.forEach(s=>{
+      const d = new Date(s.ts);
+      const quem = (s.cliente && s.cliente.trim()) ? s.cliente.trim() : "Venda avulsa";
+      const row = document.createElement("div");
+      row.className = "rep-row";
+      row.innerHTML =
+        `<div class="g">
+           <div class="nm">${escapeHtml(quem)}</div>
+           <div class="dl">${escapeHtml(descreverVenda(s))} · ${d.toLocaleDateString("pt-BR")}</div>
+         </div>
+         <div class="v">${din(s.total)}${s.pago===false?' <span class="badge-pend">a receber</span>':''}</div>`;
+      salesBox.appendChild(row);
+    });
   }
 
   function renderAlerta(){
@@ -1017,17 +1145,17 @@
   function openModal(){
     const m = $("modal");
     const h = hojeStr();
-    const deb = dividasVencidas();
-    const rows = deb.map(s=>{
-      const vencida = s.vencimento && s.vencimento <= h;
+    const grupos = dividasPorNome().filter(g => g.vencimento && g.vencimento <= h);
+    const rows = grupos.map(g=>{
+      const vencida = g.vencimento && g.vencimento <= h;
       return `<div class="debt-row">
         <div class="ava">🧑</div>
         <div class="info">
-          <div class="nm">${escapeHtml(nomeCliente(s))}</div>
-          <div class="dl">${escapeHtml(s.items?descreverVenda(s):"")}<br>Vence ${formatDataBr(s.vencimento)}${vencida?' <span class="over">· '+labelVencida(calcDias(s.vencimento))+'</span>':''}</div>
+          <div class="nm">${escapeHtml(g.nome)}</div>
+          <div class="dl">${escapeHtml(g.descricao)}<br>Vence ${formatDataBr(g.vencimento)}${vencida?' <span class="over">· '+labelVencida(calcDias(g.vencimento))+'</span>':''}</div>
         </div>
-        <div class="val">${din(s.total)}</div>
-        <button class="btn btn-primary btn-sm" data-pago="${s.id}">✅ Pago</button>
+        <div class="val">${din(g.total)}</div>
+        <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">✅ Pago</button>
       </div>`;
     }).join("");
     m.innerHTML = `<div class="sheet">
@@ -1040,8 +1168,8 @@
     m.classList.remove("hidden");
     m.removeAttribute("hidden");
     $("modalClose").addEventListener("click", closeModal);
-    m.querySelectorAll("[data-pago]").forEach(b=> b.addEventListener("click", ()=>{
-      marcarPago(b.dataset.pago); openModal();
+    m.querySelectorAll("[data-nome]").forEach(b=> b.addEventListener("click", ()=>{
+      marcarPagoPorNome(b.dataset.nome); openModal();
     }));
   }
   function closeModal(){
@@ -1066,11 +1194,13 @@
   function renderAll(){
     renderPainel();
     mountSaborChips();
+    mountClienteChips();
     renderStock();
     renderSellList();
     renderCart();
     renderHist();
     renderReceber();
+    renderRelatorio();
     renderAlerta();
   }
 
@@ -1097,6 +1227,7 @@
     $("alerta").addEventListener("click", openModal);
     $("alerta").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openModal(); } });
     $("modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeModal(); });
+    $("btnEnviarVendas").addEventListener("click", enviarVendasDoDia);
   }
 
   // ===== PWA (instalação no celular) =====
@@ -1140,6 +1271,125 @@
       deferredPrompt = null;
       hideSplash();
     });
+  }
+
+  // ===== ENVIAR VENDAS DO DIA (WhatsApp) =====
+  function vendasDoDia(){
+    const hoje = new Date().toDateString();
+    return state.sales.filter(s => new Date(s.ts).toDateString() === hoje)
+                      .slice().sort((a,b)=>b.ts-a.ts);
+  }
+
+  function dataHojeFormatada(){
+    return new Date().toLocaleDateString("pt-BR");
+  }
+
+  function mensagemTexto(vendas, total){
+    const linhas = vendas.map(s=>{
+      const d = new Date(s.ts);
+      const hora = d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+      const quem = (s.cliente && s.cliente.trim()) ? s.cliente.trim() : "Venda avulsa";
+      return `• ${hora} — ${quem} — ${descreverVenda(s)} — ${din(s.total)}`;
+    });
+    return `🍯 *Cá Doces Mel* — Vendas de ${dataHojeFormatada()}\n------------------------------\n${linhas.join("\n")}\n------------------------------\n💰 *Total do dia: ${din(total)}*`;
+  }
+
+  function gerarImagemVendas(vendas){
+    return new Promise((resolve)=>{
+      const W = 1000, P = 60;
+      const lineH = 92, headerH = 230, totalH = 210;
+      const H = headerH + vendas.length*lineH + totalH + 90;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "#FFFDF8";
+      ctx.fillRect(0,0,W,H);
+
+      ctx.fillStyle = "#4E342E";
+      ctx.fillRect(0,0,W,headerH);
+      ctx.fillStyle = "#FFE3B3";
+      ctx.font = "bold 58px Georgia, 'Times New Roman', serif";
+      ctx.textAlign = "center";
+      ctx.fillText("🍯 Cá Doces Mel", W/2, 100);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "34px Arial, sans-serif";
+      ctx.fillText("Vendas do dia " + dataHojeFormatada(), W/2, 168);
+
+      let y = headerH + 52;
+      ctx.textAlign = "left";
+      vendas.forEach(s=>{
+        const d = new Date(s.ts);
+        const hora = d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+        const quem = (s.cliente && s.cliente.trim()) ? s.cliente.trim() : "Venda avulsa";
+        ctx.fillStyle = "#3E2B20";
+        ctx.font = "bold 33px Arial, sans-serif";
+        ctx.fillText(hora + "   " + quem, P, y);
+        ctx.fillStyle = "#9A8578";
+        ctx.font = "29px Arial, sans-serif";
+        ctx.fillText(descreverVenda(s), P, y + 42);
+        ctx.fillStyle = "#2E7D32";
+        ctx.font = "bold 33px Arial, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(din(s.total), W-P, y);
+        ctx.textAlign = "left";
+        y += lineH;
+      });
+
+      ctx.strokeStyle = "#E7D2BB";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(P, y+6);
+      ctx.lineTo(W-P, y+6);
+      ctx.stroke();
+
+      y += 66;
+      const total = vendas.reduce((s,x)=>s+(x.total||0),0);
+      ctx.fillStyle = "#3E2B20";
+      ctx.font = "bold 40px Arial, sans-serif";
+      ctx.fillText("Total do dia:", P, y);
+      ctx.fillStyle = "#C0392B";
+      ctx.textAlign = "right";
+      ctx.font = "bold 52px Arial, sans-serif";
+      ctx.fillText(din(total), W-P, y);
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#9A8578";
+      ctx.font = "28px Arial, sans-serif";
+      ctx.fillText("Obrigado pela preferência! 😊", W/2, H-36);
+
+      canvas.toBlob(blob=>{
+        const f = new File([blob], "vendas-do-dia.png", { type:"image/png" });
+        resolve(f);
+      }, "image/png");
+    });
+  }
+
+  function baixarImagem(file){
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url; a.download = "vendas-do-dia.png";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }
+
+  async function enviarVendasDoDia(){
+    const vendas = vendasDoDia();
+    if(!vendas.length){ alert("Nenhuma venda registrada hoje ainda."); return; }
+    const total = vendas.reduce((s,x)=>s+(x.total||0),0);
+    const file = await gerarImagemVendas(vendas);
+
+    if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+      try{
+        await navigator.share({ files:[file], title:"Vendas do dia", text:"Vendas de hoje · "+din(total) });
+      }catch(e){ /* usuário cancelou */ }
+      return;
+    }
+
+    // Fallback: baixa a imagem e abre o WhatsApp com o resumo em texto
+    baixarImagem(file);
+    window.open("https://wa.me/?text=" + encodeURIComponent(mensagemTexto(vendas, total)), "_blank");
   }
 
   // ===== INIT =====
