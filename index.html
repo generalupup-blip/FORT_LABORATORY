@@ -294,6 +294,16 @@
   .big-caixa.receber{background:linear-gradient(135deg,#B7791F,#C08552)}
   .big-caixa.receber .v{color:#FFF3D6}
 
+  .viz-resumo{font-size:.82rem;color:var(--muted);margin-bottom:14px;font-weight:600}
+  .viz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media (min-width:520px){.viz-grid{grid-template-columns:repeat(3,1fr)}}
+  .viz-card{background:#FDFBF8;border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center;box-shadow:var(--shadow-sm)}
+  .viz-card .em{font-size:34px;margin-bottom:6px}
+  .viz-card .nm{font-weight:800;font-size:.92rem}
+  .viz-card .fl{font-size:.78rem;color:var(--caramel-dark);font-weight:600;margin:2px 0 8px}
+  .viz-card .qty{font-size:.8rem;color:var(--muted)}
+  .viz-card .price{font-size:.95rem;font-weight:800;color:var(--green);margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -327,6 +337,7 @@
 <nav class="tabs" role="tablist" aria-label="Seções">
   <button class="active" data-tab="painel" role="tab" aria-selected="true">📊 Painel</button>
   <button data-tab="estoque" role="tab" aria-selected="false">📦 Estoque</button>
+  <button data-tab="viz" role="tab" aria-selected="false">👁️ Visualização</button>
   <button data-tab="vendas" role="tab" aria-selected="false">🛒 Vendas</button>
   <button data-tab="caixa" role="tab" aria-selected="false">💰 Caixa</button>
   <button data-tab="receber" role="tab" aria-selected="false">📅 A Receber</button>
@@ -378,6 +389,15 @@
         <input type="month" id="fRelMes" style="flex:1;min-width:130px" aria-label="Filtrar por mês">
       </div>
       <div id="reportSales"></div>
+    </div>
+  </section>
+
+  <!-- ============ VISUALIZAÇÃO ============ -->
+  <section class="view" id="viz" role="tabpanel">
+    <div class="card">
+      <div class="section-title"><span class="dot"></span>Estoque disponível</div>
+      <p id="vizResumo" class="viz-resumo"></p>
+      <div class="viz-grid" id="vizGrid"></div>
     </div>
   </section>
 
@@ -1260,6 +1280,35 @@
     window.scrollTo({top:0, behavior:"smooth"});
   }
 
+  function renderVisualizacao(){
+    const grid = $("vizGrid");
+    const ordem = Object.keys(PRODUTOS);
+    const itens = state.stock.filter(x=>x.quantidade>0).sort((a,b)=>{
+      const ta = ordem.indexOf(a.tipo), tb = ordem.indexOf(b.tipo);
+      if(ta!==tb) return ta-tb;
+      return (a.sabor||"").localeCompare(b.sabor||"");
+    });
+    const unidades = itens.reduce((s,x)=>s+(x.quantidade||0),0);
+    $("vizResumo").textContent = itens.length ? `${itens.length} produtos · ${unidades} ${unidades===1?"unidade":"unidades"} em estoque` : "Nenhum produto em estoque.";
+    if(!itens.length){
+      grid.innerHTML = '<div class="empty"><span class="big">📦</span>Nenhum produto em estoque no momento.<br>Adicione itens em "Estoque".</div>';
+      return;
+    }
+    grid.innerHTML = "";
+    itens.forEach(it=>{
+      const p = PRODUTOS[it.tipo] || {};
+      const div = document.createElement("div");
+      div.className = "viz-card";
+      div.innerHTML =
+        `<div class="em">${p.emoji||"🍬"}</div>
+         <div class="nm">${p.nome||it.tipo}</div>
+         <div class="fl">${escapeHtml(it.sabor)}</div>
+         <div class="qty">${it.quantidade} ${it.quantidade===1?"unidade":"unidades"}</div>
+         <div class="price">${din(it.preco)}</div>`;
+      grid.appendChild(div);
+    });
+  }
+
   function renderAll(){
     renderPainel();
     mountSaborChips();
@@ -1269,6 +1318,7 @@
     renderCart();
     renderReceber();
     renderRelatorio();
+    renderVisualizacao();
     renderAlerta();
   }
 
