@@ -286,6 +286,14 @@
   .rep-row .g .nm{font-weight:700}
   .rep-row .g .dl{font-size:.74rem;color:var(--muted)}
   .rep-row .v{font-weight:800;white-space:nowrap}
+  .sub-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .sub-tabs button{flex:0 0 auto;font-family:inherit;font-weight:600;font-size:.82rem;color:var(--choco);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;transition:.16s}
+  .sub-tabs button:hover{transform:translateY(-1px)}
+  .sub-tabs button.active{background:var(--caramel);color:#fff;border-color:var(--caramel)}
+  .sug-list{position:relative;margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden;z-index:20}
+  .sug-item{display:block;width:100%;text-align:left;font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;border:none;border-bottom:1px solid var(--line);padding:11px 14px;cursor:pointer}
+  .sug-item:last-child{border-bottom:none}
+  .sug-item:hover{background:var(--cream)}
 
   .brand-name{background:linear-gradient(90deg,#ffe3b3 0%,#fff 28%,#ffe3b3 50%,#fff 72%,#ffe3b3 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 3s linear infinite, glow 2.2s ease-in-out infinite}
   @keyframes shine{to{background-position:200% center}}
@@ -338,6 +346,7 @@
 
 <nav class="tabs" role="tablist" aria-label="Seções">
   <button class="active" data-tab="painel" role="tab" aria-selected="true">📊 Painel</button>
+  <button data-tab="relatorio" role="tab" aria-selected="false">📋 Relatório</button>
   <button data-tab="estoque" role="tab" aria-selected="false">📦 Estoque</button>
   <button data-tab="viz" role="tab" aria-selected="false">👁️ Visualização</button>
   <button data-tab="vendas" role="tab" aria-selected="false">🛒 Vendas</button>
@@ -380,17 +389,25 @@
       </div>
     </div>
 
+  </section>
+
+  <!-- ============ RELATÓRIO ============ -->
+  <section class="view" id="relatorio" role="tabpanel">
     <div class="card">
       <div class="section-title"><span class="dot"></span>Relatório</div>
-      <h3 class="sub-head">🔔 Quem está me devendo</h3>
-      <div id="reportDebt"></div>
-      <h3 class="sub-head">🛍️ Vendas</h3>
-      <div class="filtros" style="margin-bottom:10px">
-        <input type="text" id="fRelNome" placeholder="Nome do cliente" style="flex:1;min-width:130px">
-        <input type="date" id="fRelDia" style="flex:1;min-width:130px" aria-label="Filtrar por dia">
-        <input type="month" id="fRelMes" style="flex:1;min-width:130px" aria-label="Filtrar por mês">
+      <div class="sub-tabs" id="repTabs">
+        <button class="active" data-rep="devedores">🔔 Quem está me devendo</button>
+        <button data-rep="hoje">🛍️ Vendas de hoje</button>
       </div>
-      <div id="reportSales"></div>
+      <div id="viewDevedores">
+        <div id="reportDebt"></div>
+      </div>
+      <div id="viewHoje" class="hidden">
+        <div class="filtros" style="margin-bottom:10px">
+          <input type="text" id="fHojeNome" placeholder="Buscar por nome..." style="flex:1;min-width:130px">
+        </div>
+        <div id="reportHoje"></div>
+      </div>
     </div>
   </section>
 
@@ -458,8 +475,8 @@
       <hr class="divider">
       <div class="field">
         <label class="fld" for="inCliente">Cliente (nome)</label>
-        <input type="text" id="inCliente" list="dlClientes" placeholder="Ex.: Maria Silva" autocomplete="off">
-        <datalist id="dlClientes"></datalist>
+        <input type="text" id="inCliente" placeholder="Ex.: Maria Silva" autocomplete="off">
+        <div id="clienteSug" class="sug-list hidden"></div>
         <div class="chips" id="clienteChips"></div>
       </div>
       <div class="field">
@@ -768,10 +785,8 @@
   }
 
   function mountClienteChips(){
-    const dl = $("dlClientes");
     const chips = $("clienteChips");
     const nomes = clientesExistentes();
-    dl.innerHTML = nomes.map(n=>`<option value="${escapeHtml(n)}"></option>`).join("");
     chips.innerHTML = "";
     if(!nomes.length){
       chips.innerHTML = '<span style="font-size:.72rem;color:var(--muted)">Nenhum cliente salvo ainda.</span>';
@@ -782,8 +797,28 @@
       b.type = "button";
       b.className = "chip";
       b.textContent = n;
-      b.addEventListener("click", ()=> $("inCliente").value = n);
+      b.addEventListener("click", ()=> { $("inCliente").value = n; atualizarSugestoesCliente(); });
       chips.appendChild(b);
+    });
+  }
+
+  function normalizar(s){
+    return String(s==null?"":s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  }
+  function atualizarSugestoesCliente(){
+    const sug = $("clienteSug");
+    const q = normalizar($("inCliente").value.trim());
+    if(!q){ sug.classList.add("hidden"); sug.innerHTML=""; return; }
+    const nomes = clientesExistentes().filter(n=> normalizar(n).includes(q));
+    if(!nomes.length){ sug.classList.add("hidden"); sug.innerHTML=""; return; }
+    sug.innerHTML = nomes.slice(0,8).map(n=>`<button type="button" class="sug-item">${escapeHtml(n)}</button>`).join("");
+    sug.classList.remove("hidden");
+    sug.querySelectorAll(".sug-item").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        $("inCliente").value = b.textContent;
+        sug.classList.add("hidden");
+        $("inCliente").focus();
+      });
     });
   }
 
@@ -1048,7 +1083,17 @@
 
   function descreverVenda(s){
     if(!s.items) return "";
-    return s.items.map(i=>`${i.qty}x ${PRODUTOS[i.tipo]?.nome||i.tipo}`).join(", ");
+    return s.items.map(i=>{
+      const p = PRODUTOS[i.tipo] || {};
+      return `${i.qty}x ${p.nome||i.tipo}${i.sabor ? " " + i.sabor : ""}`;
+    }).join(", ");
+  }
+  function descreverVendaComEmoji(s){
+    if(!s.items) return "";
+    return s.items.map(i=>{
+      const p = PRODUTOS[i.tipo] || {};
+      return `${p.emoji||""} ${i.qty}x ${p.nome||i.tipo}${i.sabor ? " " + i.sabor : ""}`;
+    }).join(" · ");
   }
 
   // ===== A RECEBER / COBRANÇAS =====
@@ -1088,9 +1133,11 @@
         agg.get(k).qty += (i.qty||0);
       }));
       const descricao = Array.from(agg.values()).map(a=>{
-        const nome = PRODUTOS[a.tipo]?.nome || a.tipo;
+        const p = PRODUTOS[a.tipo] || {};
+        const nome = p.nome || a.tipo;
+        const emo = p.emoji || "";
         const sabor = a.sabor ? " "+a.sabor : "";
-        return `${a.qty}x ${nome}${sabor}`;
+        return `${emo} ${a.qty}x ${nome}${sabor}`;
       }).join(" · ");
       return { nome: g.nome, saldo, recebido, vencimento, descricao, qtd: vendas.length };
     });
@@ -1151,56 +1198,65 @@
     });
   }
 
+  function switchRep(rep){
+    document.querySelectorAll("#repTabs button").forEach(b=>{
+      b.classList.toggle("active", b.dataset.rep===rep);
+    });
+    $("viewDevedores").classList.toggle("hidden", rep!=="devedores");
+    $("viewHoje").classList.toggle("hidden", rep!=="hoje");
+  }
+
   function renderRelatorio(){
+    renderDevedores();
+    renderVendasHoje();
+  }
+
+  function renderDevedores(){
     const debtBox = $("reportDebt");
     const grupos = dividasPorNome();
     const h = hojeStr();
     if(!grupos.length){
       debtBox.innerHTML = '<div class="empty" style="padding:12px">Ninguém te deve no momento 😊</div>';
-    } else {
-      debtBox.innerHTML = "";
-      grupos.forEach(g=>{
-        const vencida = g.vencimento && g.vencimento <= h;
-        const row = document.createElement("div");
-        row.className = "rep-row";
-        row.innerHTML =
-          `<div class="g">
-             <div class="nm">${escapeHtml(g.nome)}</div>
-             <div class="dl">${escapeHtml(g.descricao)}</div>
-           </div>
-           <div style="text-align:right">
-             <div class="v">${din(g.saldo)}</div>
-             <div class="dl" style="${vencida?'color:var(--red);font-weight:700':''}">${g.vencimento?"vence "+formatDataBr(g.vencimento):""}</div>
-           </div>`;
-        debtBox.appendChild(row);
-      });
-    }
-
-    const salesBox = $("reportSales");
-    const fNome = ($("fRelNome").value || "").trim().toLowerCase();
-    const fDia = $("fRelDia").value;
-    const fMes = $("fRelMes").value;
-
-    let recentes = state.sales.slice().sort((a,b)=>b.ts-a.ts);
-    if(fNome || fDia || fMes){
-      recentes = recentes.filter(s=>{
-        const d = new Date(s.ts);
-        const dia = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-        if(fNome && !((s.cliente||"").toLowerCase().includes(fNome))) return false;
-        if(fDia && dia !== fDia) return false;
-        if(fMes && dia.slice(0,7) !== fMes) return false;
-        return true;
-      });
-    } else {
-      recentes = recentes.slice(0,6);
-    }
-
-    if(!recentes.length){
-      salesBox.innerHTML = '<div class="empty" style="padding:12px">Nenhuma venda encontrada.</div>';
       return;
     }
-    salesBox.innerHTML = "";
-    recentes.forEach(s=>{
+    debtBox.innerHTML = "";
+    grupos.forEach(g=>{
+      const vencida = g.vencimento && g.vencimento <= h;
+      const row = document.createElement("div");
+      row.className = "rep-row";
+      row.innerHTML =
+        `<div class="g">
+           <div class="nm">${escapeHtml(g.nome)}</div>
+           <div class="dl">${escapeHtml(g.descricao)}</div>
+         </div>
+         <div style="text-align:right">
+           <div class="v">${din(g.saldo)}</div>
+           <div class="dl" style="${vencida?'color:var(--red);font-weight:700':''}">${g.vencimento?"paga em "+formatDataBr(g.vencimento):"sem data"}</div>
+         </div>`;
+      debtBox.appendChild(row);
+    });
+  }
+
+  function renderVendasHoje(){
+    const box = $("reportHoje");
+    const h = hojeStr();
+    const fNome = normalizar($("fHojeNome").value || "");
+    let vendas = state.sales.filter(s=>{
+      const d = new Date(s.ts);
+      const dia = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+      return dia === h;
+    }).sort((a,b)=>b.ts-a.ts);
+
+    if(fNome){
+      vendas = vendas.filter(s=> normalizar(s.cliente).includes(fNome));
+    }
+
+    if(!vendas.length){
+      box.innerHTML = '<div class="empty" style="padding:12px">'+(fNome?"Nenhuma venda hoje para esse nome.":"Nenhuma venda registrada hoje ainda.")+'</div>';
+      return;
+    }
+    box.innerHTML = "";
+    vendas.forEach(s=>{
       const d = new Date(s.ts);
       const quem = (s.cliente && s.cliente.trim()) ? s.cliente.trim() : "Venda avulsa";
       const row = document.createElement("div");
@@ -1208,10 +1264,10 @@
       row.innerHTML =
         `<div class="g">
            <div class="nm">${escapeHtml(quem)}</div>
-           <div class="dl">${escapeHtml(descreverVenda(s))} · ${d.toLocaleDateString("pt-BR")}</div>
+           <div class="dl">${escapeHtml(descreverVendaComEmoji(s))} · ${d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</div>
          </div>
          <div class="v">${din(s.total)}${s.pago===false?' <span class="badge-pend">a receber</span>':''}</div>`;
-      salesBox.appendChild(row);
+      box.appendChild(row);
     });
   }
 
@@ -1343,9 +1399,14 @@
     $("alerta").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openModal(); } });
     $("modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeModal(); });
     $("btnEnviarVendas").addEventListener("click", enviarVendasDoDia);
-    $("fRelNome").addEventListener("input", renderRelatorio);
-    $("fRelDia").addEventListener("change", renderRelatorio);
-    $("fRelMes").addEventListener("change", renderRelatorio);
+    $("fHojeNome").addEventListener("input", renderRelatorio);
+    document.getElementById("repTabs").addEventListener("click", e=>{
+      const b = e.target.closest("button[data-rep]");
+      if(b) switchRep(b.dataset.rep);
+    });
+    $("inCliente").addEventListener("input", atualizarSugestoesCliente);
+    $("inCliente").addEventListener("focus", atualizarSugestoesCliente);
+    $("inCliente").addEventListener("blur", ()=> setTimeout(()=> $("clienteSug").classList.add("hidden"), 150));
   }
 
   // ===== PWA (instalação no celular) =====
