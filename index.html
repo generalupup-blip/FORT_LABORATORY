@@ -200,6 +200,10 @@
   .sell-row .plus:hover{background:var(--caramel);
     transform:scale(1.05)}
   .sell-row.out{border-color:var(--red)}
+  .pega-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .pega-toggle button{font-family:inherit;font-weight:800;font-size:1rem;border:2px solid var(--line);border-radius:12px;padding:13px 10px;cursor:pointer;background:#fff;color:var(--muted);transition:.16s}
+  .pega-toggle button[data-pega="pegou"].active{background:linear-gradient(135deg,#2E7D32,#43A047);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(46,125,50,.3)}
+  .pega-toggle button[data-pega="naopegou"].active{background:linear-gradient(135deg,#C0392B,#E74C3C);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(192,57,43,.3)}
 
   /* ===== CAIXA / HISTÓRICO ===== */
   .hist-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -354,6 +358,7 @@
   <button data-tab="vendas" role="tab" aria-selected="false">🛒 Vendas</button>
   <button data-tab="caixa" role="tab" aria-selected="false">💰 Caixa</button>
   <button data-tab="receber" role="tab" aria-selected="false">📅 A Receber</button>
+  <button data-tab="retirada" role="tab" aria-selected="false">📦 Retirada</button>
   <button data-tab="pix" role="tab" aria-selected="false">💠 Pix</button>
 </nav>
 
@@ -475,6 +480,12 @@
         <span id="cartTotal">R$ 0,00</span>
       </div>
       <hr class="divider">
+
+      <div class="pega-toggle" id="pegaToggle">
+        <button class="active" data-pega="pegou">✅ PEGOU</button>
+        <button data-pega="naopegou">❌ NÃO PEGOU</button>
+      </div>
+
       <div class="field">
         <label class="fld" for="inCliente">Cliente (nome)</label>
         <input type="text" id="inCliente" placeholder="Ex.: Maria Silva" autocomplete="off">
@@ -541,6 +552,18 @@
     </div>
   </section>
 
+  <!-- ============ RETIRADA ============ -->
+  <section class="view" id="retirada" role="tabpanel">
+    <div class="card">
+      <div class="section-title"><span class="dot"></span>Produtos aguardando retirada (não pegos)</div>
+      <div class="big-caixa" style="margin-bottom:14px">
+        <span class="l">Total em produtos a retirar</span>
+        <span class="v" id="retiradaTotal">R$ 0,00</span>
+      </div>
+      <div id="retiradaList"></div>
+    </div>
+  </section>
+
   <!-- ============ PIX ============ -->
   <section class="view" id="pix" role="tabpanel">
     <div class="card" style="text-align:center">
@@ -584,7 +607,7 @@
   const TS_KEY = STORAGE_KEY + "_ts";
 
   // ===== ESTADO =====
-  let state = { stock: [], sales: [], withdrawals: [] };
+  let state = { stock: [], sales: [], withdrawals: [], retiradas: [] };
   let cart = []; // [{id, qty}]
   let localTs = 0;
 
@@ -609,7 +632,7 @@
       localTs = parseInt(localStorage.getItem(TS_KEY)||"0",10) || 0;
       if(raw){
         const p = JSON.parse(raw);
-        state = Object.assign({ stock: [], sales: [], withdrawals: [] }, p);
+        state = Object.assign({ stock: [], sales: [], withdrawals: [], retiradas: [] }, p);
       }
     }catch(e){ /* dados corrompidos: recomeça vazio */ }
   }
@@ -639,7 +662,7 @@
     if(!db) return;
     try{
       await fbSetDoc(fbDoc(db, "docaria", "estado"), {
-        stock: state.stock, sales: state.sales, withdrawals: state.withdrawals,
+        stock: state.stock, sales: state.sales, withdrawals: state.withdrawals, retiradas: state.retiradas,
         atualizado: Date.now()
       }, { merge: true });
     }catch(e){ /* sem conexão: mantém salvo localmente */ }
@@ -656,6 +679,7 @@
         state.stock = Array.isArray(d.stock) ? d.stock : [];
         state.sales = Array.isArray(d.sales) ? d.sales : [];
         state.withdrawals = Array.isArray(d.withdrawals) ? d.withdrawals : [];
+        state.retiradas = Array.isArray(d.retiradas) ? d.retiradas : [];
         try{
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
           localStorage.setItem(TS_KEY, String(cloudTs));
@@ -1004,6 +1028,7 @@
     const cliente = $("inCliente").value.trim();
     const depois = PAGAMENTOS[forma] && PAGAMENTOS[forma].depois;
     const vencimento = $("inVenc").value;
+    const naoPegou = pegaSelecionado() === "naopegou";
     if(depois){
       if(!cliente){ alert("Para pagamento depois, informe o nome do cliente."); $("inCliente").focus(); return; }
       if(!vencimento){ alert("Informe a data em que o cliente vai pagar."); $("inVenc").focus(); return; }
@@ -1022,14 +1047,16 @@
       id: uid(), ts: Date.now(), items, qtde, total,
       forma: forma, cliente: cliente,
       pago: !depois, vencimento: depois ? vencimento : "",
-      recebido: 0
+      recebido: 0,
+      pegou: !naoPegou
     });
     saveState();
     cart = [];
     $("inCliente").value = "";
     $("inVenc").value = "";
+    togglePega("pegou");
     renderAll();
-    switchTab(depois ? "receber" : "caixa");
+    switchTab(naoPegou ? "retirada" : (depois ? "receber" : "caixa"));
   }
 
   function retirarCaixa(){
@@ -1374,6 +1401,59 @@
     $("modalClose").addEventListener("click", closeModal);
   }
 
+  function pegaSelecionado(){
+    const el = document.querySelector('#pegaToggle button.active');
+    return el ? el.dataset.pega : "pegou";
+  }
+
+  function togglePega(mode){
+    document.querySelectorAll("#pegaToggle button").forEach(b=>{
+      b.classList.toggle("active", b.dataset.pega===mode);
+    });
+  }
+
+  function renderRetirada(){
+    const list = $("retiradaList");
+    const pendentes = state.sales.filter(s => s.pegou === false).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const total = pendentes.reduce((s,x)=>s+(x.total||0),0);
+    $("retiradaTotal").textContent = din(total);
+    if(!pendentes.length){
+      list.innerHTML = '<div class="empty"><span class="big">📦</span>Nenhum produto aguardando retirada.<br>Quando alguém pagar e não levar, marque "NÃO PEGOU" na venda.</div>';
+      return;
+    }
+    list.innerHTML = "";
+    pendentes.forEach(s=>{
+      const d = new Date(s.ts);
+      const quem = nomeCliente(s);
+      let status;
+      if(s.pago === false){
+        status = '<span class="badge-pend">fiado '+din(saldoDe(s))+'</span>' + (s.vencimento ? ' · paga em '+formatDataBr(s.vencimento) : '');
+      } else {
+        status = '<span style="color:var(--green);font-weight:700">💵 já pagou</span>';
+      }
+      const div = document.createElement("div");
+      div.className = "debt-row";
+      div.innerHTML =
+        `<div class="ava">📦</div>
+         <div class="info">
+           <div class="nm">${escapeHtml(quem)}</div>
+           <div class="dl">${escapeHtml(descreverVendaComEmoji(s))}</div>
+           <div class="dl">${status} · vendeu em ${d.toLocaleDateString("pt-BR")}</div>
+         </div>
+         <button class="btn btn-dark btn-sm" data-entregue="${s.id}">✅ Entregou</button>`;
+      div.querySelector("[data-entregue]").addEventListener("click", ()=>marcarEntregue(s.id));
+      list.appendChild(div);
+    });
+  }
+
+  function marcarEntregue(id){
+    const s = state.sales.find(x=>x.id===id);
+    if(!s) return;
+    s.pegou = true;
+    saveState();
+    renderAll();
+  }
+
   // ===== ABA / NAV =====
   function switchTab(tab){
     document.querySelectorAll(".tabs button").forEach(b=>{
@@ -1426,6 +1506,7 @@
     renderReceber();
     renderRelatorio();
     renderVisualizacao();
+    renderRetirada();
     renderAlerta();
   }
 
@@ -1461,6 +1542,10 @@
     $("inCliente").addEventListener("input", atualizarSugestoesCliente);
     $("inCliente").addEventListener("focus", atualizarSugestoesCliente);
     $("inCliente").addEventListener("blur", ()=> setTimeout(()=> $("clienteSug").classList.add("hidden"), 150));
+    document.getElementById("pegaToggle").addEventListener("click", e=>{
+      const b = e.target.closest("button[data-pega]");
+      if(b) togglePega(b.dataset.pega);
+    });
   }
 
   // ===== PWA (instalação no celular) =====
