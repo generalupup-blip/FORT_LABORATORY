@@ -252,7 +252,8 @@
   .debt-row{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
   .debt-row .ava{width:44px;height:44px;flex:0 0 auto;border-radius:12px;background:#FBEAE0;display:grid;place-items:center;font-size:24px}
   .debt-row .info{flex:1;min-width:0}
-  .debt-row .info .nm{font-weight:800;font-size:1rem}
+  .debt-row .info .nm{font-weight:800;font-size:1rem;cursor:pointer}
+  .debt-row .info .nm:hover{color:var(--caramel-dark);text-decoration:underline}
   .debt-row .info .dl{font-size:.76rem;color:var(--muted)}
   .debt-row .info .dl .over{color:var(--red);font-weight:700}
   .debt-row .val{font-weight:800;white-space:nowrap}
@@ -283,7 +284,8 @@
   .rep-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.88rem}
   .rep-row:last-child{border-bottom:none}
   .rep-row .g{flex:1;min-width:0}
-  .rep-row .g .nm{font-weight:700}
+  .rep-row .g .nm{font-weight:700;cursor:pointer}
+  .rep-row .g .nm:hover{color:var(--caramel-dark);text-decoration:underline}
   .rep-row .g .dl{font-size:.74rem;color:var(--muted)}
   .rep-row .v{font-weight:800;white-space:nowrap}
   .sub-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
@@ -1194,6 +1196,7 @@
          <div class="val">${din(g.saldo)}</div>
          <button class="btn btn-primary btn-sm" data-nome="${escapeHtml(g.nome)}">💵 Receber</button>`;
       div.querySelector("[data-nome]").addEventListener("click", ()=>pedirReceber(g.nome, g.saldo));
+      div.querySelector(".info .nm").addEventListener("click", ()=>abrirDetalhesCliente(g.nome));
       list.appendChild(div);
     });
   }
@@ -1233,6 +1236,7 @@
            <div class="v">${din(g.saldo)}</div>
            <div class="dl" style="${vencida?'color:var(--red);font-weight:700':''}">${g.vencimento?"paga em "+formatDataBr(g.vencimento):"sem data"}</div>
          </div>`;
+      row.querySelector(".g .nm").addEventListener("click", ()=>abrirDetalhesCliente(g.nome));
       debtBox.appendChild(row);
     });
   }
@@ -1318,6 +1322,56 @@
     const m = $("modal");
     m.classList.add("hidden");
     m.setAttribute("hidden","");
+  }
+
+  function vendasDoCliente(nome){
+    const key = normalizar(nome);
+    return state.sales
+      .filter(s => normalizar(s.cliente) === key)
+      .sort((a,b)=>(a.ts||0)-(b.ts||0));
+  }
+
+  function abrirDetalhesCliente(nome){
+    const vendas = vendasDoCliente(nome);
+    if(!vendas.length) return;
+    const totalDevido = vendas.reduce((s,x)=>s+saldoDe(x),0);
+    const totalRecebido = vendas.reduce((s,x)=>s+recebidoDe(x),0);
+    const linhas = vendas.map(s=>{
+      const d = new Date(s.ts);
+      const dia = d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
+      const hora = d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+      const saldo = saldoDe(s);
+      let status;
+      if(s.pago === false){
+        if(saldo > 0){
+          status = '<span class="badge-pend">deve '+din(saldo)+'</span>' + (s.vencimento ? ' · vence '+formatDataBr(s.vencimento) : '');
+        } else {
+          status = '✅ quitado';
+        }
+      } else {
+        status = '💵 pago';
+      }
+      return `<div class="debt-row">
+        <div class="ava">🛍️</div>
+        <div class="info">
+          <div class="nm">${dia} · ${hora}</div>
+          <div class="dl">${escapeHtml(descreverVendaComEmoji(s))}</div>
+          <div class="dl">${status} · total ${din(s.total)}</div>
+        </div>
+      </div>`;
+    }).join("");
+    const m = $("modal");
+    m.innerHTML = `<div class="sheet">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h2 style="font-size:1.2rem;margin:0">🧑 ${escapeHtml(nome)}</h2>
+        <button class="btn btn-ghost btn-sm" id="modalClose">✕ Fechar</button>
+      </div>
+      <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">${vendas.length} compra${vendas.length>1?"s":""} · já pagou ${din(totalRecebido)}${totalDevido>0?" · ainda deve "+din(totalDevido):""}</p>
+      ${linhas || '<div class="empty">Nenhuma venda.</div>'}
+    </div>`;
+    m.classList.remove("hidden");
+    m.removeAttribute("hidden");
+    $("modalClose").addEventListener("click", closeModal);
   }
 
   // ===== ABA / NAV =====
