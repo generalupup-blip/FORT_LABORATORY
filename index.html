@@ -244,9 +244,20 @@
   #alerta .bell{font-size:28px;animation:shake .7s infinite;filter:drop-shadow(0 0 6px #fff)}
   #alerta .sub{font-weight:500;font-size:.78rem;opacity:.95;line-height:1.3}
   #alerta .cta{margin-left:auto;background:#fff;color:#d92c1e;border-radius:999px;padding:6px 15px;font-weight:800;font-size:.8rem;white-space:nowrap;animation:blinkCta .7s infinite}
+  #alerta .close{flex:0 0 auto;background:rgba(255,255,255,.22);color:#fff;border:none;width:32px;height:32px;border-radius:999px;font-size:16px;font-weight:800;line-height:1;display:grid;place-items:center;cursor:pointer}
+  #alerta .close:active{background:rgba(255,255,255,.4)}
   @keyframes blink{0%,100%{background:#d92c1e;box-shadow:0 12px 34px rgba(217,44,30,.55)}50%{background:#ff2012;box-shadow:0 12px 44px rgba(255,58,38,.9)}}
   @keyframes blinkCta{0%,100%{background:#fff;color:#d92c1e}50%{background:#ffe0dc;color:#a31208}}
   @keyframes shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-18deg)}40%{transform:rotate(15deg)}60%{transform:rotate(-11deg)}80%{transform:rotate(9deg)}}
+
+  /* Botão flutuante (alerta recolhido) */
+  #alertaFab{
+    position:fixed;z-index:250;width:56px;height:56px;border-radius:999px;
+    border:2px solid #ffd7cf;background:#d92c1e;color:#fff;font-size:24px;
+    display:grid;place-items:center;cursor:grab;box-shadow:0 8px 22px rgba(217,44,30,.5);
+    user-select:none;-webkit-user-select:none;touch-action:none;
+  }
+  #alertaFab.dragging{cursor:grabbing}
 
   /* Modal */
   .overlay{position:fixed;inset:0;background:rgba(40,22,15,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease}
@@ -263,6 +274,12 @@
   .debt-row .val{font-weight:800;white-space:nowrap}
   .badge-pend{background:#FBEAE0;color:var(--red);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px}
   .hval.pend{color:var(--amber)}
+
+  /* Editar pedido (a receber) */
+  .edit-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .edit-row select{flex:1 1 150px;min-width:130px;width:auto}
+  .edit-row input[type="text"]{flex:1 1 90px;min-width:80px;width:auto}
+  .edit-row input[type="number"]{flex:0 0 64px;width:64px}
 
   @media (max-width:460px){
     .tipo-grid{grid-template-columns:1fr}
@@ -582,7 +599,10 @@
     <div class="sub" id="alertaSub"></div>
   </div>
   <span class="cta">VER</span>
+  <button id="alertaClose" class="close" type="button" aria-label="Fechar alerta">✕</button>
 </div>
+
+<button id="alertaFab" class="hidden" type="button" aria-label="Abrir alerta de cobranças">🔔</button>
 
 <div id="modal" class="overlay hidden" hidden></div>
 
@@ -1302,15 +1322,28 @@
     });
   }
 
+  let alertaDismissed = false;
   function renderAlerta(){
     const al = $("alerta");
+    const fab = $("alertaFab");
     const h = hojeStr();
     const grupos = dividasPorNome().filter(g=>g.vencimento && g.vencimento<=h);
-    if(!grupos.length){ al.classList.add("hidden"); return; }
+    if(!grupos.length){ alertaDismissed = false; al.classList.add("hidden"); fab.classList.add("hidden"); return; }
     const total = grupos.reduce((s,x)=>s+x.saldo,0);
     $("alertaTitulo").textContent = grupos.length===1 ? `${grupos[0].nome} está te devendo!` : `Você tem ${grupos.length} cobranças vencidas!`;
     $("alertaSub").textContent = `Total: ${din(total)} · clique para ver quem deve`;
-    al.classList.remove("hidden");
+    if(alertaDismissed){ al.classList.add("hidden"); fab.classList.remove("hidden"); }
+    else { al.classList.remove("hidden"); fab.classList.add("hidden"); }
+  }
+  function closeAlerta(){
+    alertaDismissed = true;
+    $("alerta").classList.add("hidden");
+    $("alertaFab").classList.remove("hidden");
+  }
+  function openAlerta(){
+    alertaDismissed = false;
+    $("alertaFab").classList.add("hidden");
+    $("alerta").classList.remove("hidden");
   }
 
   function openModal(){
@@ -1378,6 +1411,7 @@
       } else {
         status = '💵 pago';
       }
+      const editavel = s.pago === false && saldoDe(s) > 0;
       return `<div class="debt-row">
         <div class="ava">🛍️</div>
         <div class="info">
@@ -1385,6 +1419,7 @@
           <div class="dl">${escapeHtml(descreverVendaComEmoji(s))}</div>
           <div class="dl">${status} · total ${din(s.total)}</div>
         </div>
+        ${editavel ? `<button class="btn btn-ghost btn-sm" data-edit="${s.id}">✏️ Editar</button>` : ""}
       </div>`;
     }).join("");
     const m = $("modal");
@@ -1399,6 +1434,155 @@
     m.classList.remove("hidden");
     m.removeAttribute("hidden");
     $("modalClose").addEventListener("click", closeModal);
+    m.querySelectorAll("[data-edit]").forEach(b=> b.addEventListener("click", ()=> editarPedido(b.dataset.edit)));
+  }
+
+  function editarPedido(id){
+    const s = state.sales.find(x=>x.id===id);
+    if(!s) return;
+    if(s.pago !== false || saldoDe(s) <= 0){ alert("Este pedido já está quitado."); return; }
+    const m = $("modal");
+    m.innerHTML = `<div class="sheet">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h2 style="font-size:1.2rem;margin:0">✏️ Editar pedido</h2>
+        <button class="btn btn-ghost btn-sm" id="editClose">✕ Fechar</button>
+      </div>
+      <p style="color:var(--muted);font-size:.82rem;margin-bottom:14px">${escapeHtml(nomeCliente(s))} · fiado · total atual ${din(s.total)}${(s.recebido||0)>0?' · já pagou '+din(s.recebido||0):''}</p>
+      <div id="editItemList"></div>
+      <button class="btn btn-dark btn-sm" id="editAddItem" type="button" style="width:100%;margin-top:8px">➕ Adicionar produto</button>
+      <div style="margin-top:16px">
+        <label class="fld">Forma de pagamento</label>
+        <div class="forma-grid" id="editFormaGrid"></div>
+      </div>
+      <div class="field hidden" id="editCampoVenc" style="margin-top:14px">
+        <label class="fld" for="editVenc">Data do pagamento</label>
+        <input type="date" id="editVenc">
+      </div>
+      <hr class="divider">
+      <button class="btn btn-primary" id="editSave" type="button" style="width:100%">💾 Salvar alterações</button>
+    </div>`;
+    m.classList.remove("hidden");
+    m.removeAttribute("hidden");
+    $("editClose").addEventListener("click", closeModal);
+
+    const rows = (s.items || []).map(i=>({ tipo:i.tipo, sabor:i.sabor||"", qty:i.qty||1 }));
+    function opcoesTipo(sel){
+      return Object.entries(PRODUTOS).map(([k,p])=>`<option value="${k}" ${k===sel?"selected":""}>${p.emoji} ${p.nome} · ${din(p.preco)}</option>`).join("");
+    }
+    function renderRows(){
+      const list = $("editItemList");
+      list.innerHTML = "";
+      rows.forEach((r, idx)=>{
+        const div = document.createElement("div");
+        div.className = "edit-row";
+        div.innerHTML =
+          `<select data-k="tipo" data-idx="${idx}">${opcoesTipo(r.tipo)}</select>
+           <input type="text" data-k="sabor" data-idx="${idx}" value="${escapeHtml(r.sabor)}" placeholder="Sabor" autocomplete="off">
+           <input type="number" data-k="qty" data-idx="${idx}" value="${r.qty}" min="1" step="1">
+           <button type="button" class="btn btn-ghost btn-sm" data-rm="${idx}" title="Remover">🗑️</button>`;
+        list.appendChild(div);
+      });
+      list.querySelectorAll("[data-k]").forEach(el=>{
+        el.addEventListener("input", ()=>{
+          const idx = parseInt(el.dataset.idx,10);
+          const k = el.dataset.k;
+          if(k==="qty") rows[idx].qty = Math.max(1, parseInt(el.value,10)||1);
+          else rows[idx][k] = el.value;
+        });
+      });
+      list.querySelectorAll("[data-rm]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          rows.splice(parseInt(b.dataset.rm,10), 1);
+          renderRows();
+        });
+      });
+    }
+    renderRows();
+    $("editAddItem").addEventListener("click", ()=>{ rows.push({ tipo:Object.keys(PRODUTOS)[0], sabor:"", qty:1 }); renderRows(); });
+
+    // Forma de pagamento
+    const formaGrid = $("editFormaGrid");
+    Object.entries(PAGAMENTOS).forEach(([key,p])=>{
+      const label = document.createElement("label");
+      label.className = "forma-opt";
+      label.innerHTML =
+        `<input type="radio" name="editForma" value="${key}" ${key===(s.forma||"depois")?"checked":""}>
+         <div class="forma-card"><span class="em">${p.emoji}</span>${p.nome}</div>`;
+      formaGrid.appendChild(label);
+      label.querySelector("input").addEventListener("change", toggleEditVenc);
+    });
+    $("editVenc").value = s.vencimento || "";
+    function editFormaSelecionada(){
+      const el = formaGrid.querySelector('input[name="editForma"]:checked');
+      return el ? el.value : "depois";
+    }
+    function toggleEditVenc(){
+      const f = editFormaSelecionada();
+      $("editCampoVenc").classList.toggle("hidden", !(PAGAMENTOS[f] && PAGAMENTOS[f].depois));
+    }
+    toggleEditVenc();
+
+    $("editSave").addEventListener("click", ()=>{
+      const novos = rows.map(r=>({ tipo:r.tipo, sabor:String(r.sabor||"").trim(), qty:Math.max(1, r.qty|0) }));
+      if(!novos.length){ alert("Adicione pelo menos um produto."); return; }
+      for(const n of novos){ if(!n.sabor){ alert("Preencha o sabor de todos os produtos."); return; } }
+      const formaNova = editFormaSelecionada();
+      const vencNova = $("editVenc").value;
+      if(PAGAMENTOS[formaNova] && PAGAMENTOS[formaNova].depois && !vencNova){
+        alert("Informe a data em que o cliente vai pagar.");
+        return;
+      }
+      const novosItems = novos.map(n=>{
+        const p = PRODUTOS[n.tipo] || {};
+        let preco = p.preco || 0;
+        const ex = state.stock.find(x=>x.tipo===n.tipo && x.sabor===n.sabor);
+        if(ex && ex.preco) preco = ex.preco;
+        return { tipo:n.tipo, sabor:n.sabor, preco, qty:n.qty, total: preco*n.qty };
+      });
+      const chave = (t,b)=>(t||"")+"|"+(b||"");
+      const velho = new Map();
+      (s.items||[]).forEach(i=>{ const k=chave(i.tipo,i.sabor); velho.set(k,(velho.get(k)||0)+(i.qty||0)); });
+      const novo = new Map();
+      novosItems.forEach(i=>{ const k=chave(i.tipo,i.sabor); novo.set(k,(novo.get(k)||0)+(i.qty||0)); });
+      const chaves = new Set([...velho.keys(), ...novo.keys()]);
+      for(const k of chaves){
+        const diff = (novo.get(k)||0) - (velho.get(k)||0);
+        if(diff > 0){
+          const [t,b] = k.split("|");
+          const it = state.stock.find(x=>x.tipo===t && x.sabor===b);
+          const disp = it ? it.quantidade : 0;
+          if(disp < diff){ alert(`Estoque insuficiente de ${(PRODUTOS[t]||{}).nome||t} (${b}). Faltam ${diff-disp} unidade(s).`); return; }
+        }
+      }
+      for(const k of chaves){
+        const diff = (novo.get(k)||0) - (velho.get(k)||0);
+        if(diff === 0) continue;
+        const [t,b] = k.split("|");
+        let it = state.stock.find(x=>x.tipo===t && x.sabor===b);
+        if(diff < 0){
+          if(it) it.quantidade += (-diff);
+          else state.stock.push({ id: uid(), tipo:t, sabor:b, preco:(PRODUTOS[t]||{}).preco||0, quantidade: -diff });
+        } else {
+          it.quantidade -= diff;
+        }
+      }
+      s.items = novosItems;
+      s.qtde = novosItems.reduce((a,i)=>a+i.qty,0);
+      s.total = novosItems.reduce((a,i)=>a+i.total,0);
+      s.forma = formaNova;
+      if(PAGAMENTOS[formaNova] && PAGAMENTOS[formaNova].depois){
+        s.vencimento = vencNova;
+        if((s.recebido||0) > s.total) s.recebido = s.total;
+        if(saldoDe(s) <= 0) s.pago = true;
+      } else {
+        s.vencimento = "";
+        s.pago = true;
+        s.recebido = s.total;
+      }
+      saveState();
+      closeModal();
+      renderAll();
+    });
   }
 
   function pegaSelecionado(){
@@ -1532,6 +1716,36 @@
     $("formaGrid").addEventListener("change", toggleVenc);
     $("alerta").addEventListener("click", openModal);
     $("alerta").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openModal(); } });
+    $("alertaClose").addEventListener("click", e=>{ e.stopPropagation(); closeAlerta(); });
+    const fab = $("alertaFab");
+    fab.style.left = (window.innerWidth - 72) + "px";
+    fab.style.top = (window.innerHeight - 88) + "px";
+    let fabDrag = false, fabMoved = false, fabX = 0, fabY = 0, fabSx = 0, fabSy = 0;
+    fab.addEventListener("pointerdown", e=>{
+      fabDrag = true; fabMoved = false;
+      fabSx = e.clientX; fabSy = e.clientY;
+      fab.setPointerCapture(e.pointerId);
+      const r = fab.getBoundingClientRect();
+      fabX = e.clientX - r.left; fabY = e.clientY - r.top;
+      fab.classList.add("dragging");
+    });
+    fab.addEventListener("pointermove", e=>{
+      if(!fabDrag) return;
+      if(Math.abs(e.clientX - fabSx) > 5 || Math.abs(e.clientY - fabSy) > 5) fabMoved = true;
+      const S = 56;
+      let x = e.clientX - fabX, y = e.clientY - fabY;
+      x = Math.max(8, Math.min(window.innerWidth - S - 8, x));
+      y = Math.max(8, Math.min(window.innerHeight - S - 8, y));
+      fab.style.left = x + "px";
+      fab.style.top = y + "px";
+    });
+    fab.addEventListener("pointerup", e=>{
+      if(!fabDrag) return;
+      fabDrag = false;
+      fab.classList.remove("dragging");
+      if(!fabMoved) openAlerta();
+    });
+    fab.addEventListener("pointercancel", ()=>{ fabDrag = false; fab.classList.remove("dragging"); });
     $("modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeModal(); });
     $("btnEnviarVendas").addEventListener("click", enviarVendasDoDia);
     $("fHojeNome").addEventListener("input", renderRelatorio);
