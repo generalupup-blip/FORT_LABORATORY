@@ -565,6 +565,9 @@
     </div>
     <div class="card">
       <div class="section-title"><span class="dot"></span>Quem está me devendo</div>
+      <div class="filtros">
+        <input type="text" id="fReceberNome" placeholder="Buscar por nome..." style="flex:1;min-width:140px" aria-label="Buscar por nome">
+      </div>
       <div id="receberList"></div>
     </div>
   </section>
@@ -576,6 +579,9 @@
       <div class="big-caixa" style="margin-bottom:14px">
         <span class="l">Total em produtos a retirar</span>
         <span class="v" id="retiradaTotal">R$ 0,00</span>
+      </div>
+      <div class="filtros">
+        <input type="text" id="fRetiradaNome" placeholder="Buscar por nome..." style="flex:1;min-width:140px" aria-label="Buscar por nome">
       </div>
       <div id="retiradaList"></div>
     </div>
@@ -1223,9 +1229,11 @@
     $("recTotal").textContent = din(totalAReceber());
     $("recVencidas").textContent = dividasPorNome().filter(g=>g.vencimento && g.vencimento<=hojeStr()).length;
     const list = $("receberList");
-    const grupos = dividasPorNome();
+    const fNome = normalizar($("fReceberNome").value || "");
+    let grupos = dividasPorNome();
+    if(fNome) grupos = grupos.filter(g => normalizar(g.nome).includes(fNome));
     if(!grupos.length){
-      list.innerHTML = '<div class="empty"><span class="big">😊</span>Ninguém está te devendo.<br>Tudo em dia!</div>';
+      list.innerHTML = '<div class="empty"><span class="big">😊</span>' + (fNome ? 'Nenhum cliente encontrado com esse nome.' : 'Ninguém está te devendo.<br>Tudo em dia!') + '</div>';
       return;
     }
     const h = hojeStr();
@@ -1598,15 +1606,17 @@
 
   function renderRetirada(){
     const list = $("retiradaList");
+    const fNome = normalizar($("fRetiradaNome").value || "");
     const pendentes = state.sales.filter(s => s.pegou === false).sort((a,b)=>(b.ts||0)-(a.ts||0));
     const total = pendentes.reduce((s,x)=>s+(x.total||0),0);
     $("retiradaTotal").textContent = din(total);
-    if(!pendentes.length){
-      list.innerHTML = '<div class="empty"><span class="big">📦</span>Nenhum produto aguardando retirada.<br>Quando alguém pagar e não levar, marque "NÃO PEGOU" na venda.</div>';
+    const visiveis = fNome ? pendentes.filter(s => normalizar(nomeCliente(s)).includes(fNome)) : pendentes;
+    if(!visiveis.length){
+      list.innerHTML = '<div class="empty"><span class="big">📦</span>' + (fNome ? 'Nenhuma retirada encontrada com esse nome.' : 'Nenhum produto aguardando retirada.<br>Quando alguém pagar e não levar, marque "NÃO PEGOU" na venda.') + '</div>';
       return;
     }
     list.innerHTML = "";
-    pendentes.forEach(s=>{
+    visiveis.forEach(s=>{
       const d = new Date(s.ts);
       const quem = nomeCliente(s);
       let status;
@@ -1711,6 +1721,8 @@
     document.getElementById("tipoGrid").addEventListener("change", updatePrecoShow);
     $("fTipo").addEventListener("change", renderStock);
     $("fBusca").addEventListener("input", renderStock);
+    $("fReceberNome").addEventListener("input", renderReceber);
+    $("fRetiradaNome").addEventListener("input", renderRetirada);
     $("btnFinalizar").addEventListener("click", finalizarVenda);
     $("btnRetirar").addEventListener("click", retirarCaixa);
     $("formaGrid").addEventListener("change", toggleVenc);
